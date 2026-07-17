@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GHACEM — Permits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12181B; --surface:#1B2226; --surface-2:#222A2F; --border:#313B40;
+    --text:#F2F0EB; --text-dim:#93A0A6;
+    --accent:#E8730A; --accent-dim:rgba(232,115,10,.16);
+    --danger:#C23B3B; --danger-dim:rgba(194,59,59,.16);
+    --good:#4F9D69; --good-dim:rgba(79,157,105,.16);
+    --caution:#E8B93A; --caution-dim:rgba(232,185,58,.16);
+    --font-d:'Oswald',sans-serif; --font-b:'Inter',sans-serif; --font-m:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-b);}
+  header.topbar{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;}
+  .mark{width:34px;height:34px;object-fit:contain;flex:none;}
+  h1{font-family:var(--font-d);font-size:16px;letter-spacing:.06em;margin:0;text-transform:uppercase;}
+  header span{display:block;font-size:10.5px;color:var(--text-dim);font-family:var(--font-m);letter-spacing:.05em;}
+  main{max-width:680px;margin:0 auto;padding:18px 16px 60px;}
+  .note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--text-dim);margin-bottom:16px;}
+  .subtabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;position:sticky;top:60px;background:var(--bg);padding:6px 0;z-index:4;}
+  .subtabbtn{background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);font-family:var(--font-b);font-weight:600;font-size:12px;padding:9px 14px;border-radius:20px;cursor:pointer;}
+  .subtabbtn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+  .subpane{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px 20px;}
+  .subpane.hidden{display:none;}
+  .permitcode{font-family:var(--font-m);font-size:11px;color:var(--text-dim);letter-spacing:.03em;}
+  .permittitle{font-family:var(--font-d);font-size:18px;text-transform:uppercase;margin:4px 0 4px;}
+  .permitdesc{font-size:12.5px;color:var(--text-dim);line-height:1.5;margin:0 0 4px;}
+  .statuspill{float:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 9px;border-radius:20px;}
+  .statuspill.draft{background:var(--surface-2);color:var(--text-dim);border:1px solid var(--border);}
+  .statuspill.signed{background:var(--good-dim);color:var(--good);}
+
+  .pc-section{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
+  .pc-section:first-of-type{margin-top:14px;}
+  .pc-section h5{font-family:var(--font-d);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;color:var(--accent);margin:0 0 8px;}
+  label.f{display:block;font-size:11.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;font-weight:600;margin:12px 0 6px;}
+  label.f:first-child{margin-top:0;}
+  textarea,select,input[type=text]{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 11px;color:var(--text);font-family:var(--font-b);font-size:13.5px;}
+  textarea{min-height:60px;resize:vertical;}
+  .chiprow{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{border:1px solid var(--border);background:var(--surface-2);color:var(--text-dim);padding:7px 12px;border-radius:20px;font-size:12px;cursor:pointer;font-weight:500;}
+  .chip.sel{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+  .ynrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border);flex-wrap:wrap;}
+  .ynrow:last-child{border-bottom:none;}
+  .ynlabel{font-size:12.5px;flex:1;min-width:140px;}
+  .ynopts{display:flex;gap:6px;}
+  .ynopt{font-size:11px;color:var(--text-dim);border:1px solid var(--border);border-radius:6px;padding:5px 9px;cursor:pointer;display:flex;align-items:center;gap:4px;background:var(--surface-2);}
+  .ynopt.sel{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+  .ynopt input{margin:0;}
+  .sigrow{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:11px 12px;margin-top:8px;font-size:12.5px;}
+  .sigrow.signed{border-color:var(--good);}
+  .sigmeta{color:var(--good);font-size:11px;margin-top:2px;font-family:var(--font-m);}
+  .btn{border:none;border-radius:8px;padding:9px 14px;font-family:var(--font-b);font-weight:600;font-size:12.5px;cursor:pointer;}
+  .btn-primary{background:var(--accent);color:#14181B;}
+  .btn-ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--border);}
+  .testtable{width:100%;border-collapse:collapse;margin-top:6px;}
+  .testtable th,.testtable td{border:1px solid var(--border);padding:6px 7px;font-size:11.5px;}
+  .testtable th{background:var(--surface-2);color:var(--text-dim);font-weight:600;text-align:left;}
+  .testtable input{width:100%;background:transparent;border:none;color:var(--text);font-family:var(--font-m);font-size:11.5px;padding:2px;}
+  .testtable input:focus{outline:1px solid var(--accent);}
+  .crewrow{display:flex;gap:8px;align-items:center;margin-bottom:7px;}
+  .crewrow input[type=text]{flex:1;}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--good);color:#0d1a12;padding:10px 18px;border-radius:8px;font-weight:600;font-size:13px;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,.4);}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <img class="mark" src="data:image/png;base64,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vLw8VqxYwfjx46mrq8M0TaItL4tJSsA555zD2LFjqaurY8OGDSkJSL7npKqqiurqapRSWJZFOBxOOZe3thDD4fBnvjvrqABJivSYMWO45557OPHEEzn77LO544476NOnD8FgkBtvvJGBAwcyffp0DMNg+fLljBo1ihEjRvDwww9/agWblpZGMBjkvvvuo76+noKCAmKxGFdeeSVlZWUMGzaMZcuWsXjxYsLhMLfccgtr1qyhoqKCYDDIsmXLGDFiBGVlZdx3330YhsHFF1/Meeedx6BBg5g0aVKKCUgmwzAoLCzk7rvv5oYbbiAUCqG15qKLLmLu3LnU1dUxevRoGhsbqauro6amhoyMDPx+P5ZlUVdXx6RJkygrK6O+vp7s7Gxs22bKlCmceuqpTJ48GcdxeOSRRzjrrLMYM2YMa9as+Xwm+PMco5Osq+M4qZOeHccRx3HEtm0ZOnSozJgxQ2zblh07dkhaWpr85je/kYcfflgsy5La2lo54YQT5Morr5RnnnlGDMOQnTt3tnEnnTZtmowfP16GDRsml112mfTs2VO2bNkif/7zn+WNN96QESNGyKRJk6SiokL8fr8sX75cFi9eLIBUV1dL9+7d5ec//7m88MILAsjWrVtl9OjRcvLJJ8v//u//ilJKPvzwwzYs8dy5c0UpJSeeeKIAct1114mISLdu3eR3v/ud7NixQwCpr6+XMWPGyPTp02X9+vViGIY0NTXJf//3f0tpaam8+uqrkpWVJQsXLpQHH3xQMjMzZe3atdKxY0d56KGH5P777xfTNOX555+XSCTyuS6q+vOkISkRSasnKaqQOHA4qS5af540aRIjR44kLy+PqqoqGhsbWbFiBffccw95eXns3r27zcQdj8cpKChgypQpzJ8/PyX6oVCIW2+9lV27dpGXl0dOTg5aa4qKikhPT6egoIDt27ezc+dOJkyYwIQJE/D5fGzcuJHMzEy++93v8qMf/YhgMPgpC8p1XdLT05k7dy733nsv999/P2vXrqWkpAStNYZhkJaWhoiQmZmZ+myaJuFwmBUrVjBhwgROP/10cnNzicfjfPjhh/h8Pq677josy0pxbL169eKcc84hEAh87mSvP8vuXrp0Ka+99hqxWIx58+axd+9eNm7cyDPPPHNISyT5vbGxkXA4TDQaTXl7jBs3jgULFvDKK6/Qr1+/NqtarTX19fVcdNFFOI5DLBbjvffe45prrmH27NmceuqpqTexxWIxLMvCsiwikQgdOnTAsiwqKyvZs2cP8Xic4uJi4vE4zc3NNDQ0pCbqQ7VxwIAB9OnThwMHDrBjx47UvbFYjGg0mppHki8qs22b7OxscnNzKS8vJxqNEg6HsSyLTp06YZomjzzyCK+++iqXXHIJTU1N2LZ9xOf+6s/iq6677jquvvpqdu3axZQpU1i+fDlPPvkkkyZNIhQKtZlTko1sLSkA2dnZ3HLLLSxYsIBp06Zx8803f6pyyc7Nzs7mggsuoLm5mdLSUnr27Mm1117LBx98QHl5ObFYjF69ejF58mRWrlxJeno6hYWF3Hrrrdx2222cfvrpnH/++QwePDjVSUnpPVhvW5ZFPB5n4MCBTJo0idNOO43TTjuNsrIy5syZw7Rp08jNzWX//v0pDq2kpASfz8fdd9/Nr3/9a9asWUNZWRmxWIy6ujqmT59OXl4eF154IT/96U/ZtGkTaWlpn2Kiv/A6JBU1u20bruvSq1cv3n//fU444QTC4TB79uxJMaUVFRUEAgGKioqwbZuKigpKSkoAqKqqokuXLvj9fjZt2sSWLVsYOnQohYWFKTJORNizZw+2bdO5c2eam5vZs2cPffv2pbKyktWrVzNo0CCi0Sj9+vVj3759bNiwgV69euG6LsXFxfj9ftavX09DQwMjR45ERKisrCQ9PZ3c3FwqKiooLS1NqZ0kfb53715c1yUQCNClS5eU2fvOO++QlZVFfn4+HTp0oLa2FqUUxcXFbNq0iaamJsrKyti6dSs1NTUpoIqKilLquaCggMGDB1NfX09jYyPdunU7Ivb3qBeGX2Txc7RE29Eu6L4sLqz174cq89+xkv9MQFovjpIVaH3tUFRG64oe/Dn5v0N5gLSmYFqX2bqRrctvTXm0VrMHM8VJE/tQnXcwo9u6/IOvHexocSi2N3lvazr+4P76j2J7vwmp/fXd7YC0p3ZA2gFpT+2AtAPSntoBaQekPbUD0g5Ie2oHpD0dNv1/hBjbDnVu6W4AAAAASUVORK5CYII=" alt="GHACEM logo">
+  <div><h1>GHACEM — Permits</h1><span>PERMIT FORMS</span></div>
+</header>
+
+<main>
+  <div class="note">This screen is just the permit forms. Fill in what's needed for the job, then sign each section.</div>
+
+  <div class="subtabs">
+    <button class="subtabbtn active" data-sub="general">General Work Permit</button>
+    <button class="subtabbtn" data-sub="hotwork">Hot Work / Confined / Silo</button>
+    <button class="subtabbtn" data-sub="height">Working at Height</button>
+  </div>
+
+  <div class="subpane" id="sub-general">
+    <span class="statuspill" id="pill-general"></span>
+    <div class="permitcode">GHA.OCPF 04A</div>
+    <div class="permittitle">General Work Permit / Authorization</div>
+    <div id="form-general"></div>
+  </div>
+  <div class="subpane hidden" id="sub-hotwork">
+    <span class="statuspill" id="pill-hotwork"></span>
+    <div class="permitcode">GHA.OCPF 04B</div>
+    <div class="permittitle">Hot Work / Confined Space / Silo Entry</div>
+    <div id="form-hotwork"></div>
+  </div>
+  <div class="subpane hidden" id="sub-height">
+    <span class="statuspill" id="pill-height"></span>
+    <div class="permitcode">GHA.OCPF 04C</div>
+    <div class="permittitle">Working at Height Safety Form</div>
+    <div id="form-height"></div>
+  </div>
+</main>
+
+<div id="toastHost"></div>
+
+<script>
+(function(){
+  const hasClaudeStorage = typeof window.storage !== 'undefined';
+  let hasLocalStorage = false;
+  try{ localStorage.setItem('__pt__','1'); localStorage.removeItem('__pt__'); hasLocalStorage = true; }catch(e){}
+
+  const DEFAULTS = {
+    general:{
+      deptLocation:'', description:'', dateIssue:'', timeIssue:'', contractor:'',
+      envHazards:[], safetyHazards:[],
+      ppeHead:'', ppeEar:'', ppeEyeFace:'', ppeRespiratory:'', ppeHand:'', ppeBody:'', ppeFeet:'', ppeOthers:'',
+      precEnv:[], precSafety:[],
+      crewLeaderSig:null, authSig:null,
+      crewLog:[{date:'',persons:'',sigLeader:'',sigMgr:'',timeStart:'',timeStop:''}],
+      completionSig:null
+    },
+    hotwork:{
+      no:'', dateActivity:'', location:'', equipmentId:'', department:'', workOrderNumber:'', deptContractor:'',
+      typeOfWork:[], purpose:'',
+      workAtHeight:null, heightFormRef:'',
+      isolation:{electrical:null,mechanical:null,fireDetection:null,pipeline:null,contactMaintenance:null}, isolationOther:'', isolationCheckedBy:'',
+      testData:{ oxygen:{reading:'',date:'',time:''}, lel:{reading:'',date:'',time:''}, co:{reading:'',date:'',time:''}, temp:{reading:'',date:'',time:''} },
+      confinedSpaceTestedBy:'',
+      combustibleCleared:null,
+      sparksContact:null, sparksControls:[], sparksOther:'', firewatchBy:'',
+      fumesProduced:null, ventilationOther:[], ventilationOtherList:'',
+      commsEquip:null, commsDescribe:'',
+      ppe:[], ppeOther:'',
+      entrants:'', attendants:'',
+      entrantUnderstands:null, attendantUnderstands:null,
+      emergencyOther:'', emergencyEquip:'',
+      safeCommenceMgr:null, safeCommenceCrew:null,
+      signOffMgr:null, signOffCrew:null
+    },
+    height:{
+      formNo:'', location:'', equipmentId:'', department:'', workOrderNo:'', dateOfWork:'', description:'', contractor:'',
+      isoMechanical:null, isoElectrical:null, isoDepressurized:null, isoFlushed:null, isoEarthed:null, isolationCheckedBy:'',
+      scaffolding:null, safeAccess:null, ladderTied:null, otherAccessMeans:'',
+      platformsSafe:null, railingsToeBoards:null, ppeAppropriate:null,
+      dropZoneCordoned:null, dropZoneCleared:null, dropZoneSigns:null,
+      lighted:null, commsAssured:null,
+      emergencyOther:'', emergencyEquip:'',
+      specialInstructions:'',
+      crew:[{name:'',trained:null}],
+      explainNo:'',
+      authCrew:null, authMgr:null,
+      closureCrew:null, closureMgr:null
+    }
+  };
+
+  let permitData = null;
+
+  async function loadState(){
+    if(hasClaudeStorage){
+      try{ const r = await window.storage.get('standalone_permits', true); permitData = JSON.parse(r.value); }
+      catch(e){ permitData = JSON.parse(JSON.stringify(DEFAULTS)); }
+    } else if(hasLocalStorage){
+      try{ const v = JSON.parse(localStorage.getItem('standalone_permits')); if(!v) throw 0; permitData = v; }
+      catch(e){ permitData = JSON.parse(JSON.stringify(DEFAULTS)); }
+    } else {
+      permitData = JSON.parse(JSON.stringify(DEFAULTS));
+    }
+  }
+  function saveState(){
+    if(hasClaudeStorage){ try{ window.storage.set('standalone_permits', JSON.stringify(permitData), true); }catch(e){} }
+    else if(hasLocalStorage){ try{ localStorage.setItem('standalone_permits', JSON.stringify(permitData)); }catch(e){} }
+  }
+
+  function toast(msg){
+    const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+    document.getElementById('toastHost').appendChild(t);
+    setTimeout(()=>t.remove(),2200);
+  }
+
+  function getPath(obj, path){ return path.split('.').reduce((o,k)=> (o && o[k]!==undefined) ? o[k] : undefined, obj); }
+  function setPath(obj, path, val){
+    const parts = path.split('.'); let o = obj;
+    for(let i=0;i<parts.length-1;i++){ if(!o[parts[i]]) o[parts[i]] = {}; o = o[parts[i]]; }
+    o[parts[parts.length-1]] = val;
+  }
+  function pd(formKey){ return permitData[formKey]; }
+
+  function ynField(formKey, path, label, withNA){
+    const opts = withNA ? ['Yes','No','N/A'] : ['Yes','No'];
+    const val = getPath(pd(formKey), path);
+    return `<div class="ynrow">
+      <span class="ynlabel">${label}</span>
+      <div class="ynopts">
+        ${opts.map(o=>`<label class="ynopt ${val===o?'sel':''}"><input type="radio" data-yn="${formKey}|${path}" value="${o}" ${val===o?'checked':''}> ${o}</label>`).join('')}
+      </div>
+    </div>`;
+  }
+  function chipsField(formKey, path, label, options){
+    const sel = getPath(pd(formKey), path) || [];
+    return `<div class="fchips">
+      <label class="f">${label}</label>
+      <div class="chiprow">
+        ${options.map(o=>`<div class="chip ${sel.includes(o)?'sel':''}" data-chip="${formKey}|${path}" data-val="${o.replace(/"/g,'&quot;')}">${o}</div>`).join('')}
+      </div>
+    </div>`;
+  }
+  function textField(formKey, path, label, isArea){
+    const val = getPath(pd(formKey), path) || '';
+    if(isArea) return `<label class="f">${label}</label><textarea data-text="${formKey}|${path}">${val}</textarea>`;
+    return `<label class="f">${label}</label><input type="text" data-text="${formKey}|${path}" value="${String(val).replace(/"/g,'&quot;')}">`;
+  }
+  function sigField(formKey, path, label){
+    const sig = getPath(pd(formKey), path);
+    if(sig && sig.name){
+      return `<div class="sigrow signed">
+        <div style="flex:1;"><strong>${label}</strong><div class="sigmeta">Signed by ${sig.name} · ${new Date(sig.at).toLocaleString()}</div></div>
+        <button class="btn btn-ghost" data-unsign="${formKey}|${path}">Clear</button>
+      </div>`;
+    }
+    return `<div class="sigrow">
+      <div style="flex:1;">
+        <strong>${label}</strong>
+        <input type="text" placeholder="Type full name to sign" data-signame="${formKey}|${path}" style="margin-top:6px;">
+      </div>
+      <button class="btn btn-primary" data-sign="${formKey}|${path}">Sign</button>
+    </div>`;
+  }
+  function formIsSigned(formKey){
+    const w = pd(formKey);
+    if(formKey==='general') return !!(w.crewLeaderSig && w.authSig);
+    if(formKey==='hotwork') return !!(w.safeCommenceMgr && w.safeCommenceCrew);
+    if(formKey==='height') return !!(w.authCrew && w.authMgr);
+    return false;
+  }
+
+  function crewLogRow(i){
+    const r = pd('general').crewLog[i];
+    return `<tr>
+      <td><input type="text" data-text="general|crewLog.${i}.date" value="${(r.date||'').replace(/"/g,'&quot;')}" placeholder="date"></td>
+      <td><input type="text" data-text="general|crewLog.${i}.persons" value="${(r.persons||'').replace(/"/g,'&quot;')}"></td>
+      <td><input type="text" data-text="general|crewLog.${i}.sigLeader" value="${(r.sigLeader||'').replace(/"/g,'&quot;')}"></td>
+      <td><input type="text" data-text="general|crewLog.${i}.sigMgr" value="${(r.sigMgr||'').replace(/"/g,'&quot;')}"></td>
+      <td><input type="text" data-text="general|crewLog.${i}.timeStart" value="${(r.timeStart||'').replace(/"/g,'&quot;')}"></td>
+      <td><input type="text" data-text="general|crewLog.${i}.timeStop" value="${(r.timeStop||'').replace(/"/g,'&quot;')}"></td>
+    </tr>`;
+  }
+
+  function renderGeneralForm(){
+    const g = pd('general');
+    return `
+      <p style="font-size:11px;color:var(--text-dim);margin:0 0 4px;">The permit is valid for only the work described below. This must be filled-in before work is started and notify EHS Dept.</p>
+      <div class="pc-section" style="border-top:none;margin-top:12px;">
+        ${textField('general','deptLocation','Department/Location of the Work (Activity)')}
+        ${textField('general','description','Description of the Work (Activity) being undertaken', true)}
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;">${textField('general','dateIssue','Date of Issue of GWP')}</div>
+          <div style="flex:1;">${textField('general','timeIssue','Time of Issue')}</div>
+        </div>
+        <p style="font-size:11.5px;color:var(--caution);margin:8px 0 0;">Duration of GWP: valid for one day, subject to daily renewal.</p>
+        ${textField('general','contractor','Contractor/Department Undertaking the Work (Activity)')}
+        <label class="f">Authorization (Dept. Manager/SH/SUP.)</label>
+        ${sigField('general','authSig','Name / Signature / Date / Time')}
+      </div>
+      <div class="pc-section">
+        <h5>Environment, Health, Safety (EHS) Issues</h5>
+        <p style="font-size:11px;color:var(--text-dim);margin:-4px 0 8px;">Tick the EHS hazards that may be present:</p>
+        ${chipsField('general','envHazards','Environment', ['Dust','Noise','Corrosive chemical','Inflammables','Fumes','Waste','Others'])}
+        ${chipsField('general','safetyHazards','Safety', ['Moving machinery','Hot material','Traffic','Buried services','Electricity','Others'])}
+        <label class="f">PPE Required (State)</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div>${textField('general','ppeHead','Head protection')}</div>
+          <div>${textField('general','ppeEar','Ear protection')}</div>
+          <div>${textField('general','ppeEyeFace','Eye/face protection')}</div>
+          <div>${textField('general','ppeRespiratory','Respiratory protection')}</div>
+          <div>${textField('general','ppeHand','Hand protection')}</div>
+          <div>${textField('general','ppeBody','Body protection')}</div>
+          <div>${textField('general','ppeFeet','Feet protection')}</div>
+          <div>${textField('general','ppeOthers','Others (specify)')}</div>
+        </div>
+      </div>
+      <div class="pc-section">
+        <h5>Precautions to be Taken (Tick as Appropriate)</h5>
+        ${chipsField('general','precEnv','Environmental Aspects', ['Clean spilled chemicals, oils, raw material, cement','Storage of materials/oils appropriately','Disposal of waste (segregate and dispose appropriately)','Handling of raw materials/oils, cement appropriately to prevent spillage','Others (specify)'])}
+        ${chipsField('general','precSafety','Safety', ['Required PPE supplied','Area cordoned off','Fire fighting equipment provided','Services (electricity, water, air) have been isolated and locked off','Possible leakage guarded','Warning signs has been displayed','Others (specify)'])}
+      </div>
+      <div class="pc-section">
+        <h5>Receipt (Crew Leader)</h5>
+        <p style="font-size:11.5px;color:var(--text-dim);">I have read this form and understand the work to be carried out and the precautions to be undertaken. I confirm that these and other safety regulations at site will be followed strictly.</p>
+        ${sigField('general','crewLeaderSig','Signature / Date / Time')}
+      </div>
+      <div class="pc-section">
+        <h5>Crew Log</h5>
+        <table class="testtable">
+          <tr><th>Date</th><th>No. of Persons Doing the Work</th><th>Signature of Leader</th><th>Signature of Dept. Mgr.</th><th>Time to Start Work</th><th>Time to Stop Work</th></tr>
+          ${g.crewLog.map((r,i)=>crewLogRow(i)).join('')}
+        </table>
+        <button class="btn btn-ghost" id="addCrewLogRow" type="button" style="margin-top:8px;">+ Add row</button>
+      </div>
+      <div class="pc-section">
+        <h5>Completion of Permit</h5>
+        <p style="font-size:11.5px;color:var(--text-dim);">I have personally examined the conditions of the Activity/Item/Plant and declare it fit for normal operation. This permit is cancelled.</p>
+        ${sigField('general','completionSig','Dept. Manager \u2014 Signed / Date / Time')}
+        <p style="font-size:10.5px;color:var(--text-dim);margin-top:10px;">NB: This permit will be renewed during the work within which it is issued provided conditions of the plant/Activity/Item remain the same.</p>
+        <p style="font-size:10.5px;color:var(--text-dim);font-weight:600;">Return original copy of the completed form to the Environment, Health and Safety Department.</p>
+      </div>`;
+  }
+
+  function testRow(label, pel, key){
+    const t = pd('hotwork').testData[key];
+    return `<tr>
+      <td>${label}</td><td>${pel}</td>
+      <td><input type="text" data-text="hotwork|testData.${key}.reading" value="${t.reading}"></td>
+      <td><input type="text" data-text="hotwork|testData.${key}.date" value="${t.date}" placeholder="date"></td>
+      <td><input type="text" data-text="hotwork|testData.${key}.time" value="${t.time}" placeholder="time"></td>
+    </tr>`;
+  }
+
+  function renderHotworkForm(){
+    const h = pd('hotwork');
+    return `
+      <p style="font-size:11px;color:var(--text-dim);margin:0 0 12px;">This GHA.OCPF 34 must be completed, and signed prior to all Hot Work/Confined Space Entry and EHS Dept. must be notified.</p>
+      <div class="pc-section" style="border-top:none;margin-top:0;">
+        <h5>1. Identification</h5>
+        ${textField('hotwork','no','No.')}
+        ${textField('hotwork','dateActivity','Date of Activity')}
+        <p style="font-size:11px;color:var(--text-dim);margin:0 0 8px;">Valid until: end of day</p>
+        ${textField('hotwork','location','Location')}
+        ${textField('hotwork','equipmentId','Equipment ID')}
+        ${textField('hotwork','workOrderNumber','Work Order Number')}
+      </div>
+      <div class="pc-section">
+        <h5>2. Dept./Contractor</h5>
+        ${textField('hotwork','deptContractor','Dept./Contractor')}
+      </div>
+      <div class="pc-section">
+        <h5>3. Type of Work</h5>
+        ${chipsField('hotwork','typeOfWork','', ['Hot Work','Confined Space Entry','Silo Entry'])}
+      </div>
+      <div class="pc-section">
+        <h5>4. Purpose of Entry/Hot Work</h5>
+        ${textField('hotwork','purpose','', true)}
+      </div>
+      <div class="pc-section">
+        <h5>5. Work at Height</h5>
+        ${ynField('hotwork','workAtHeight','Will the hot work be conducted at a height above 2 meters?', false)}
+        ${textField('hotwork','heightFormRef','If answer is yes, a GHA.OCPF 04C must also be completed')}
+      </div>
+      <div class="pc-section">
+        <h5>6. Isolation</h5>
+        ${ynField('hotwork','isolation.electrical','Electrical isolation', false)}
+        ${ynField('hotwork','isolation.mechanical','Mechanical isolation', false)}
+        ${ynField('hotwork','isolation.fireDetection','Fire detection system', false)}
+        ${ynField('hotwork','isolation.pipeline','Pipeline isolation', false)}
+        ${ynField('hotwork','isolation.contactMaintenance','Contact with maintenance is required', false)}
+        ${textField('hotwork','isolationOther','Other')}
+        <p style="font-size:11px;color:var(--text-dim);margin:8px 0 4px;">Required isolation is checked by:</p>
+        ${textField('hotwork','isolationCheckedBy','')}
+      </div>
+      <div class="pc-section">
+        <h5>7. Confined Space Entry Test Data</h5>
+        <p style="font-size:11px;color:var(--text-dim);">List tests made, entry is prohibited if reading is outside permissible entry level (PEL)</p>
+        <table class="testtable">
+          <tr><th>Substance Tested</th><th>PEL</th><th>Reading</th><th>Date</th><th>Time</th></tr>
+          ${testRow('% Oxygen','&gt;19.5 &lt;22.0','oxygen')}
+          ${testRow('% Lower Explosive Limit','10','lel')}
+          ${testRow('Carbon Monoxide','35ppm','co')}
+          ${testRow('Temperature','40\u00b0C','temp')}
+        </table>
+        <p style="font-size:11px;color:var(--text-dim);margin:8px 0 4px;">Confined space tested by:</p>
+        ${textField('hotwork','confinedSpaceTestedBy','')}
+      </div>
+      <div class="pc-section">
+        <h5>8. Combustible Materials</h5>
+        ${ynField('hotwork','combustibleCleared','All removable combustible materials have been cleared from the area?', false)}
+      </div>
+      <div class="pc-section">
+        <h5>9. Sparks/Heat</h5>
+        ${ynField('hotwork','sparksContact','Can sparks/heat come into contact with flammable liquids/gases/dust, plant equipments, property, or buildings?', false)}
+        <label class="f">Controls</label>
+        ${chipsField('hotwork','sparksControls','', ['Isolate services (5)','Covered penetrations','Barriers','Purging/ventilation (9)','Firewatch(es) (12)','Screens','Other'])}
+        ${textField('hotwork','sparksOther','Other (list)')}
+        <p style="font-size:11px;color:var(--text-dim);margin:8px 0 4px;">Firewatch conducted after atleast 30 minutes of hot work by:</p>
+        ${textField('hotwork','firewatchBy','')}
+      </div>
+      <div class="pc-section">
+        <h5>10. Fumes</h5>
+        ${ynField('hotwork','fumesProduced','Will fumes be produced by the hot work?', false)}
+        ${chipsField('hotwork','ventilationOther','', ['Ventilation','Other'])}
+        ${textField('hotwork','ventilationOtherList','List')}
+      </div>
+      <div class="pc-section">
+        <h5>11. Communication</h5>
+        ${ynField('hotwork','commsEquip','Has crew been given equipment to enhance communication?', true)}
+        ${textField('hotwork','commsDescribe','Describe (radio, visual, speaking etc.)')}
+      </div>
+      <div class="pc-section">
+        <h5>12. PPE and Other Equipment</h5>
+        <p style="font-size:11px;color:var(--text-dim);margin:0 0 8px;">Tick items of PPE and other equipment required by persons conducting hot work</p>
+        ${chipsField('hotwork','ppe','', ['Gloves','Eye protection','Overals','Hearing protection','Boots','Fire blanket','Screens','Lighting','Signage','Respiratory protection','Ladder','Welding mask','First aid','Fire extinguisher','Fire hose','Barricades','Two way radio','Fall arrest','Platform','Ventilation (7)','Other'])}
+        ${textField('hotwork','ppeOther','Other (list)')}
+      </div>
+      <div class="pc-section">
+        <h5>13. Personnel</h5>
+        ${textField('hotwork','entrants','Name of Person(s) Carrying Out Hot Work/Entrant(s)', true)}
+        ${textField('hotwork','attendants','Name of Firewatch(es)/Attendant(s)', true)}
+      </div>
+      <div class="pc-section">
+        <h5>14. Entry/Exit Procedures</h5>
+        ${ynField('hotwork','entrantUnderstands','Entrant understands entry and exit requirments?', false)}
+        ${ynField('hotwork','attendantUnderstands','Attendant understands duties?', false)}
+      </div>
+      <div class="pc-section">
+        <h5>15. Emergency Plans</h5>
+        <p style="font-size:11px;color:var(--text-dim);">Emergency contact numbers: GNFS: 022-202-554/192, GNAS: 029-9900-952/193</p>
+        ${textField('hotwork','emergencyOther','Other Numbers')}
+        ${textField('hotwork','emergencyEquip','Emergency Equipment (list)', true)}
+      </div>
+      <div class="pc-section">
+        <h5>16. Safe to Commence Authorisation</h5>
+        <p style="font-size:11.5px;color:var(--text-dim);">I/We have reviewed this safety form and are aware of the hazards and precautions necessary for performing the designated Hot Work/CSE authorized by this form. I therefore certify that all existing and potential hazards have been evaluated, necessary protective measures have been taken, and acceptable environmental conditions exist for safe execution of the job.</p>
+        ${sigField('hotwork','safeCommenceMgr','Mgr./SH/Sup. Name/Signature/Date and Time')}
+        ${sigField('hotwork','safeCommenceCrew','Crew Leader Name/Signature/Date and Time')}
+      </div>
+      <div class="pc-section">
+        <h5>17. Sign Off Authorisation</h5>
+        <p style="font-size:11.5px;color:var(--text-dim);">The area has been made safe, tools/equipment have been removed from the site, fire detection has been activated (if applicable). This job is now closed.</p>
+        ${sigField('hotwork','signOffMgr','Mgr./SH/Sup. Name/Signature/Date and Time')}
+        ${sigField('hotwork','signOffCrew','Crew Leader Name/Signature/Date and Time')}
+        <p style="font-size:10.5px;color:var(--text-dim);font-weight:600;margin-top:12px;">Please send original copy of the closed safety form to EHS Dept.</p>
+      </div>`;
+  }
+
+  function renderHeightForm(){
+    const h = pd('height');
+    return `
+      <p style="font-size:11px;color:var(--text-dim);margin:0 0 12px;">This permit must be completed, and signed before starting work and EHS Dept. must be notified.</p>
+      <div class="pc-section" style="border-top:none;margin-top:0;">
+        ${textField('height','location','Location')}
+        ${textField('height','department','Department')}
+        ${textField('height','equipmentId','Equipment ID')}
+        ${textField('height','formNo','No.')}
+        ${textField('height','workOrderNo','Work Order No.')}
+        ${textField('height','dateOfWork','Date of Work at Height')}
+        <p style="font-size:11px;color:var(--text-dim);margin:0 0 8px;">Valid until: end of day</p>
+        ${textField('height','description','Description of Activity', true)}
+        ${textField('height','contractor','Department/Contractor Executing Job')}
+      </div>
+      <div class="pc-section">
+        <h5>Checklist — Is Equipment Isolated, Locked and Tagged?</h5>
+        ${ynField('height','isoMechanical','Mechanical', true)}
+        ${ynField('height','isoElectrical','Electrical', true)}
+        ${ynField('height','isoDepressurized','Depressurized and drained', true)}
+        ${ynField('height','isoFlushed','Flushed and purged', true)}
+        ${ynField('height','isoEarthed','Properly earthed', true)}
+        <p style="font-size:11px;color:var(--text-dim);margin:8px 0 4px;">Isolation checked by (name/sign/date/time):</p>
+        ${textField('height','isolationCheckedBy','')}
+      </div>
+      <div class="pc-section">
+        ${ynField('height','scaffolding','Is adequate scaffolding provided?', true)}
+        ${ynField('height','safeAccess','Is a safe access and exit to and from work area provided?', true)}
+        ${ynField('height','ladderTied','Has ladder been tied and supported properly at ends?', true)}
+        <p style="font-size:11px;color:var(--text-dim);margin:8px 0 4px;">Specify other means of accessing working area:</p>
+        ${textField('height','otherAccessMeans','')}
+      </div>
+      <div class="pc-section">
+        ${ynField('height','platformsSafe','Are working platforms in safe condition?', true)}
+        ${ynField('height','railingsToeBoards','Are all railings and toe boards provided around the platform?', true)}
+        ${ynField('height','ppeAppropriate','Is the used personal protective equipment appropriate for this task and in good condition?', true)}
+        <label class="f">Has a Drop Zone Been Established?</label>
+        ${ynField('height','dropZoneCordoned','Cordoned off?', true)}
+        ${ynField('height','dropZoneCleared','Cleared off?', true)}
+        ${ynField('height','dropZoneSigns','Are warning signs displayed (boards, red lights, ...etc)?', true)}
+        ${ynField('height','lighted','Is the work place sufficiently lighted?', true)}
+        ${ynField('height','commsAssured','Is the communication between the crew members assured?', true)}
+      </div>
+      <div class="pc-section">
+        <p style="font-size:11px;color:var(--text-dim);">Emergency contact numbers: GNFS: 022-202-554/192, GNAS: 029-9900-952/193</p>
+        ${textField('height','emergencyOther','Other Numbers')}
+        ${textField('height','emergencyEquip','Emergency Equipment (list)', true)}
+        ${textField('height','specialInstructions','Special Instructions/Precautions to be Complied', true)}
+      </div>
+      <div class="pc-section">
+        <h5>Work Crew Members</h5>
+        <p style="font-size:11px;color:var(--text-dim);margin:0 0 8px;">Trained for working at height?</p>
+        <div id="crewRows">
+          ${h.crew.map((c,i)=>`<div class="crewrow">
+            <input type="text" placeholder="Crew member name" data-crewname="${i}" value="${(c.name||'').replace(/"/g,'&quot;')}">
+            <div class="ynopts">
+              ${['Yes','No'].map(o=>`<label class="ynopt ${c.trained===o?'sel':''}"><input type="radio" data-crewtrained="${i}" value="${o}" ${c.trained===o?'checked':''}> ${o}</label>`).join('')}
+            </div>
+          </div>`).join('')}
+        </div>
+        <button class="btn btn-ghost" id="addCrewRow" type="button">+ Add crew member</button>
+        <p style="font-size:11px;color:var(--text-dim);margin:12px 0 4px;">If any of these questions is answered by "No", please explain:</p>
+        ${textField('height','explainNo','', true)}
+      </div>
+      <div class="pc-section">
+        <h5>Working at Height Safety Form Authorization</h5>
+        <p style="font-size:11.5px;color:var(--text-dim);">I/We have reviewed this safety form and are aware of the hazards and precautions necessary for performing the designated work at height authorized by this form. I therefore certify that all existing and potential hazards have been evaluated, necessary protective measures have been taken, and acceptable conditions exist for safe execution of job.</p>
+        ${sigField('height','authCrew','Crew Leader Name/Signature/Date and Time')}
+        ${sigField('height','authMgr','Dept. Mgr./SH/Supervisor Name/Signature/Date and Time')}
+      </div>
+      <div class="pc-section">
+        <h5>Working at Height Safety Form Closure Authorization</h5>
+        <p style="font-size:11.5px;color:var(--text-dim);">I confirm that the work described above is complete and the conditions of the Activity/Item/Location/Plant are safe for normal/safe operation. This safety form is however closed/cancelled.</p>
+        ${sigField('height','closureCrew','Crew Leader Name/Signature/Date and Time')}
+        ${sigField('height','closureMgr','Dept. Mgr./Supervisor Name/Signature/Date and Time')}
+        <p style="font-size:10.5px;color:var(--text-dim);font-weight:600;margin-top:12px;">Please send original copy of closed safety form to EHS Department.</p>
+      </div>`;
+  }
+
+  function renderAll(){
+    document.getElementById('form-general').innerHTML = renderGeneralForm();
+    document.getElementById('form-hotwork').innerHTML = renderHotworkForm();
+    document.getElementById('form-height').innerHTML = renderHeightForm();
+    ['general','hotwork','height'].forEach(k=>{
+      const pill = document.getElementById('pill-'+k);
+      pill.textContent = formIsSigned(k) ? 'Signed' : 'Draft';
+      pill.className = 'statuspill ' + (formIsSigned(k) ? 'signed' : 'draft');
+    });
+    const addBtn = document.getElementById('addCrewRow');
+    if(addBtn) addBtn.addEventListener('click', ()=>{
+      pd('height').crew.push({name:'',trained:null});
+      saveState(); renderAll();
+    });
+    const addLogBtn = document.getElementById('addCrewLogRow');
+    if(addLogBtn) addLogBtn.addEventListener('click', ()=>{
+      pd('general').crewLog.push({date:'',persons:'',sigLeader:'',sigMgr:'',timeStart:'',timeStop:''});
+      saveState(); renderAll();
+    });
+  }
+
+  document.querySelector('main').addEventListener('click', e=>{
+    const chip = e.target.closest('.chip[data-chip]');
+    if(chip){
+      const [formKey, path] = chip.dataset.chip.split('|');
+      const arr = (getPath(pd(formKey), path) || []).slice();
+      const val = chip.dataset.val;
+      const i = arr.indexOf(val);
+      if(i>-1) arr.splice(i,1); else arr.push(val);
+      setPath(pd(formKey), path, arr);
+      saveState(); renderAll();
+      return;
+    }
+    const signBtn = e.target.closest('[data-sign]');
+    if(signBtn){
+      const [formKey, path] = signBtn.dataset.sign.split('|');
+      const row = signBtn.closest('.sigrow');
+      const nameInput = row.querySelector('[data-signame]');
+      const name = (nameInput.value||'').trim();
+      if(!name){ toast('Type a name before signing'); return; }
+      setPath(pd(formKey), path, {name, at: Date.now()});
+      saveState(); renderAll();
+      return;
+    }
+    const unsignBtn = e.target.closest('[data-unsign]');
+    if(unsignBtn){
+      const [formKey, path] = unsignBtn.dataset.unsign.split('|');
+      setPath(pd(formKey), path, null);
+      saveState(); renderAll();
+      return;
+    }
+  });
+  document.querySelector('main').addEventListener('change', e=>{
+    const yn = e.target.closest('[data-yn]');
+    if(yn){
+      const [formKey, path] = yn.dataset.yn.split('|');
+      setPath(pd(formKey), path, yn.value);
+      saveState(); renderAll();
+      return;
+    }
+    const crewTrained = e.target.closest('[data-crewtrained]');
+    if(crewTrained){
+      const i = +crewTrained.dataset.crewtrained;
+      pd('height').crew[i].trained = crewTrained.value;
+      saveState(); renderAll();
+      return;
+    }
+  });
+  document.querySelector('main').addEventListener('input', e=>{
+    const t = e.target.closest('[data-text]');
+    if(t){
+      const [formKey, path] = t.dataset.text.split('|');
+      setPath(pd(formKey), path, t.value);
+      saveState();
+      return;
+    }
+    const cn = e.target.closest('[data-crewname]');
+    if(cn){
+      pd('height').crew[+cn.dataset.crewname].name = cn.value;
+      saveState();
+      return;
+    }
+  });
+
+  document.querySelectorAll('.subtabbtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.subtabbtn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      ['general','hotwork','height'].forEach(t=>{
+        document.getElementById('sub-'+t).classList.toggle('hidden', t!==btn.dataset.sub);
+      });
+    });
+  });
+
+  async function init(){
+    await loadState();
+    renderAll();
+  }
+  init();
+})();
+</script>
+</body>
+</html>
