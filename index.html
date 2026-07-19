@@ -67,6 +67,15 @@
   .crewrow{display:flex;gap:8px;align-items:center;margin-bottom:7px;}
   .crewrow input[type=text]{flex:1;}
   .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--good);color:#0d1a12;padding:10px 18px;border-radius:8px;font-weight:600;font-size:13px;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,.4);}
+  .syncbar{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 13px;margin-bottom:14px;}
+  .syncstatus{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);}
+  .syncdot{width:8px;height:8px;border-radius:50%;background:var(--text-dim);flex:none;}
+  .syncdot.ok{background:var(--good);box-shadow:0 0 0 3px var(--good-dim);}
+  .syncdot.err{background:var(--danger);box-shadow:0 0 0 3px var(--danger-dim);}
+  .syncdot.pending{background:var(--caution);box-shadow:0 0 0 3px var(--caution-dim);}
+  .syncsettings{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:13px 14px;margin-bottom:14px;}
+  .syncsettings.hidden{display:none;}
+  .btn-sm{padding:6px 10px;font-size:11.5px;}
 </style>
 </head>
 <body>
@@ -78,6 +87,24 @@
 
 <main>
   <div class="note">This screen is just the permit forms. Fill in what's needed for the job, then sign each section.</div>
+
+  <div class="syncbar" id="syncBar">
+    <div class="syncstatus" id="syncStatus">
+      <span class="syncdot" id="syncDot"></span>
+      <span id="syncStatusText">Live sync not configured</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" id="syncSettingsBtn">Sync Settings</button>
+  </div>
+  <div class="syncsettings hidden" id="syncSettingsPanel">
+    <label class="f">Google Apps Script Web App URL</label>
+    <input type="text" id="syncUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+    <div class="actionrow">
+      <button class="btn btn-primary btn-sm" id="saveSyncUrlBtn">Save</button>
+      <button class="btn btn-ghost btn-sm" id="testSyncBtn">Send Test</button>
+      <button class="btn btn-ghost btn-sm" id="clearSyncUrlBtn">Clear</button>
+    </div>
+  </div>
+
 
   <div class="subtabs">
     <button class="subtabbtn active" data-sub="general">General Work Permit</button>
@@ -173,6 +200,150 @@
   function saveState(){
     if(hasClaudeStorage){ try{ window.storage.set('standalone_permits', JSON.stringify(permitData), true); }catch(e){} }
     else if(hasLocalStorage){ try{ localStorage.setItem('standalone_permits', JSON.stringify(permitData)); }catch(e){} }
+    scheduleSync();
+  }
+
+  // ================= LIVE SYNC TO GOOGLE SHEETS =================
+  // Baked-in default so this syncs automatically for anyone opening the page — no setup needed.
+  // The Sync Settings panel can still override this if you ever point it at a different sheet.
+  const DEFAULT_SYNC_URL = 'https://script.google.com/macros/s/AKfycbz8L1Izxu4dXNaQ9uIgwIGLtxT9o3N8w3kNA7cba2r27YD3YSfEIahLCs4fkQ5W_Igv/exec';
+  let syncUrl = '';
+  let syncTimer = null;
+
+  async function loadSyncUrl(){
+    if(hasClaudeStorage){
+      try{ const r = await window.storage.get('ghacem_sync_url', true); syncUrl = r.value || DEFAULT_SYNC_URL; }catch(e){ syncUrl = DEFAULT_SYNC_URL; }
+    } else if(hasLocalStorage){
+      syncUrl = localStorage.getItem('ghacem_sync_url') || DEFAULT_SYNC_URL;
+    } else {
+      syncUrl = DEFAULT_SYNC_URL;
+    }
+  }
+  function saveSyncUrl(url){
+    syncUrl = url;
+    if(hasClaudeStorage){ try{ window.storage.set('ghacem_sync_url', url, true); }catch(e){} }
+    else if(hasLocalStorage){ try{ localStorage.setItem('ghacem_sync_url', url); }catch(e){} }
+  }
+
+  function setSyncStatus(state, text){
+    const dot = document.getElementById('syncDot');
+    const txt = document.getElementById('syncStatusText');
+    dot.className = 'syncdot ' + (state||'');
+    txt.textContent = text;
+  }
+
+  function sigOrEmpty(sig){ return sig && sig.name ? sig.name : ''; }
+  function sigTimeOrEmpty(sig){ return sig && sig.at ? new Date(sig.at).toLocaleString() : ''; }
+
+  function flattenGeneral(){
+    const g = pd('general');
+    return {
+      'Timestamp': new Date().toLocaleString(),
+      'Department/Location': g.deptLocation,
+      'Description': g.description,
+      'Date of Issue': g.dateIssue,
+      'Time of Issue': g.timeIssue,
+      'Contractor': g.contractor,
+      'Environment Hazards': (g.envHazards||[]).join(', '),
+      'Safety Hazards': (g.safetyHazards||[]).join(', '),
+      'PPE Head': g.ppeHead, 'PPE Ear': g.ppeEar, 'PPE Eye/Face': g.ppeEyeFace,
+      'PPE Respiratory': g.ppeRespiratory, 'PPE Hand': g.ppeHand, 'PPE Body': g.ppeBody,
+      'PPE Feet': g.ppeFeet, 'PPE Others': g.ppeOthers,
+      'Precautions Environmental': (g.precEnv||[]).join(', '),
+      'Precautions Safety': (g.precSafety||[]).join(', '),
+      'Crew Leader Signed By': sigOrEmpty(g.crewLeaderSig), 'Crew Leader Signed At': sigTimeOrEmpty(g.crewLeaderSig),
+      'Authorization Signed By': sigOrEmpty(g.authSig), 'Authorization Signed At': sigTimeOrEmpty(g.authSig),
+      'Completion Signed By': sigOrEmpty(g.completionSig), 'Completion Signed At': sigTimeOrEmpty(g.completionSig),
+      'Crew Log': JSON.stringify(g.crewLog||[]),
+      'Status': formIsSigned('general') ? 'Signed' : 'Draft'
+    };
+  }
+  function flattenHotwork(){
+    const h = pd('hotwork');
+    return {
+      'Timestamp': new Date().toLocaleString(),
+      'No.': h.no, 'Date of Activity': h.dateActivity, 'Location': h.location,
+      'Equipment ID': h.equipmentId, 'Work Order Number': h.workOrderNumber, 'Dept/Contractor': h.deptContractor,
+      'Type of Work': (h.typeOfWork||[]).join(', '), 'Purpose': h.purpose,
+      'Work at Height?': h.workAtHeight,
+      'Isolation - Electrical': h.isolation.electrical, 'Isolation - Mechanical': h.isolation.mechanical,
+      'Isolation - Fire Detection': h.isolation.fireDetection, 'Isolation - Pipeline': h.isolation.pipeline,
+      'Isolation - Contact Maintenance': h.isolation.contactMaintenance, 'Isolation Other': h.isolationOther,
+      'Isolation Checked By': h.isolationCheckedBy,
+      'O2 Reading': h.testData.oxygen.reading, 'O2 Date': h.testData.oxygen.date, 'O2 Time': h.testData.oxygen.time,
+      'LEL Reading': h.testData.lel.reading, 'LEL Date': h.testData.lel.date, 'LEL Time': h.testData.lel.time,
+      'CO Reading': h.testData.co.reading, 'CO Date': h.testData.co.date, 'CO Time': h.testData.co.time,
+      'Temp Reading': h.testData.temp.reading, 'Temp Date': h.testData.temp.date, 'Temp Time': h.testData.temp.time,
+      'Confined Space Tested By': h.confinedSpaceTestedBy,
+      'Combustible Cleared?': h.combustibleCleared,
+      'Sparks Contact?': h.sparksContact, 'Sparks Controls': (h.sparksControls||[]).join(', '), 'Sparks Other': h.sparksOther,
+      'Firewatch By': h.firewatchBy,
+      'Fumes Produced?': h.fumesProduced, 'Ventilation/Other': (h.ventilationOther||[]).join(', '), 'Ventilation List': h.ventilationOtherList,
+      'Comms Equip?': h.commsEquip, 'Comms Describe': h.commsDescribe,
+      'PPE': (h.ppe||[]).join(', '), 'PPE Other': h.ppeOther,
+      'Entrants': h.entrants, 'Attendants': h.attendants,
+      'Entrant Understands?': h.entrantUnderstands, 'Attendant Understands?': h.attendantUnderstands,
+      'Emergency Other': h.emergencyOther, 'Emergency Equipment': h.emergencyEquip,
+      'Safe Commence - Mgr': sigOrEmpty(h.safeCommenceMgr), 'Safe Commence - Mgr At': sigTimeOrEmpty(h.safeCommenceMgr),
+      'Safe Commence - Crew': sigOrEmpty(h.safeCommenceCrew), 'Safe Commence - Crew At': sigTimeOrEmpty(h.safeCommenceCrew),
+      'Sign Off - Mgr': sigOrEmpty(h.signOffMgr), 'Sign Off - Mgr At': sigTimeOrEmpty(h.signOffMgr),
+      'Sign Off - Crew': sigOrEmpty(h.signOffCrew), 'Sign Off - Crew At': sigTimeOrEmpty(h.signOffCrew),
+      'Status': formIsSigned('hotwork') ? 'Signed' : 'Draft'
+    };
+  }
+  function flattenHeight(){
+    const h = pd('height');
+    return {
+      'Timestamp': new Date().toLocaleString(),
+      'Location': h.location, 'Department': h.department, 'Equipment ID': h.equipmentId,
+      'Form No.': h.formNo, 'Work Order No.': h.workOrderNo, 'Date of Work': h.dateOfWork,
+      'Description': h.description, 'Contractor': h.contractor,
+      'Iso - Mechanical': h.isoMechanical, 'Iso - Electrical': h.isoElectrical,
+      'Iso - Depressurized': h.isoDepressurized, 'Iso - Flushed': h.isoFlushed, 'Iso - Earthed': h.isoEarthed,
+      'Isolation Checked By': h.isolationCheckedBy,
+      'Scaffolding?': h.scaffolding, 'Safe Access?': h.safeAccess, 'Ladder Tied?': h.ladderTied,
+      'Other Access Means': h.otherAccessMeans,
+      'Platforms Safe?': h.platformsSafe, 'Railings/Toe Boards?': h.railingsToeBoards, 'PPE Appropriate?': h.ppeAppropriate,
+      'Drop Zone Cordoned?': h.dropZoneCordoned, 'Drop Zone Cleared?': h.dropZoneCleared, 'Drop Zone Signs?': h.dropZoneSigns,
+      'Lighted?': h.lighted, 'Comms Assured?': h.commsAssured,
+      'Emergency Other': h.emergencyOther, 'Emergency Equipment': h.emergencyEquip,
+      'Special Instructions': h.specialInstructions,
+      'Crew': JSON.stringify(h.crew||[]),
+      'Explain No': h.explainNo,
+      'Auth - Crew': sigOrEmpty(h.authCrew), 'Auth - Crew At': sigTimeOrEmpty(h.authCrew),
+      'Auth - Mgr': sigOrEmpty(h.authMgr), 'Auth - Mgr At': sigTimeOrEmpty(h.authMgr),
+      'Closure - Crew': sigOrEmpty(h.closureCrew), 'Closure - Crew At': sigTimeOrEmpty(h.closureCrew),
+      'Closure - Mgr': sigOrEmpty(h.closureMgr), 'Closure - Mgr At': sigTimeOrEmpty(h.closureMgr),
+      'Status': formIsSigned('height') ? 'Signed' : 'Draft'
+    };
+  }
+
+  function scheduleSync(){
+    if(!syncUrl) return;
+    clearTimeout(syncTimer);
+    setSyncStatus('pending', 'Syncing…');
+    syncTimer = setTimeout(doSync, 800);
+  }
+  async function doSync(){
+    if(!syncUrl) return;
+    const jobs = [
+      { formType:'general', data: flattenGeneral() },
+      { formType:'hotwork', data: flattenHotwork() },
+      { formType:'height', data: flattenHeight() },
+    ];
+    try{
+      for(const job of jobs){
+        await fetch(syncUrl, {
+          method:'POST',
+          mode:'no-cors',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body: JSON.stringify(job)
+        });
+      }
+      setSyncStatus('ok', 'Synced ' + new Date().toLocaleTimeString());
+    }catch(err){
+      setSyncStatus('err', 'Sync failed — check the URL and try again');
+    }
   }
 
   function toast(msg){
@@ -607,8 +778,39 @@
     });
   });
 
+  document.getElementById('syncSettingsBtn').addEventListener('click', ()=>{
+    document.getElementById('syncSettingsPanel').classList.toggle('hidden');
+  });
+  document.getElementById('saveSyncUrlBtn').addEventListener('click', ()=>{
+    const url = document.getElementById('syncUrlInput').value.trim();
+    if(!url){ toast('Enter a Web App URL first'); return; }
+    saveSyncUrl(url);
+    setSyncStatus('pending', 'Saved — syncing…');
+    scheduleSync();
+    toast('Sync URL saved');
+  });
+  document.getElementById('clearSyncUrlBtn').addEventListener('click', ()=>{
+    saveSyncUrl('');
+    document.getElementById('syncUrlInput').value = '';
+    setSyncStatus('', 'Live sync not configured');
+    toast('Sync URL cleared');
+  });
+  document.getElementById('testSyncBtn').addEventListener('click', ()=>{
+    const url = document.getElementById('syncUrlInput').value.trim() || syncUrl;
+    if(!url){ toast('Enter a Web App URL first'); return; }
+    if(url !== syncUrl) saveSyncUrl(url);
+    setSyncStatus('pending', 'Sending test…');
+    doSync();
+  });
+
   async function init(){
     await loadState();
+    await loadSyncUrl();
+    document.getElementById('syncUrlInput').value = syncUrl === DEFAULT_SYNC_URL ? '' : syncUrl;
+    document.getElementById('syncUrlInput').placeholder = syncUrl === DEFAULT_SYNC_URL
+      ? 'Using built-in GHACEM sheet (leave blank, or paste a different URL to override)'
+      : 'https://script.google.com/macros/s/.../exec';
+    setSyncStatus(syncUrl ? 'ok' : '', syncUrl ? 'Live sync active — will sync on changes' : 'Live sync not configured');
     renderAll();
   }
   init();
