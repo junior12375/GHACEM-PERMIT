@@ -15,12 +15,19 @@
     --danger:#C23B3B; --danger-dim:rgba(194,59,59,.16);
     --good:#4F9D69; --good-dim:rgba(79,157,105,.16);
     --caution:#E8B93A; --caution-dim:rgba(232,185,58,.16);
+    --series-general:#3987e5; --series-hotwork:#d95926; --series-height:#199e70;
     --font-d:'Oswald',sans-serif; --font-b:'IBM Plex Sans',sans-serif; --font-m:'IBM Plex Mono',monospace;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-b);}
   header.topbar{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--brand-deep);border-bottom:1px solid rgba(0,221,57,.35);position:sticky;top:0;z-index:5;}
   .mark{width:34px;height:34px;object-fit:contain;flex:none;}
+  .brand-divider{width:1px;height:24px;background:rgba(238,243,234,.25);flex:none;}
+  .hmark{width:28px;height:28px;object-fit:contain;flex:none;}
+  .sitefooter{display:flex;align-items:center;justify-content:center;gap:12px;padding:22px 18px;background:var(--brand-deep);border-top:1px solid rgba(0,221,57,.2);flex-wrap:wrap;text-align:center;}
+  .sitefooter-mark{width:26px;height:26px;object-fit:contain;flex:none;}
+  .sitefooter-text{font-size:11px;color:#8FCBA3;font-family:var(--font-m);letter-spacing:.03em;}
+  .sitefooter-text strong{color:#EEF3EA;font-family:var(--font-b);font-weight:600;letter-spacing:0;}
   h1{font-family:var(--font-d);font-size:16px;letter-spacing:.06em;margin:0;text-transform:uppercase;color:#EEF3EA;}
   header span{display:block;font-size:10.5px;color:#8FCBA3;font-family:var(--font-m);letter-spacing:.05em;}
   .sitebanner{position:relative;height:150px;overflow:hidden;background:#000;}
@@ -41,7 +48,8 @@
   .permitdesc{font-size:12.5px;color:var(--text-dim);line-height:1.5;margin:0 0 4px;}
   .statuspill{float:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 9px;border-radius:20px;}
   .statuspill.draft{background:var(--surface-2);color:var(--text-dim);border:1px solid var(--border);}
-  .statuspill.signed{background:var(--good-dim);color:var(--good);}
+  .statuspill.active{background:var(--caution-dim);color:var(--caution);}
+  .statuspill.closed{background:var(--good-dim);color:var(--good);}
 
   .pc-section{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
   .pc-section:first-of-type{margin-top:14px;}
@@ -147,8 +155,9 @@
   .histtoolbar select{flex:1;min-width:120px;width:auto;}
   .histcard{background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;transition:border-color .2s ease, box-shadow .2s ease, transform .1s ease;}
   .histcard:hover{border-color:var(--text-dim);box-shadow:0 2px 10px rgba(0,0,0,.25);}
-  .histcard.is-signed{border-left-color:var(--good);}
-  .histcard.is-draft{border-left-color:var(--caution);}
+  .histcard.is-active{border-left-color:var(--caution);}
+  .histcard.is-closed{border-left-color:var(--good);}
+  .histcard.is-draft{border-left-color:var(--text-dim);}
   .histcard.highlighted{border-color:var(--accent);border-left-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);animation:histPulse 1.8s ease 2;}
   @keyframes histPulse{
     0%,100%{box-shadow:0 0 0 3px var(--accent-dim);}
@@ -169,24 +178,34 @@
   .statcard{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;}
   .statcard .n{font-family:var(--font-d);font-size:20px;color:var(--text);}
   .statcard .l{font-size:9.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
-  .expirybadge{font-size:9.5px;font-weight:700;text-transform:uppercase;padding:2px 7px;border-radius:10px;margin-left:6px;}
-  .expirybadge.active{background:var(--good-dim);color:var(--good);}
-  .expirybadge.expired{background:var(--danger-dim);color:#ff8b8b;}
-  .activecard{background:var(--surface-2);border:1px solid var(--good);border-left:4px solid var(--good);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
-  .activecard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
-  .activecard-type{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);}
-  .activecard-title{font-family:var(--font-d);font-size:18px;text-transform:uppercase;margin:3px 0 2px;}
-  .activecard-desc{font-size:13px;color:var(--text-dim);margin-bottom:8px;}
-  .activecard-signers{font-size:12px;color:var(--text);margin-top:6px;}
-  .activecard-signers b{color:var(--good);}
-  .activecard-time{font-size:11px;color:var(--text-dim);margin-top:4px;}
-  .approvedbadge{background:var(--good-dim);color:var(--good);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:5px 10px;border-radius:20px;white-space:nowrap;flex:none;}
+  .paneintro{font-size:12px;color:var(--text-dim);margin:0 0 14px;max-width:70ch;}
+
+  .vizgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .vizcard{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px 10px;}
+  .vizcard-wide{grid-column:1 / -1;}
+  .vizcard h5{font-family:var(--font-d);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;color:var(--accent);margin:0 0 10px;}
+  .vizcard-sub{font-family:var(--font-b);text-transform:none;letter-spacing:0;font-size:11px;color:var(--text-dim);font-weight:400;margin-left:6px;}
+  .vizbar{cursor:pointer;transition:opacity .12s ease;}
+  .vizbar:hover, .vizbar:focus{opacity:.8;outline:none;}
+  .vizaxislabel{font-family:var(--font-b);font-size:10.5px;fill:var(--text-dim);}
+  .vizvaluelabel{font-family:var(--font-m);font-size:11px;font-weight:600;fill:var(--text);}
+  .vizgrid-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .vizlegend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;}
+  .vizlegend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);}
+  .vizlegend-swatch{width:10px;height:10px;border-radius:2px;flex:none;}
+  .viz-tooltip{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:11.5px;color:var(--text);box-shadow:0 4px 16px rgba(0,0,0,.4);z-index:50;max-width:220px;}
+  .viz-tooltip.hidden{display:none;}
+  .viz-tooltip .n{font-family:var(--font-m);font-weight:600;color:var(--text);}
+  .viz-tooltip .l{color:var(--text-dim);}
+  @media (max-width:760px){ .vizgrid{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
 
 <header class="topbar">
   <img class="mark" src="data:image/png;base64,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vLw8VqxYwfjx46mrq8M0TaItL4tJSsA555zD2LFjqaurY8OGDSkJSL7npKqqiurqapRSWJZFOBxOOZe3thDD4fBnvjvrqABJivSYMWO45557OPHEEzn77LO544476NOnD8FgkBtvvJGBAwcyffp0DMNg+fLljBo1ihEjRvDwww9/agWblpZGMBjkvvvuo76+noKCAmKxGFdeeSVlZWUMGzaMZcuWsXjxYsLhMLfccgtr1qyhoqKCYDDIsmXLGDFiBGVlZdx3330YhsHFF1/Meeedx6BBg5g0aVKKCUgmwzAoLCzk7rvv5oYbbiAUCqG15qKLLmLu3LnU1dUxevRoGhsbqauro6amhoyMDPx+P5ZlUVdXx6RJkygrK6O+vp7s7Gxs22bKlCmceuqpTJ48GcdxeOSRRzjrrLMYM2YMa9as+Xwm+PMco5Osq+M4qZOeHccRx3HEtm0ZOnSozJgxQ2zblh07dkhaWpr85je/kYcfflgsy5La2lo54YQT5Morr5RnnnlGDMOQnTt3tnEnnTZtmowfP16GDRsml112mfTs2VO2bNkif/7zn+WNN96QESNGyKRJk6SiokL8fr8sX75cFi9eLIBUV1dL9+7d5ec//7m88MILAsjWrVtl9OjRcvLJJ8v//u//ilJKPvzwwzYs8dy5c0UpJSeeeKIAct1114mISLdu3eR3v/ud7NixQwCpr6+XMWPGyPTp02X9+vViGIY0NTXJf//3f0tpaam8+uqrkpWVJQsXLpQHH3xQMjMzZe3atdKxY0d56KGH5P777xfTNOX555+XSCTyuS6q+vOkISkRSasnKaqQOHA4qS5af540aRIjR44kLy+PqqoqGhsbWbFiBffccw95eXns3r27zcQdj8cpKChgypQpzJ8/PyX6oVCIW2+9lV27dpGXl0dOTg5aa4qKikhPT6egoIDt27ezc+dOJkyYwIQJE/D5fGzcuJHMzEy++93v8qMf/YhgMPgpC8p1XdLT05k7dy733nsv999/P2vXrqWkpAStNYZhkJaWhoiQmZmZ+myaJuFwmBUrVjBhwgROP/10cnNzicfjfPjhh/h8Pq677josy0pxbL169eKcc84hEAh87mSvP8vuXrp0Ka+99hqxWIx58+axd+9eNm7cyDPPPHNISyT5vbGxkXA4TDQaTXl7jBs3jgULFvDKK6/Qr1+/NqtarTX19fVcdNFFOI5DLBbjvffe45prrmH27NmceuqpqTexxWIxLMvCsiwikQgdOnTAsiwqKyvZs2cP8Xic4uJi4vE4zc3NNDQ0pCbqQ7VxwIAB9OnThwMHDrBjx47UvbFYjGg0mppHki8qs22b7OxscnNzKS8vJxqNEg6HsSyLTp06YZomjzzyCK+++iqXXHIJTU1N2LZ9xOf+6s/iq6677jquvvpqdu3axZQpU1i+fDlPPvkkkyZNIhQKtZlTko1sLSkA2dnZ3HLLLSxYsIBp06Zx8803f6pyyc7Nzs7mggsuoLm5mdLSUnr27Mm1117LBx98QHl5ObFYjF69ejF58mRWrlxJeno6hYWF3Hrrrdx2222cfvrpnH/++QwePDjVSUnpPVhvW5ZFPB5n4MCBTJo0idNOO43TTjuNsrIy5syZw7Rp08jNzWX//v0pDq2kpASfz8fdd9/Nr3/9a9asWUNZWRmxWIy6ujqmT59OXl4eF154IT/96U/ZtGkTaWlpn2Kiv/A6JBU1u20bruvSq1cv3n//fU444QTC4TB79uxJMaUVFRUEAgGKioqwbZuKigpKSkoAqKqqokuXLvj9fjZt2sSWLVsYOnQohYWFKTJORNizZw+2bdO5c2eam5vZs2cPffv2pbKyktWrVzNo0CCi0Sj9+vVj3759bNiwgV69euG6LsXFxfj9ftavX09DQwMjR45ERKisrCQ9PZ3c3FwqKiooLS1NqZ0kfb53715c1yUQCNClS5eU2fvOO++QlZVFfn4+HTp0oLa2FqUUxcXFbNq0iaamJsrKyti6dSs1NTUpoIqKilLquaCggMGDB1NfX09jYyPdunU7Ivb3qBeGX2Txc7RE29Eu6L4sLqz174cq89+xkv9MQFovjpIVaH3tUFRG64oe/Dn5v0N5gLSmYFqX2bqRrctvTXm0VrMHM8VJE/tQnXcwo9u6/IOvHexocSi2N3lvazr+4P76j2J7vwmp/fXd7YC0p3ZA2gFpT+2AtAPSntoBaQekPbUD0g5Ie2oHpD0dNv1/hBjbDnVu6W4AAAAASUVORK5CYII=" alt="GHACEM logo">
+  <span class="brand-divider"></span>
+  <img class="hmark" src="data:image/png;base64,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" alt="Heidelberg Materials logo">
   <div><h1>GHACEM — Permits</h1><span>PERMIT FORMS</span></div>
 </header>
 
@@ -223,17 +242,9 @@
     <button class="subtabbtn active" data-sub="general">General Work Permit</button>
     <button class="subtabbtn" data-sub="hotwork">Hot Work / Confined / Silo</button>
     <button class="subtabbtn" data-sub="height">Working at Height</button>
-    <button class="subtabbtn" data-sub="active">Active (24h)</button>
-    <button class="subtabbtn" data-sub="history">History</button>
-  </div>
-
-  <div class="subpane hidden" id="sub-active">
-    <div class="permittitle" style="margin-bottom:4px;">Active Permits (Last 24 Hours)</div>
-    <p style="font-size:12px;color:var(--text-dim);margin:0 0 14px;">Signed within the last 24 hours, plant-wide — for quick verification during site visits. Older signed permits drop off this list automatically but stay in History forever.</p>
-    <div class="actionrow" style="margin:0 0 14px;">
-      <button class="btn btn-ghost btn-sm" id="refreshActiveBtn">↻ Refresh</button>
-    </div>
-    <div id="activeList"></div>
+    <button class="subtabbtn" data-sub="history">Active Permits</button>
+    <button class="subtabbtn" data-sub="closed">Closed Permits</button>
+    <button class="subtabbtn" data-sub="insights">Insights</button>
   </div>
 
   <div class="subpane" id="sub-general">
@@ -270,29 +281,74 @@
     <p class="formsubmit-note">Submitting notifies EHS by email and records a permanent, time-stamped entry — independent of the other two permit types.</p>
   </div>
   <div class="subpane hidden" id="sub-history">
-    <div class="permittitle" style="margin-bottom:12px;">Submitted Permit History</div>
+    <div class="permittitle" style="margin-bottom:4px;">Active Permits</div>
+    <p class="paneintro">Authorized and currently open, plant-wide. Once the completion / closure signatures are added and the form is resubmitted, a permit moves to <b>Closed Permits</b> automatically — nothing is ever deleted, every version stays on permanent record.</p>
     <div class="statsbar" id="statsBar"></div>
-    <div class="historytypes">
+    <div class="historytypes" data-mode="active">
       <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
       <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
       <button class="histtypebtn" data-histtype="height">Working at Height</button>
-      <button class="btn btn-ghost btn-sm" id="refreshHistoryBtn" style="margin-left:auto;">↻ Refresh</button>
+      <button class="btn btn-ghost btn-sm" id="refreshActiveListBtn" style="margin-left:auto;">↻ Refresh</button>
     </div>
     <div class="histtoolbar">
-      <input type="text" id="historySearch" placeholder="Search by location or description…">
-      <select id="historyStatusFilter">
-        <option value="all">All statuses</option>
-        <option value="Signed">Signed only</option>
-        <option value="Draft">Draft only</option>
-      </select>
-      <select id="historySort">
+      <input type="text" id="activeSearch" placeholder="Search by location or description…">
+      <select id="activeSort">
         <option value="new">Newest first</option>
         <option value="old">Oldest first</option>
       </select>
     </div>
-    <div id="historyList"></div>
+    <div id="activePermitList"></div>
+  </div>
+
+  <div class="subpane hidden" id="sub-closed">
+    <div class="permittitle" style="margin-bottom:4px;">Closed Permits</div>
+    <p class="paneintro">Fully signed off and completed — retained here permanently for EHS verification and audit.</p>
+    <div class="statsbar" id="statsBarClosed"></div>
+    <div class="historytypes" data-mode="closed">
+      <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
+      <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
+      <button class="histtypebtn" data-histtype="height">Working at Height</button>
+      <button class="btn btn-ghost btn-sm" id="refreshClosedListBtn" style="margin-left:auto;">↻ Refresh</button>
+    </div>
+    <div class="histtoolbar">
+      <input type="text" id="closedSearch" placeholder="Search by location or description…">
+      <select id="closedSort">
+        <option value="new">Newest first</option>
+        <option value="old">Oldest first</option>
+      </select>
+    </div>
+    <div id="closedPermitList"></div>
+  </div>
+
+  <div class="subpane hidden" id="sub-insights">
+    <div class="permittitle" style="margin-bottom:4px;">Insights</div>
+    <p class="paneintro">A quick read on permit volume, plant-wide — computed live from every submitted permit on record.</p>
+    <div class="actionrow" style="margin:0 0 14px;">
+      <button class="btn btn-ghost btn-sm" id="refreshInsightsBtn">↻ Refresh</button>
+    </div>
+    <div class="vizgrid">
+      <div class="vizcard">
+        <h5>Permits by Type</h5>
+        <div id="vizByType"></div>
+      </div>
+      <div class="vizcard">
+        <h5>Top Departments / Locations</h5>
+        <div id="vizByDept"></div>
+      </div>
+      <div class="vizcard vizcard-wide">
+        <h5>Weekly Submission Trend <span class="vizcard-sub">last 8 weeks</span></h5>
+        <div id="vizTrend"></div>
+      </div>
+    </div>
   </div>
 </main>
+
+<footer class="sitefooter">
+  <img class="sitefooter-mark" src="data:image/png;base64,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" alt="Heidelberg Materials mark">
+  <span class="sitefooter-text"><strong>GHACEM</strong> &middot; A Heidelberg Materials Company</span>
+</footer>
+
+<div id="vizTooltip" class="viz-tooltip hidden" role="tooltip"></div>
 
 <div id="toastHost"></div>
 
@@ -306,11 +362,12 @@
     general:{
       deptLocation:'', description:'', dateIssue:'', timeIssue:'', contractor:'',
       envHazards:[], safetyHazards:[],
-      ppeHead:'', ppeEar:'', ppeEyeFace:'', ppeRespiratory:'', ppeHand:'', ppeBody:'', ppeFeet:'', ppeOthers:'',
+      ppeItems:[], ppeOthers:'',
       precEnv:[], precSafety:[],
       crewLeaderSig:null, authSig:null,
       crewLog:[{date:'',persons:'',sigLeader:'',sigMgr:'',timeStart:'',timeStop:''}],
-      completionSig:null
+      completionSig:null,
+      _submissionId:''
     },
     hotwork:{
       no:'', dateActivity:'', location:'', equipmentId:'', department:'', workOrderNumber:'', deptContractor:'',
@@ -328,7 +385,8 @@
       entrantUnderstands:null, attendantUnderstands:null,
       emergencyOther:'', emergencyEquip:'',
       safeCommenceMgr:null, safeCommenceCrew:null,
-      signOffMgr:null, signOffCrew:null
+      signOffMgr:null, signOffCrew:null,
+      _submissionId:''
     },
     height:{
       formNo:'', location:'', equipmentId:'', department:'', workOrderNo:'', dateOfWork:'', description:'', contractor:'',
@@ -342,7 +400,8 @@
       crew:[{name:'',trained:null}],
       explainNo:'',
       authCrew:null, authMgr:null,
-      closureCrew:null, closureMgr:null
+      closureCrew:null, closureMgr:null,
+      _submissionId:''
     }
   };
 
@@ -412,16 +471,14 @@
       'Contractor': g.contractor,
       'Environment Hazards': (g.envHazards||[]).join(', '),
       'Safety Hazards': (g.safetyHazards||[]).join(', '),
-      'PPE Head': g.ppeHead, 'PPE Ear': g.ppeEar, 'PPE Eye/Face': g.ppeEyeFace,
-      'PPE Respiratory': g.ppeRespiratory, 'PPE Hand': g.ppeHand, 'PPE Body': g.ppeBody,
-      'PPE Feet': g.ppeFeet, 'PPE Others': g.ppeOthers,
+      'PPE Required': (g.ppeItems||[]).join(', '), 'PPE Others': g.ppeOthers,
       'Precautions Environmental': (g.precEnv||[]).join(', '),
       'Precautions Safety': (g.precSafety||[]).join(', '),
       'Crew Leader Signed By': sigOrEmpty(g.crewLeaderSig), 'Crew Leader Signed At': sigTimeOrEmpty(g.crewLeaderSig),
       'Authorization Signed By': sigOrEmpty(g.authSig), 'Authorization Signed At': sigTimeOrEmpty(g.authSig),
       'Completion Signed By': sigOrEmpty(g.completionSig), 'Completion Signed At': sigTimeOrEmpty(g.completionSig),
       'Crew Log': JSON.stringify(g.crewLog||[]),
-      'Status': formIsSigned('general') ? 'Signed' : 'Draft'
+      'Status': formIsClosed('general') ? 'Closed' : (formIsSigned('general') ? 'Active' : 'Draft')
     };
   }
   function flattenHotwork(){
@@ -454,7 +511,7 @@
       'Safe Commence - Crew': sigOrEmpty(h.safeCommenceCrew), 'Safe Commence - Crew At': sigTimeOrEmpty(h.safeCommenceCrew),
       'Sign Off - Mgr': sigOrEmpty(h.signOffMgr), 'Sign Off - Mgr At': sigTimeOrEmpty(h.signOffMgr),
       'Sign Off - Crew': sigOrEmpty(h.signOffCrew), 'Sign Off - Crew At': sigTimeOrEmpty(h.signOffCrew),
-      'Status': formIsSigned('hotwork') ? 'Signed' : 'Draft'
+      'Status': formIsClosed('hotwork') ? 'Closed' : (formIsSigned('hotwork') ? 'Active' : 'Draft')
     };
   }
   function flattenHeight(){
@@ -480,7 +537,7 @@
       'Auth - Mgr': sigOrEmpty(h.authMgr), 'Auth - Mgr At': sigTimeOrEmpty(h.authMgr),
       'Closure - Crew': sigOrEmpty(h.closureCrew), 'Closure - Crew At': sigTimeOrEmpty(h.closureCrew),
       'Closure - Mgr': sigOrEmpty(h.closureMgr), 'Closure - Mgr At': sigTimeOrEmpty(h.closureMgr),
-      'Status': formIsSigned('height') ? 'Signed' : 'Draft'
+      'Status': formIsClosed('height') ? 'Closed' : (formIsSigned('height') ? 'Active' : 'Draft')
     };
   }
 
@@ -490,6 +547,22 @@
     setSyncStatus('pending', 'Syncing…');
     syncTimer = setTimeout(doSync, 800);
   }
+  // Posts a job and actually reads the server's real JSON response — no more assuming success
+  // just because the network request didn't throw. Returns {ok, submissionId?, error?}.
+  async function postToBackend(job){
+    try{
+      const res = await fetch(syncUrl, {
+        method:'POST',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify(job)
+      });
+      const result = await res.json();
+      return (result && typeof result === 'object') ? result : { ok:false, error:'Unexpected response from server' };
+    }catch(err){
+      return { ok:false, error:String(err) };
+    }
+  }
+
   async function doSync(){
     if(!syncUrl) return;
     const jobs = [
@@ -497,38 +570,20 @@
       { formType:'hotwork', action:'draft', data: flattenHotwork() },
       { formType:'height', action:'draft', data: flattenHeight() },
     ];
-    try{
-      for(const job of jobs){
-        await fetch(syncUrl, {
-          method:'POST',
-          mode:'no-cors',
-          headers:{'Content-Type':'text/plain;charset=utf-8'},
-          body: JSON.stringify(job)
-        });
-      }
-      setSyncStatus('ok', 'Synced ' + new Date().toLocaleTimeString());
-    }catch(err){
-      setSyncStatus('err', 'Sync failed — check the URL and try again');
+    let lastError = '';
+    for(const job of jobs){
+      const result = await postToBackend(job);
+      if(!result.ok) lastError = result.error || 'Server rejected the request';
     }
+    if(!lastError) setSyncStatus('ok', 'Synced ' + new Date().toLocaleTimeString());
+    else setSyncStatus('err', 'Sync failed — ' + lastError);
   }
 
   // Appends a PERMANENT history row (never overwritten) — used only when the person hits Submit.
-  async function submitToHistory(formKeys){
-    if(!syncUrl) return true;
+  async function submitFormToBackend(formKey){
+    if(!syncUrl) return { ok:true };
     const flatteners = { general: flattenGeneral, hotwork: flattenHotwork, height: flattenHeight };
-    try{
-      for(const formKey of formKeys){
-        await fetch(syncUrl, {
-          method:'POST',
-          mode:'no-cors',
-          headers:{'Content-Type':'text/plain;charset=utf-8'},
-          body: JSON.stringify({ formType: formKey, action:'submit', data: flatteners[formKey]() })
-        });
-      }
-      return true;
-    }catch(err){
-      return false;
-    }
+    return await postToBackend({ formType: formKey, action:'submit', data: flatteners[formKey]() });
   }
 
   // ================= HISTORY: unflatten a saved record back into an editable form =================
@@ -541,9 +596,7 @@
       deptLocation:r['Department/Location']||'', description:r['Description']||'',
       dateIssue:r['Date of Issue']||'', timeIssue:r['Time of Issue']||'', contractor:r['Contractor']||'',
       envHazards:splitList(r['Environment Hazards']), safetyHazards:splitList(r['Safety Hazards']),
-      ppeHead:r['PPE Head']||'', ppeEar:r['PPE Ear']||'', ppeEyeFace:r['PPE Eye/Face']||'',
-      ppeRespiratory:r['PPE Respiratory']||'', ppeHand:r['PPE Hand']||'', ppeBody:r['PPE Body']||'',
-      ppeFeet:r['PPE Feet']||'', ppeOthers:r['PPE Others']||'',
+      ppeItems:splitList(r['PPE Required']), ppeOthers:r['PPE Others']||'',
       precEnv:splitList(r['Precautions Environmental']), precSafety:splitList(r['Precautions Safety']),
       crewLeaderSig:sigFromRecord(r['Crew Leader Signed By'], r['Crew Leader Signed At']),
       authSig:sigFromRecord(r['Authorization Signed By'], r['Authorization Signed At']),
@@ -681,6 +734,51 @@
     if(formKey==='height') return !!(w.authCrew && w.authMgr);
     return false;
   }
+  // Completion / closure signatures — distinct from the initial authorization above.
+  // Signing these on a permit that was loaded from history closes it out immediately
+  // (see CLOSING_PATHS / autoCloseSync below) — no Submit click needed.
+  function formIsClosed(formKey){
+    const w = pd(formKey);
+    if(formKey==='general') return !!w.completionSig;
+    if(formKey==='hotwork') return !!(w.signOffMgr && w.signOffCrew);
+    if(formKey==='height') return !!(w.closureCrew && w.closureMgr);
+    return false;
+  }
+
+  // Which signature path(s), once signed, mark a permit as closed for each form type.
+  const CLOSING_PATHS = {
+    general: ['completionSig'],
+    hotwork: ['signOffMgr','signOffCrew'],
+    height:  ['closureCrew','closureMgr']
+  };
+
+  // Silently moves an already-submitted permit (one that was Loaded for Editing from
+  // history, hence has a remembered _submissionId) straight to Closed once its completion
+  // signature(s) are in place — no Submit click, and it does not count as a new submission:
+  // the backend updates that same row in place instead of appending a new one, and never
+  // emails EHS a second time for it.
+  async function autoCloseSync(formKey){
+    const w = pd(formKey);
+    const submissionId = w._submissionId;
+    if(!submissionId) return; // not a record loaded from history — nothing to close in place
+    if(!formIsClosed(formKey)) return;
+
+    const flatteners = { general: flattenGeneral, hotwork: flattenHotwork, height: flattenHeight };
+    const data = flatteners[formKey]();
+    let result = { ok:true };
+    if(syncUrl) result = await postToBackend({ formType: formKey, action:'close', submissionId, data });
+
+    if(result.ok){
+      toast(FORM_LABEL[formKey] + ' closed — moved to Closed Permits.');
+      permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
+      saveState();
+      renderAll();
+    } else {
+      // Leave the form (and its _submissionId) exactly as-is so the completion signature
+      // is still there and closing can simply be retried — nothing to redo.
+      toast(FORM_LABEL[formKey] + ' signed as closed, but syncing the closure failed — ' + (result.error || 'check your connection') + '. It will retry automatically the next time this page loads.');
+    }
+  }
 
   function crewLogRow(i){
     const r = pd('general').crewLog[i];
@@ -715,17 +813,8 @@
         <p style="font-size:11px;color:var(--text-dim);margin:-4px 0 8px;">Tick the EHS hazards that may be present:</p>
         ${chipsField('general','envHazards','Environment', ['Dust','Noise','Corrosive chemical','Inflammables','Fumes','Waste','Others'])}
         ${chipsField('general','safetyHazards','Safety', ['Moving machinery','Hot material','Traffic','Buried services','Electricity','Others'])}
-        <label class="f">PPE Required (State)</label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <div>${textField('general','ppeHead','Head protection')}</div>
-          <div>${textField('general','ppeEar','Ear protection')}</div>
-          <div>${textField('general','ppeEyeFace','Eye/face protection')}</div>
-          <div>${textField('general','ppeRespiratory','Respiratory protection')}</div>
-          <div>${textField('general','ppeHand','Hand protection')}</div>
-          <div>${textField('general','ppeBody','Body protection')}</div>
-          <div>${textField('general','ppeFeet','Feet protection')}</div>
-          <div>${textField('general','ppeOthers','Others (specify)')}</div>
-        </div>
+        ${chipsField('general','ppeItems','PPE Required (State)', ['Head protection','Ear protection','Eye/face protection','Respiratory protection','Hand protection','Body protection','Feet protection','Other'])}
+        ${textField('general','ppeOthers','Other (specify)')}
       </div>
       <div class="pc-section">
         <h5>Precautions to be Taken (Tick as Appropriate)</h5>
@@ -964,8 +1053,9 @@
     document.getElementById('form-height').innerHTML = renderHeightForm();
     ['general','hotwork','height'].forEach(k=>{
       const pill = document.getElementById('pill-'+k);
-      pill.textContent = formIsSigned(k) ? 'Signed' : 'Draft';
-      pill.className = 'statuspill ' + (formIsSigned(k) ? 'signed' : 'draft');
+      const closed = formIsClosed(k), signed = formIsSigned(k);
+      pill.textContent = closed ? 'Closed' : (signed ? 'Active' : 'Draft');
+      pill.className = 'statuspill ' + (closed ? 'closed' : (signed ? 'active' : 'draft'));
     });
     ['general','hotwork','height'].forEach(updateSubmitHint);
     const addBtn = document.getElementById('addCrewRow');
@@ -1004,6 +1094,7 @@
       const key = formKey+'|'+path;
       const newRow = document.querySelector(`[data-sigrow="${key}"]`);
       if(newRow){ newRow.classList.add('just-signed'); setTimeout(()=>newRow.classList.remove('just-signed'), 650); }
+      if((CLOSING_PATHS[formKey]||[]).includes(path)) autoCloseSync(formKey);
       return;
     }
     const unsignBtn = e.target.closest('[data-unsign]');
@@ -1096,23 +1187,35 @@
     btn.disabled = true;
     btn.textContent = 'Submitting…';
 
-    let archiveOk = true;
+    let result = { ok:true };
     if(syncUrl){
       clearTimeout(syncTimer);
-      archiveOk = await submitToHistory([formKey]);
+      result = await submitFormToBackend(formKey);
     }
 
     btn.disabled = false;
     btn.textContent = 'Submit ' + formLabel;
 
-    // Clear only this permit's own form — the other two permit types are untouched.
-    permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
-    saveState();
-    renderAll();
+    if(!syncUrl){
+      permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
+      saveState();
+      renderAll();
+      toast(formLabel + ' submitted — saved on this device only (no live sync configured).');
+      return;
+    }
 
-    toast(syncUrl
-      ? (archiveOk ? formLabel + ' submitted — saved to history in the shared sheet.' : formLabel + ' submitted — saved on this device, but sending to the shared sheet failed.')
-      : formLabel + ' submitted — saved on this device.');
+    if(result.ok){
+      // Clear only this permit's own form — the other two permit types are untouched.
+      permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
+      saveState();
+      renderAll();
+      toast(formLabel + ' submitted — saved to history in the shared sheet.');
+    } else {
+      // Don't wipe the form on a real failure — the person would have to redo everything.
+      hint.innerHTML = 'Not submitted: ' + (result.error || 'the shared sheet rejected it') + ' — your entries are still here, try Submit again.';
+      hint.style.color = 'var(--danger)';
+      toast(formLabel + ' was NOT submitted — ' + (result.error || 'the shared sheet rejected it') + '. Try again.');
+    }
   }
   document.getElementById('submitBtn-general').addEventListener('click', ()=> submitOne('general'));
   document.getElementById('submitBtn-hotwork').addEventListener('click', ()=> submitOne('hotwork'));
@@ -1122,42 +1225,51 @@
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
-      ['general','hotwork','height','active','history'].forEach(t=>{
+      ['general','hotwork','height','history','closed','insights'].forEach(t=>{
         document.getElementById('sub-'+t).classList.toggle('hidden', t!==btn.dataset.sub);
       });
-      if(btn.dataset.sub === 'history') loadHistoryCache().then(()=>{ renderStatsBar(); renderHistoryList(currentHistoryType); });
-      if(btn.dataset.sub === 'active') loadHistoryCache().then(renderActiveList);
+      if(btn.dataset.sub === 'history') loadHistoryCache().then(()=>{ renderStatsBar(); renderPermitList(activeType,'active'); });
+      if(btn.dataset.sub === 'closed') loadHistoryCache().then(()=>{ renderStatsBar(); renderPermitList(closedType,'closed'); });
+      if(btn.dataset.sub === 'insights') loadHistoryCache().then(renderInsights);
     });
   });
 
-  let currentHistoryType = 'general';
+  let activeType = 'general';
+  let closedType = 'general';
   let historyCache = { general: [], hotwork: [], height: [] };
-  let historySearchQuery = '';
-  let historyStatusFilter = 'all';
-  let historySortOrder = 'new';
-  let historyHighlightId = null;
-  let historyExpanded = new Set();
-  document.querySelectorAll('.histtypebtn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.histtypebtn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      currentHistoryType = btn.dataset.histtype;
-      historyExpanded.clear();
-      renderHistoryList(currentHistoryType);
+  let activeSearchQuery = '', closedSearchQuery = '';
+  let activeSortOrder = 'new', closedSortOrder = 'new';
+  let activeExpanded = new Set(), closedExpanded = new Set();
+  let historyHighlightId = null, historyHighlightMode = null;
+
+  document.querySelectorAll('.historytypes').forEach(group=>{
+    const mode = group.dataset.mode;
+    group.querySelectorAll('.histtypebtn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        group.querySelectorAll('.histtypebtn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        if(mode === 'active'){ activeType = btn.dataset.histtype; activeExpanded.clear(); renderPermitList(activeType, 'active'); }
+        else { closedType = btn.dataset.histtype; closedExpanded.clear(); renderPermitList(closedType, 'closed'); }
+      });
     });
   });
-  document.getElementById('historySearch').addEventListener('input', e=>{
-    historySearchQuery = e.target.value.trim().toLowerCase();
-    renderHistoryList(currentHistoryType);
+  document.getElementById('activeSearch').addEventListener('input', e=>{
+    activeSearchQuery = e.target.value.trim().toLowerCase();
+    renderPermitList(activeType, 'active');
   });
-  document.getElementById('historyStatusFilter').addEventListener('change', e=>{
-    historyStatusFilter = e.target.value;
-    renderHistoryList(currentHistoryType);
+  document.getElementById('activeSort').addEventListener('change', e=>{
+    activeSortOrder = e.target.value;
+    renderPermitList(activeType, 'active');
   });
-  document.getElementById('historySort').addEventListener('change', e=>{
-    historySortOrder = e.target.value;
-    renderHistoryList(currentHistoryType);
+  document.getElementById('closedSearch').addEventListener('input', e=>{
+    closedSearchQuery = e.target.value.trim().toLowerCase();
+    renderPermitList(closedType, 'closed');
   });
+  document.getElementById('closedSort').addEventListener('change', e=>{
+    closedSortOrder = e.target.value;
+    renderPermitList(closedType, 'closed');
+  });
+
   function copyText(text){
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(()=>toast('Link copied')).catch(()=>fallbackCopy(text));
@@ -1173,14 +1285,20 @@
     catch(e){ toast('Could not copy — link: ' + text); }
     ta.remove();
   }
-  document.getElementById('refreshActiveBtn').addEventListener('click', async ()=>{
-    await loadHistoryCache();
-    renderActiveList();
-  });
-  document.getElementById('refreshHistoryBtn').addEventListener('click', async ()=>{
+
+  document.getElementById('refreshActiveListBtn').addEventListener('click', async ()=>{
     await loadHistoryCache();
     renderStatsBar();
-    renderHistoryList(currentHistoryType);
+    renderPermitList(activeType, 'active');
+  });
+  document.getElementById('refreshClosedListBtn').addEventListener('click', async ()=>{
+    await loadHistoryCache();
+    renderStatsBar();
+    renderPermitList(closedType, 'closed');
+  });
+  document.getElementById('refreshInsightsBtn').addEventListener('click', async ()=>{
+    await loadHistoryCache();
+    renderInsights();
   });
 
   async function loadHistoryCache(){
@@ -1193,89 +1311,54 @@
     };
   }
 
-  function isActiveToday(lastUpdated){
-    if(!lastUpdated) return null;
-    const d = new Date(lastUpdated);
-    if(isNaN(d.getTime())) return null;
-    return (Date.now() - d.getTime()) < 24*60*60*1000;
-  }
-
-  const TYPE_LABEL = { general:'General Work Permit', hotwork:'Hot Work / Confined / Silo', height:'Working at Height' };
   const TITLE_FIELD = { general:'Department/Location', hotwork:'Location', height:'Location' };
   const SUB_FIELD = { general:'Description', hotwork:'Purpose', height:'Description' };
-  const SIGNER_FIELDS = {
-    general: [['Crew Leader Signed By','Crew Leader'], ['Authorization Signed By','Authorization']],
-    hotwork: [['Safe Commence - Crew','Crew'], ['Safe Commence - Mgr','Mgr/Supervisor']],
-    height: [['Auth - Crew','Crew'], ['Auth - Mgr','Mgr/Supervisor']],
-  };
 
-  function renderActiveList(){
-    const host = document.getElementById('activeList');
-    if(!syncUrl){
-      host.innerHTML = '<div class="histempty">Live sync isn\'t configured, so there\'s nothing shared to verify yet.</div>';
-      return;
-    }
-    const combined = [];
-    ['general','hotwork','height'].forEach(formType=>{
-      (historyCache[formType]||[]).forEach(r=>{
-        if(r['Status'] === 'Signed' && isActiveToday(r['Last Updated'])){
-          combined.push({ formType, r });
-        }
-      });
-    });
-    combined.sort((a,b)=> new Date(b.r['Last Updated']) - new Date(a.r['Last Updated']));
-
-    if(combined.length === 0){
-      host.innerHTML = '<div class="histempty">No signed, active permits right now. Anything shown here would be plant-wide and currently valid.</div>';
-      return;
-    }
-    host.innerHTML = combined.map(({formType, r})=>{
-      const signers = SIGNER_FIELDS[formType]
-        .filter(([field])=> r[field])
-        .map(([field,label])=> `<b>${label}:</b> ${r[field]}`)
-        .join(' &nbsp;·&nbsp; ');
-      return `<div class="activecard">
-        <div class="activecard-top">
-          <div>
-            <div class="activecard-type">${TYPE_LABEL[formType]}</div>
-            <div class="activecard-title">${r[TITLE_FIELD[formType]] || '(no location given)'}</div>
-            <div class="activecard-desc">${(r[SUB_FIELD[formType]]||'').slice(0,100)}</div>
-            <div class="activecard-signers">${signers || 'No signer names on record'}</div>
-            <div class="activecard-time">Submitted ${r['Last Updated']||''}</div>
-          </div>
-          <span class="approvedbadge">✓ Approved</span>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  function renderStatsBar(){
-    const bar = document.getElementById('statsBar');
-    if(!syncUrl){ bar.innerHTML = ''; return; }
-    const all = [...historyCache.general, ...historyCache.hotwork, ...historyCache.height];
-    const total = all.length;
-    const weekAgo = Date.now() - 7*24*60*60*1000;
-    const thisWeek = all.filter(r=>{
-      const d = new Date(r['Last Updated']);
-      return !isNaN(d.getTime()) && d.getTime() >= weekAgo;
-    }).length;
-    const activeToday = all.filter(r => isActiveToday(r['Last Updated'])).length;
-    bar.innerHTML = `
-      <div class="statcard"><div class="n">${total}</div><div class="l">Total Submitted</div></div>
-      <div class="statcard"><div class="n">${thisWeek}</div><div class="l">Last 7 Days</div></div>
-      <div class="statcard"><div class="n">${activeToday}</div><div class="l">Active (24h)</div></div>
-      <div class="statcard"><div class="n">${historyCache.general.length}</div><div class="l">General</div></div>
-      <div class="statcard"><div class="n">${historyCache.hotwork.length}</div><div class="l">Hot Work</div></div>
-      <div class="statcard"><div class="n">${historyCache.height.length}</div><div class="l">Height</div></div>
-    `;
+  // Whether a fetched record has its completion/closure signatures — read straight off the
+  // record's own fields rather than a stored Status label, so permits submitted before this
+  // feature existed still land in the right tab.
+  function recordIsClosed(formType, r){
+    if(formType==='general') return !!r['Completion Signed By'];
+    if(formType==='hotwork') return !!(r['Sign Off - Mgr'] && r['Sign Off - Crew']);
+    if(formType==='height') return !!(r['Closure - Crew'] && r['Closure - Mgr']);
+    return false;
   }
 
   function histKey(r, i){ return r['Submission ID'] || ('idx'+i); }
 
-  function renderHistoryList(formType){
-    const host = document.getElementById('historyList');
+  function renderStatsBar(){
+    const bars = [document.getElementById('statsBar'), document.getElementById('statsBarClosed')].filter(Boolean);
+    if(!syncUrl){ bars.forEach(b=> b.innerHTML = ''); return; }
+    const all = [
+      ...historyCache.general.map(r=>({formType:'general', r})),
+      ...historyCache.hotwork.map(r=>({formType:'hotwork', r})),
+      ...historyCache.height.map(r=>({formType:'height', r})),
+    ];
+    const total = all.length;
+    const weekAgo = Date.now() - 7*24*60*60*1000;
+    const thisWeek = all.filter(({r})=>{
+      const d = new Date(r['Last Updated']);
+      return !isNaN(d.getTime()) && d.getTime() >= weekAgo;
+    }).length;
+    const closedCount = all.filter(({formType,r}) => recordIsClosed(formType, r)).length;
+    const openCount = total - closedCount;
+    const html = `
+      <div class="statcard"><div class="n">${total}</div><div class="l">Total Submitted</div></div>
+      <div class="statcard"><div class="n">${thisWeek}</div><div class="l">Last 7 Days</div></div>
+      <div class="statcard"><div class="n">${openCount}</div><div class="l">Active / Open</div></div>
+      <div class="statcard"><div class="n">${closedCount}</div><div class="l">Closed</div></div>
+      <div class="statcard"><div class="n">${historyCache.general.length}</div><div class="l">General</div></div>
+      <div class="statcard"><div class="n">${historyCache.hotwork.length}</div><div class="l">Hot Work</div></div>
+      <div class="statcard"><div class="n">${historyCache.height.length}</div><div class="l">Height</div></div>
+    `;
+    bars.forEach(b=> b.innerHTML = html);
+  }
+
+  // Shared renderer for both the Active Permits and Closed Permits tabs.
+  function renderPermitList(formType, mode){
+    const host = document.getElementById(mode === 'active' ? 'activePermitList' : 'closedPermitList');
     if(!syncUrl){
-      host.innerHTML = '<div class="histempty">Live sync isn\'t configured, so there\'s no shared history to show yet.</div>';
+      host.innerHTML = '<div class="histempty">Live sync isn\'t configured, so there\'s nothing shared to show yet.</div>';
       return;
     }
     const allRecords = historyCache[formType] || [];
@@ -1283,46 +1366,50 @@
       host.innerHTML = '<div class="histempty">No submitted permits of this type yet. Once you Submit one, it will show up here.</div>';
       return;
     }
-    const titleField = { general:'Department/Location', hotwork:'Location', height:'Location' }[formType];
-    const subField = { general:'Description', hotwork:'Purpose', height:'Description' }[formType];
+    const modeRecords = allRecords
+      .map((r,i)=>({ r, key: histKey(r,i) }))
+      .filter(({r}) => mode === 'active' ? !recordIsClosed(formType, r) : recordIsClosed(formType, r));
 
-    let records = allRecords.map((r,i)=>({ r, key: histKey(r,i) }));
-    if(historyStatusFilter !== 'all'){
-      records = records.filter(({r})=> r['Status'] === historyStatusFilter);
-    }
-    if(historySearchQuery){
+    const searchQuery = mode === 'active' ? activeSearchQuery : closedSearchQuery;
+    const sortOrder = mode === 'active' ? activeSortOrder : closedSortOrder;
+    const expanded = mode === 'active' ? activeExpanded : closedExpanded;
+    const titleField = TITLE_FIELD[formType];
+    const subField = SUB_FIELD[formType];
+
+    let records = modeRecords;
+    if(searchQuery){
       records = records.filter(({r})=>
-        (r[titleField]||'').toLowerCase().includes(historySearchQuery) ||
-        (r[subField]||'').toLowerCase().includes(historySearchQuery)
+        (r[titleField]||'').toLowerCase().includes(searchQuery) ||
+        (r[subField]||'').toLowerCase().includes(searchQuery)
       );
     }
     // Cache arrives newest-first from the backend; only re-order when "oldest first" is picked.
-    if(historySortOrder === 'old') records = records.slice().reverse();
+    if(sortOrder === 'old') records = records.slice().reverse();
 
     if(records.length === 0){
-      host.innerHTML = '<div class="histempty">No permits match your search/filter.</div>';
+      host.innerHTML = modeRecords.length === 0
+        ? `<div class="histempty">No ${mode === 'active' ? 'active' : 'closed'} permits of this type right now.</div>`
+        : '<div class="histempty">No permits match your search.</div>';
       return;
     }
 
     host.innerHTML = records.map(({r, key})=>{
-      const active = isActiveToday(r['Last Updated']);
-      const expiryBadge = active===null ? '' : active
-        ? '<span class="expirybadge active">Active</span>'
-        : '<span class="expirybadge expired">Expired</span>';
-      const statusPill = `<span class="statuspill ${r['Status']==='Signed'?'signed':'draft'}" style="float:none;">${r['Status']||'—'}</span>`;
-      const linkTag = (historyHighlightId && key === historyHighlightId) ? '<span class="linktag">🔗 From email</span>' : '';
-      const isExpanded = historyExpanded.has(key);
+      const closed = recordIsClosed(formType, r);
+      const statusPill = `<span class="statuspill ${closed ? 'closed' : 'active'}" style="float:none;">${closed ? 'Closed' : 'Active'}</span>`;
+      const isHighlighted = !!(historyHighlightId && key === historyHighlightId && historyHighlightMode === mode);
+      const linkTag = isHighlighted ? '<span class="linktag">🔗 From email</span>' : '';
+      const isExpanded = expanded.has(key);
       const detailRows = Object.keys(r)
         .filter(k => r[k] !== '' && r[k] !== null && r[k] !== undefined)
         .map(k => `<dt>${k}</dt><dd>${String(r[k]).replace(/</g,'&lt;')}</dd>`)
         .join('');
-      const highlightClass = (historyHighlightId && key === historyHighlightId) ? ' highlighted' : '';
-      const statusClass = r['Status']==='Signed' ? ' is-signed' : ' is-draft';
+      const statusClass = closed ? ' is-closed' : ' is-active';
+      const highlightClass = isHighlighted ? ' highlighted' : '';
       return `
       <div class="histcard${statusClass}${highlightClass}" data-histkey="${key}">
         <div class="histcard-top">
           <div>
-            <div class="histcard-title">${r[titleField] || '(no location given)'}${expiryBadge}${statusPill}${linkTag}</div>
+            <div class="histcard-title">${r[titleField] || '(no location given)'}${statusPill}${linkTag}</div>
             <div class="histcard-meta">${(r[subField]||'').slice(0,80)}</div>
             <div class="histcard-meta">Submitted ${r['Last Updated']||''}</div>
           </div>
@@ -1342,18 +1429,21 @@
       btn.addEventListener('click', ()=>{
         const record = byKey[btn.dataset.loadhist];
         permitData[formType] = UNFLATTEN[formType](record);
+        permitData[formType]._submissionId = record['Submission ID'] || '';
         saveState();
         renderAll();
         document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub===formType));
-        ['general','hotwork','height','active','history'].forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!==formType));
-        toast('Loaded record — now editing');
+        ['general','hotwork','height','history','closed','insights'].forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!==formType));
+        toast(mode === 'closed'
+          ? 'Loaded closed record — now editing'
+          : 'Loaded record — now editing. Signing the completion signature will close it automatically, no Submit needed.');
       });
     });
     host.querySelectorAll('[data-toggledetail]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const key = btn.dataset.toggledetail;
-        if(historyExpanded.has(key)) historyExpanded.delete(key); else historyExpanded.add(key);
-        renderHistoryList(formType);
+        if(expanded.has(key)) expanded.delete(key); else expanded.add(key);
+        renderPermitList(formType, mode);
       });
     });
     host.querySelectorAll('[data-copylink]').forEach(btn=>{
@@ -1363,6 +1453,206 @@
         copyText(url);
       });
     });
+  }
+
+  // ================= INSIGHTS: small analytics dashboard =================
+  const CHART_HEX = { general:'#3987e5', hotwork:'#d95926', height:'#199e70' };
+
+  function mondayOf(d){
+    const dt = new Date(d);
+    const day = dt.getDay();
+    const diff = (day===0 ? -6 : 1) - day;
+    dt.setDate(dt.getDate()+diff);
+    dt.setHours(0,0,0,0);
+    return dt;
+  }
+  function fmtWeekLabel(d){
+    return d.toLocaleDateString(undefined, { month:'short', day:'numeric' });
+  }
+  function escAttr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+  function escText(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+  function computeInsights(){
+    const all = [
+      ...historyCache.general.map(r=>({formType:'general', r})),
+      ...historyCache.hotwork.map(r=>({formType:'hotwork', r})),
+      ...historyCache.height.map(r=>({formType:'height', r})),
+    ];
+    const byType = { general:0, hotwork:0, height:0 };
+    const byDept = {};
+    const weeksBack = 8;
+    const weekOrder = [];
+    const weekBuckets = {};
+    const thisMonday = mondayOf(new Date());
+    for(let i=weeksBack-1;i>=0;i--){
+      const wStart = new Date(thisMonday); wStart.setDate(wStart.getDate() - i*7);
+      const key = wStart.toISOString().slice(0,10);
+      weekOrder.push(key);
+      weekBuckets[key] = { general:0, hotwork:0, height:0, label: fmtWeekLabel(wStart) };
+    }
+    all.forEach(({formType, r})=>{
+      byType[formType]++;
+      const dept = (r[TITLE_FIELD[formType]] || '').trim() || 'Unspecified';
+      byDept[dept] = (byDept[dept]||0) + 1;
+      const d = new Date(r['Last Updated']);
+      if(!isNaN(d.getTime())){
+        const wk = mondayOf(d).toISOString().slice(0,10);
+        if(weekBuckets[wk]) weekBuckets[wk][formType]++;
+      }
+    });
+    const topDepts = Object.entries(byDept).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    return { byType, topDepts, weeks: weekOrder.map(k=>weekBuckets[k]) };
+  }
+
+  function showVizTooltip(evt, label, rows){
+    const tip = document.getElementById('vizTooltip');
+    const rowsHtml = rows.map(([k,v])=> `<div><span class="n">${escText(String(v))}</span> <span class="l">${escText(k)}</span></div>`).join('');
+    tip.innerHTML = `<div class="l" style="margin-bottom:2px;">${escText(label)}</div>${rowsHtml}`;
+    tip.classList.remove('hidden');
+    positionVizTooltip(evt);
+  }
+  function positionVizTooltip(evt){
+    const tip = document.getElementById('vizTooltip');
+    const pad = 14;
+    let x = evt.clientX + pad, y = evt.clientY + pad;
+    const rect = tip.getBoundingClientRect();
+    if(x + rect.width > window.innerWidth - 8) x = evt.clientX - rect.width - pad;
+    if(y + rect.height > window.innerHeight - 8) y = evt.clientY - rect.height - pad;
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  function hideVizTooltip(){
+    document.getElementById('vizTooltip').classList.add('hidden');
+  }
+  function wireVizBarTooltips(host, unit){
+    host.querySelectorAll('.vizbar').forEach(bar=>{
+      const label = bar.dataset.label;
+      const value = bar.dataset.value;
+      const onShow = (evt)=> showVizTooltip(evt, label, [[unit, value]]);
+      bar.addEventListener('pointerenter', onShow);
+      bar.addEventListener('pointermove', positionVizTooltip);
+      bar.addEventListener('pointerleave', hideVizTooltip);
+      bar.addEventListener('focus', ()=>{
+        const r = bar.getBoundingClientRect();
+        onShow({clientX:r.left+r.width/2, clientY:r.top});
+      });
+      bar.addEventListener('blur', hideVizTooltip);
+    });
+  }
+
+  // Vertical bar: rounded top corners (the data-end), square baseline.
+  function vBarPath(x, y, w, h, r){
+    r = Math.max(0, Math.min(r, w/2, h));
+    if(h <= 0) return '';
+    return `M${x},${y+h} L${x},${y+r} Q${x},${y} ${x+r},${y} L${x+w-r},${y} Q${x+w},${y} ${x+w},${y+r} L${x+w},${y+h} Z`;
+  }
+  // Horizontal bar: rounded right corner (the data-end), square at the axis baseline.
+  function hBarPath(x, y, w, h, r){
+    r = Math.max(0, Math.min(r, h/2, w));
+    if(w <= 0) return '';
+    return `M${x},${y} L${x+w-r},${y} Q${x+w},${y} ${x+w},${y+r} L${x+w},${y+h-r} Q${x+w},${y+h} ${x+w-r},${y+h} L${x},${y+h} Z`;
+  }
+
+  function renderByTypeChart(byType){
+    const host = document.getElementById('vizByType');
+    const entries = [['general',byType.general], ['hotwork',byType.hotwork], ['height',byType.height]];
+    if(entries.every(([,v])=>v===0)){
+      host.innerHTML = '<div class="histempty">No submitted permits yet.</div>';
+      return;
+    }
+    const max = Math.max(1, ...entries.map(([,v])=>v));
+    const barW = 46, gap = 30, chartH = 140, baseline = chartH + 10;
+    const shortLabel = { general:'General', hotwork:'Hot Work', height:'Height' };
+    const bars = entries.map(([type,val], i)=>{
+      const x = 20 + i*(barW+gap);
+      const h = (val/max) * chartH;
+      const y = baseline - h;
+      return `<path class="vizbar" tabindex="0" d="${vBarPath(x,y,barW,h,4)}" fill="${CHART_HEX[type]}"
+          data-label="${escAttr(FORM_LABEL[type])}" data-value="${val}"></path>
+        <text class="vizvaluelabel" x="${x+barW/2}" y="${Math.max(12,y-6)}" text-anchor="middle">${val}</text>
+        <text class="vizaxislabel" x="${x+barW/2}" y="${baseline+16}" text-anchor="middle">${escText(shortLabel[type])}</text>`;
+    }).join('');
+    host.innerHTML = `<svg viewBox="0 0 ${20+entries.length*(barW+gap)-gap+20} ${baseline+26}" style="width:100%;height:auto;max-width:320px;">
+      <line x1="16" y1="${baseline}" x2="${entries.length*(barW+gap)+10}" y2="${baseline}" stroke="var(--border)" stroke-width="1"></line>
+      ${bars}
+    </svg>`;
+    wireVizBarTooltips(host, 'permits');
+  }
+
+  function renderByDeptChart(topDepts){
+    const host = document.getElementById('vizByDept');
+    if(topDepts.length === 0){
+      host.innerHTML = '<div class="histempty">No submitted permits yet.</div>';
+      return;
+    }
+    const max = Math.max(1, ...topDepts.map(([,v])=>v));
+    const rowH = 22, gap = 10, labelW = 118, chartW = 120, leftPad = 4;
+    const totalH = topDepts.length * (rowH+gap) - gap;
+    const rows = topDepts.map(([name,val], i)=>{
+      const y = i*(rowH+gap);
+      const w = (val/max) * chartW;
+      const shown = name.length > 16 ? name.slice(0,15)+'…' : name;
+      return `<text class="vizaxislabel" x="${leftPad}" y="${y+rowH/2+4}" text-anchor="start">${escText(shown)}</text>
+        <path class="vizbar" tabindex="0" d="${hBarPath(leftPad+labelW, y+3, w, rowH-6, 4)}" fill="var(--accent)"
+          data-label="${escAttr(name)}" data-value="${val}"></path>
+        <text class="vizvaluelabel" x="${leftPad+labelW+w+8}" y="${y+rowH/2+4}" text-anchor="start">${val}</text>`;
+    }).join('');
+    host.innerHTML = `<svg viewBox="0 0 320 ${totalH+8}" style="width:100%;height:auto;">${rows}</svg>`;
+    wireVizBarTooltips(host, 'permits');
+  }
+
+  function renderTrendChart(weeks){
+    const host = document.getElementById('vizTrend');
+    if(weeks.every(w=>w.general+w.hotwork+w.height===0)){
+      host.innerHTML = '<div class="histempty">No submitted permits yet in this window.</div>';
+      return;
+    }
+    const totals = weeks.map(w=>w.general+w.hotwork+w.height);
+    const max = Math.max(1, ...totals);
+    const barW = 34, gap = 16, chartH = 150, baseline = chartH + 10;
+    const n = weeks.length;
+    const order = ['height','hotwork','general']; // bottom-to-top stacking order
+    const bars = weeks.map((wk, i)=>{
+      const x = 20 + i*(barW+gap);
+      let cursorY = baseline;
+      const segs = order.map((type, idx)=>{
+        const val = wk[type];
+        const rawH = (val/max) * chartH;
+        if(val <= 0) return '';
+        const isTop = idx === order.length-1;
+        const isBottom = idx === 0;
+        const topInset = isTop ? 0 : 1;
+        const bottomInset = isBottom ? 0 : 1;
+        const y0 = cursorY - rawH;
+        const y = y0 + topInset;
+        const h = Math.max(0, rawH - topInset - bottomInset);
+        cursorY = y0;
+        const path = isTop ? vBarPath(x, y, barW, h, 4) : `M${x},${y+h} L${x},${y} L${x+barW},${y} L${x+barW},${y+h} Z`;
+        return `<path class="vizbar" tabindex="0" d="${path}" fill="${CHART_HEX[type]}"
+          data-label="${escAttr(wk.label + ' — ' + FORM_LABEL[type])}" data-value="${val}"></path>`;
+      }).join('');
+      const total = totals[i];
+      return `${segs}
+        ${total>0 ? `<text class="vizvaluelabel" x="${x+barW/2}" y="${Math.max(12,baseline-((total/max)*chartH)-6)}" text-anchor="middle">${total}</text>` : ''}
+        <text class="vizaxislabel" x="${x+barW/2}" y="${baseline+16}" text-anchor="middle">${escText(wk.label)}</text>`;
+    }).join('');
+    host.innerHTML = `<svg viewBox="0 0 ${20+n*(barW+gap)} ${baseline+26}" style="width:100%;height:auto;">
+        <line x1="16" y1="${baseline}" x2="${20+n*(barW+gap)-gap+14}" y2="${baseline}" stroke="var(--border)" stroke-width="1"></line>
+        ${bars}
+      </svg>
+      <div class="vizlegend">
+        <div class="vizlegend-item"><span class="vizlegend-swatch" style="background:${CHART_HEX.general}"></span>General Work Permit</div>
+        <div class="vizlegend-item"><span class="vizlegend-swatch" style="background:${CHART_HEX.hotwork}"></span>Hot Work Permit</div>
+        <div class="vizlegend-item"><span class="vizlegend-swatch" style="background:${CHART_HEX.height}"></span>Working at Height</div>
+      </div>`;
+    wireVizBarTooltips(host, 'permits');
+  }
+
+  function renderInsights(){
+    const { byType, topDepts, weeks } = computeInsights();
+    renderByTypeChart(byType);
+    renderByDeptChart(topDepts);
+    renderTrendChart(weeks);
   }
 
   document.getElementById('syncSettingsBtn').addEventListener('click', ()=>{
@@ -1400,28 +1690,39 @@
     setSyncStatus(syncUrl ? 'ok' : '', syncUrl ? 'Live sync active — will sync on changes' : 'Live sync not configured');
     renderAll();
     await openLinkedPermitFromUrl();
+    // Retry any closure that was signed but never made it to the server (e.g. the tab
+    // closed before the sync finished) — picks up right where it left off, silently.
+    ['general','hotwork','height'].forEach(k=>{
+      if(pd(k)._submissionId && formIsClosed(k)) autoCloseSync(k);
+    });
   }
 
   // Handles links like "...?permit=hotwork&id=<Submission ID>" — the kind EHS gets in the
-  // notification email — by jumping straight to History, that permit type, with the exact
-  // record highlighted and expanded.
+  // notification email — by jumping straight to whichever tab that permit is currently in
+  // (Active or Closed), that permit type, with the exact record highlighted and expanded.
   async function openLinkedPermitFromUrl(){
     const params = new URLSearchParams(location.search);
     const linkType = params.get('permit');
     const linkId = params.get('id');
     if(!linkType || !linkId || !['general','hotwork','height'].includes(linkType)) return;
 
-    historyHighlightId = linkId;
-    currentHistoryType = linkType;
-    historyExpanded.add(linkId);
-
-    document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub==='history'));
-    ['general','hotwork','height','active','history'].forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!=='history'));
-    document.querySelectorAll('.histtypebtn').forEach(b=>b.classList.toggle('active', b.dataset.histtype===linkType));
-
     await loadHistoryCache();
+    const records = historyCache[linkType] || [];
+    const idx = records.findIndex((r,i)=> histKey(r,i) === linkId);
+    const mode = (idx > -1 && recordIsClosed(linkType, records[idx])) ? 'closed' : 'active';
+
+    historyHighlightId = linkId;
+    historyHighlightMode = mode;
+    if(mode === 'active'){ activeType = linkType; activeExpanded.add(linkId); }
+    else { closedType = linkType; closedExpanded.add(linkId); }
+
+    const targetSub = mode === 'active' ? 'history' : 'closed';
+    document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub===targetSub));
+    ['general','hotwork','height','history','closed','insights'].forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!==targetSub));
+    document.querySelectorAll(`.historytypes[data-mode="${mode}"] .histtypebtn`).forEach(b=>b.classList.toggle('active', b.dataset.histtype===linkType));
+
     renderStatsBar();
-    renderHistoryList(currentHistoryType);
+    renderPermitList(linkType, mode);
 
     const card = document.querySelector(`[data-histkey="${CSS.escape(linkId)}"]`);
     if(card){ card.scrollIntoView({behavior:'smooth', block:'center'}); }
