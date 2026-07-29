@@ -24,6 +24,8 @@
   .mark{width:34px;height:34px;object-fit:contain;flex:none;}
   .brand-divider{width:1px;height:24px;background:rgba(238,243,234,.25);flex:none;}
   .hmark{width:28px;height:28px;object-fit:contain;flex:none;}
+  .pendingbadge{margin-left:auto;background:var(--caution-dim);color:var(--caution);border:1px solid rgba(232,185,58,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;letter-spacing:.02em;white-space:nowrap;}
+  .pendingbadge.hidden{display:none;}
   .sitefooter{display:flex;align-items:center;justify-content:center;gap:12px;padding:22px 18px;background:var(--brand-deep);border-top:1px solid rgba(0,221,57,.2);flex-wrap:wrap;text-align:center;}
   .sitefooter-mark{width:26px;height:26px;object-fit:contain;flex:none;}
   .sitefooter-text{font-size:11px;color:#8FCBA3;font-family:var(--font-m);letter-spacing:.03em;}
@@ -43,6 +45,21 @@
   .subtabbtn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
   .subpane{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px 20px;}
   .subpane.hidden{display:none;}
+  #adminAuthPanel.hidden{display:none;}
+  #adminContent.hidden{display:none;}
+  .adminsubpane.hidden{display:none;}
+  .adminlock{display:flex;justify-content:center;padding:44px 16px;}
+  .adminlock-card{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--border);border-radius:18px;padding:38px 32px;max-width:360px;width:100%;text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.4);}
+  .adminlock-card.shake{animation:missingShake .4s ease;}
+  .adminlock-icon{font-size:32px;line-height:1;margin-bottom:12px;filter:drop-shadow(0 2px 8px var(--accent-dim));}
+  .adminlock-title{font-family:var(--font-d);text-transform:uppercase;font-size:19px;letter-spacing:.05em;color:var(--text);margin-bottom:10px;}
+  .adminlock-sub{font-size:12.5px;color:var(--text-dim);line-height:1.55;margin:0 0 24px;}
+  .adminlock-field{display:flex;gap:8px;}
+  .adminlock-field input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-family:var(--font-m);font-size:13px;letter-spacing:.08em;transition:border-color .15s ease, box-shadow .15s ease;}
+  .adminlock-field input::placeholder{color:var(--text-dim);letter-spacing:normal;}
+  .adminlock-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+  .adminlock-field .btn{flex:none;}
+  .adminlock-error{font-size:12px;color:var(--danger);margin:14px 0 0;min-height:14px;}
   .permitcode{font-family:var(--font-m);font-size:11px;color:var(--text-dim);letter-spacing:.03em;}
   .permittitle{font-family:var(--font-d);font-size:18px;text-transform:uppercase;margin:4px 0 4px;}
   .permitdesc{font-size:12.5px;color:var(--text-dim);line-height:1.5;margin:0 0 4px;}
@@ -50,6 +67,7 @@
   .statuspill.draft{background:var(--surface-2);color:var(--text-dim);border:1px solid var(--border);}
   .statuspill.active{background:var(--caution-dim);color:var(--caution);}
   .statuspill.closed{background:var(--good-dim);color:var(--good);}
+  .statuspill.overdue{background:var(--danger-dim);color:var(--danger);}
 
   .pc-section{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
   .pc-section:first-of-type{margin-top:14px;}
@@ -82,7 +100,7 @@
   .crewrow{display:flex;gap:8px;align-items:center;margin-bottom:7px;}
   .crewrow input[type=text]{flex:1;}
   .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--good);color:#0d1a12;padding:10px 18px;border-radius:8px;font-weight:600;font-size:13px;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,.4);}
-  .syncbar{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 13px;margin-bottom:14px;}
+  .syncbar{display:none;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 13px;margin-bottom:14px;}
   .syncstatus{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);}
   .syncdot{width:8px;height:8px;border-radius:50%;background:var(--text-dim);flex:none;}
   .syncdot.ok{background:var(--good);box-shadow:0 0 0 3px var(--good-dim);}
@@ -156,6 +174,7 @@
   .histcard{background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;transition:border-color .2s ease, box-shadow .2s ease, transform .1s ease;}
   .histcard:hover{border-color:var(--text-dim);box-shadow:0 2px 10px rgba(0,0,0,.25);}
   .histcard.is-active{border-left-color:var(--caution);}
+  .histcard.is-overdue{border-left-color:var(--danger);}
   .histcard.is-closed{border-left-color:var(--good);}
   .histcard.is-draft{border-left-color:var(--text-dim);}
   .histcard.highlighted{border-color:var(--accent);border-left-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);animation:histPulse 1.8s ease 2;}
@@ -207,6 +226,7 @@
   <span class="brand-divider"></span>
   <img class="hmark" src="data:image/png;base64,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" alt="Heidelberg Materials logo">
   <div><h1>GHACEM — Permits</h1><span>PERMIT FORMS</span></div>
+  <span id="pendingSyncBadge" class="pendingbadge hidden"></span>
 </header>
 
 <div class="sitebanner">
@@ -242,9 +262,8 @@
     <button class="subtabbtn active" data-sub="general">General Work Permit</button>
     <button class="subtabbtn" data-sub="hotwork">Hot Work / Confined / Silo</button>
     <button class="subtabbtn" data-sub="height">Working at Height</button>
-    <button class="subtabbtn" data-sub="history">Active Permits</button>
-    <button class="subtabbtn" data-sub="closed">Closed Permits</button>
-    <button class="subtabbtn" data-sub="insights">Insights</button>
+    <button class="subtabbtn" data-sub="signed">Signed Permits</button>
+    <button class="subtabbtn" data-sub="admin">Admin</button>
   </div>
 
   <div class="subpane" id="sub-general">
@@ -280,64 +299,127 @@
     </div>
     <p class="formsubmit-note">Submitting notifies EHS by email and records a permanent, time-stamped entry — independent of the other two permit types.</p>
   </div>
-  <div class="subpane hidden" id="sub-history">
-    <div class="permittitle" style="margin-bottom:4px;">Active Permits</div>
-    <p class="paneintro">Authorized and currently open, plant-wide. Once the completion / closure signatures are added and the form is resubmitted, a permit moves to <b>Closed Permits</b> automatically — nothing is ever deleted, every version stays on permanent record.</p>
-    <div class="statsbar" id="statsBar"></div>
-    <div class="historytypes" data-mode="active">
+  <div class="subpane hidden" id="sub-signed">
+    <div class="permittitle" style="margin-bottom:4px;">Signed Permits</div>
+    <p class="paneintro">Authorized and open for less than 24 hours, plant-wide — visible to everyone so anyone can verify a permit is legitimately signed, or sign off its completion. No admin access needed. Once closed, a permit moves to the admin-side Closed Permits record; if it's still open past 24 hours, it moves to the admin-side Permits to be Closed list instead.</p>
+    <div class="historytypes" data-mode="signed">
       <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
       <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
       <button class="histtypebtn" data-histtype="height">Working at Height</button>
-      <button class="btn btn-ghost btn-sm" id="refreshActiveListBtn" style="margin-left:auto;">↻ Refresh</button>
+      <button class="btn btn-ghost btn-sm" id="refreshSignedListBtn" style="margin-left:auto;">↻ Refresh</button>
     </div>
     <div class="histtoolbar">
-      <input type="text" id="activeSearch" placeholder="Search by location or description…">
-      <select id="activeSort">
+      <input type="text" id="signedSearch" placeholder="Search by location or description…">
+      <select id="signedSort">
         <option value="new">Newest first</option>
         <option value="old">Oldest first</option>
       </select>
     </div>
-    <div id="activePermitList"></div>
+    <div id="signedPermitList"></div>
   </div>
 
-  <div class="subpane hidden" id="sub-closed">
-    <div class="permittitle" style="margin-bottom:4px;">Closed Permits</div>
-    <p class="paneintro">Fully signed off and completed — retained here permanently for EHS verification and audit.</p>
-    <div class="statsbar" id="statsBarClosed"></div>
-    <div class="historytypes" data-mode="closed">
-      <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
-      <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
-      <button class="histtypebtn" data-histtype="height">Working at Height</button>
-      <button class="btn btn-ghost btn-sm" id="refreshClosedListBtn" style="margin-left:auto;">↻ Refresh</button>
+  <div class="subpane hidden" id="sub-admin">
+    <div id="adminAuthPanel" class="adminlock">
+      <div class="adminlock-card" id="adminlockCard">
+        <div class="adminlock-icon">🔒</div>
+        <div class="adminlock-title">Admin Access</div>
+        <p class="adminlock-sub">Insights, Active Permits, Permits to be Closed, and Closed Permits are restricted. Enter the admin password to continue.</p>
+        <div class="adminlock-field">
+          <input type="password" id="adminPasswordInput" placeholder="Admin password" autocomplete="off">
+          <button class="btn btn-primary" id="adminUnlockBtn">Unlock</button>
+        </div>
+        <p id="adminAuthError" class="adminlock-error"></p>
+      </div>
     </div>
-    <div class="histtoolbar">
-      <input type="text" id="closedSearch" placeholder="Search by location or description…">
-      <select id="closedSort">
-        <option value="new">Newest first</option>
-        <option value="old">Oldest first</option>
-      </select>
-    </div>
-    <div id="closedPermitList"></div>
-  </div>
 
-  <div class="subpane hidden" id="sub-insights">
-    <div class="permittitle" style="margin-bottom:4px;">Insights</div>
-    <p class="paneintro">A quick read on permit volume, plant-wide — computed live from every submitted permit on record.</p>
-    <div class="actionrow" style="margin:0 0 14px;">
-      <button class="btn btn-ghost btn-sm" id="refreshInsightsBtn">↻ Refresh</button>
-    </div>
-    <div class="vizgrid">
-      <div class="vizcard">
-        <h5>Permits by Type</h5>
-        <div id="vizByType"></div>
+    <div id="adminContent" class="hidden">
+      <div class="historytypes" style="margin-bottom:16px;">
+        <button class="histtypebtn active" data-adminsub="insights">Insights</button>
+        <button class="histtypebtn" data-adminsub="active">Active Permits</button>
+        <button class="histtypebtn" data-adminsub="overdue">Permits to be Closed</button>
+        <button class="histtypebtn" data-adminsub="closed">Closed Permits</button>
+        <button class="btn btn-ghost btn-sm" id="adminLockBtn" style="margin-left:auto;">🔒 Lock</button>
       </div>
-      <div class="vizcard">
-        <h5>Top Departments / Locations</h5>
-        <div id="vizByDept"></div>
+
+      <div class="adminsubpane" id="adminsub-insights">
+        <div class="permittitle" style="margin-bottom:4px;">Insights</div>
+        <p class="paneintro">A quick read on permit volume, plant-wide — computed live from every submitted permit on record.</p>
+        <div class="actionrow" style="margin:0 0 14px;">
+          <button class="btn btn-ghost btn-sm" id="refreshInsightsBtn">↻ Refresh</button>
+        </div>
+        <div class="vizgrid">
+          <div class="vizcard">
+            <h5>Permits by Type</h5>
+            <div id="vizByType"></div>
+          </div>
+          <div class="vizcard">
+            <h5>Top Departments / Locations</h5>
+            <div id="vizByDept"></div>
+          </div>
+          <div class="vizcard vizcard-wide">
+            <h5>Weekly Submission Trend <span class="vizcard-sub">last 8 weeks</span></h5>
+            <div id="vizTrend"></div>
+          </div>
+        </div>
       </div>
-      <div class="vizcard vizcard-wide">
-        <h5>Weekly Submission Trend <span class="vizcard-sub">last 8 weeks</span></h5>
-        <div id="vizTrend"></div>
+
+      <div class="adminsubpane hidden" id="adminsub-active">
+        <div class="permittitle" style="margin-bottom:4px;">Active Permits</div>
+        <p class="paneintro">Authorized and signed within the last 24 hours, plant-wide. If a permit is still open past 24 hours, it automatically moves to <b>Permits to be Closed</b> so it doesn't get lost in this list. Once the completion / closure signature is added and the form is resubmitted, a permit moves to <b>Closed Permits</b> — nothing is ever deleted, every version stays on permanent record.</p>
+        <div class="statsbar" id="statsBar"></div>
+        <div class="historytypes" data-mode="active">
+          <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
+          <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
+          <button class="histtypebtn" data-histtype="height">Working at Height</button>
+          <button class="btn btn-ghost btn-sm" id="refreshActiveListBtn" style="margin-left:auto;">↻ Refresh</button>
+        </div>
+        <div class="histtoolbar">
+          <input type="text" id="activeSearch" placeholder="Search by location or description…">
+          <select id="activeSort">
+            <option value="new">Newest first</option>
+            <option value="old">Oldest first</option>
+          </select>
+        </div>
+        <div id="activePermitList"></div>
+      </div>
+
+      <div class="adminsubpane hidden" id="adminsub-overdue">
+        <div class="permittitle" style="margin-bottom:4px;">Permits to be Closed</div>
+        <p class="paneintro">Signed and still open for more than 24 hours, plant-wide — these need follow-up. As soon as the completion / closure signature is added and the form is resubmitted, a permit moves to <b>Closed Permits</b> automatically.</p>
+        <div class="historytypes" data-mode="overdue">
+          <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
+          <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
+          <button class="histtypebtn" data-histtype="height">Working at Height</button>
+          <button class="btn btn-ghost btn-sm" id="refreshOverdueListBtn" style="margin-left:auto;">↻ Refresh</button>
+        </div>
+        <div class="histtoolbar">
+          <input type="text" id="overdueSearch" placeholder="Search by location or description…">
+          <select id="overdueSort">
+            <option value="new">Newest first</option>
+            <option value="old">Oldest first</option>
+          </select>
+        </div>
+        <div id="toClosePermitList"></div>
+      </div>
+
+      <div class="adminsubpane hidden" id="adminsub-closed">
+        <div class="permittitle" style="margin-bottom:4px;">Closed Permits</div>
+        <p class="paneintro">Fully signed off and completed — retained here permanently for EHS verification and audit.</p>
+        <div class="statsbar" id="statsBarClosed"></div>
+        <div class="historytypes" data-mode="closed">
+          <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
+          <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
+          <button class="histtypebtn" data-histtype="height">Working at Height</button>
+          <button class="btn btn-ghost btn-sm" id="refreshClosedListBtn" style="margin-left:auto;">↻ Refresh</button>
+        </div>
+        <div class="histtoolbar">
+          <input type="text" id="closedSearch" placeholder="Search by location or description…">
+          <select id="closedSort">
+            <option value="new">Newest first</option>
+            <option value="old">Oldest first</option>
+          </select>
+        </div>
+        <div id="closedPermitList"></div>
       </div>
     </div>
   </div>
@@ -563,6 +645,75 @@
     }
   }
 
+  // ================= OFFLINE QUEUE (for poor/no network coverage) =================
+  // Submit/Close are the two actions that must never be silently lost. If either can't reach
+  // the server (offline, dropped signal, mid-lock "busy" response), the job is saved here and
+  // retried automatically — on the 'online' event, on a periodic timer, and on page load —
+  // until it succeeds. Drafts are NOT queued: each autosave supersedes the last one anyway, so
+  // there's nothing worth preserving beyond what's already sitting in the person's own form.
+  const PENDING_QUEUE_KEY = 'ghacem_pending_queue';
+  let pendingQueue = [];
+
+  async function loadPendingQueue(){
+    if(hasClaudeStorage){
+      try{ const r = await window.storage.get(PENDING_QUEUE_KEY, true); pendingQueue = JSON.parse(r.value) || []; }
+      catch(e){ pendingQueue = []; }
+    } else if(hasLocalStorage){
+      try{ pendingQueue = JSON.parse(localStorage.getItem(PENDING_QUEUE_KEY)) || []; }
+      catch(e){ pendingQueue = []; }
+    } else {
+      pendingQueue = [];
+    }
+    updatePendingBadge();
+  }
+  function savePendingQueue(){
+    if(hasClaudeStorage){ try{ window.storage.set(PENDING_QUEUE_KEY, JSON.stringify(pendingQueue), true); }catch(e){} }
+    else if(hasLocalStorage){ try{ localStorage.setItem(PENDING_QUEUE_KEY, JSON.stringify(pendingQueue)); }catch(e){} }
+    updatePendingBadge();
+  }
+  function enqueuePendingJob(job, label){
+    pendingQueue.push({ queueId: Date.now()+'-'+Math.random().toString(36).slice(2), queuedAt: Date.now(), label, payload: job });
+    savePendingQueue();
+  }
+  function updatePendingBadge(){
+    const badge = document.getElementById('pendingSyncBadge');
+    if(!badge) return;
+    if(pendingQueue.length === 0){ badge.classList.add('hidden'); return; }
+    badge.classList.remove('hidden');
+    badge.textContent = '⏳ ' + pendingQueue.length + (pendingQueue.length === 1 ? ' permit waiting to sync' : ' permits waiting to sync');
+  }
+
+  // Like postToBackend, but on failure it queues the job for retry instead of dropping it.
+  async function postToBackendQueued(job, label){
+    const result = await postToBackend(job);
+    if(!result.ok) enqueuePendingJob(job, label);
+    return result;
+  }
+
+  let pendingQueueRetryInFlight = false;
+  async function processPendingQueue(){
+    if(pendingQueueRetryInFlight || pendingQueue.length === 0 || !syncUrl || !navigator.onLine) return;
+    pendingQueueRetryInFlight = true;
+    const stillPending = [];
+    let syncedCount = 0;
+    for(const job of pendingQueue){
+      const result = await postToBackend(job.payload);
+      if(result.ok) syncedCount++; else stillPending.push(job);
+    }
+    pendingQueue = stillPending;
+    savePendingQueue();
+    pendingQueueRetryInFlight = false;
+    if(syncedCount > 0){
+      toast(syncedCount === 1
+        ? 'Back online — 1 queued permit just synced.'
+        : `Back online — ${syncedCount} queued permits just synced.`);
+      if(document.getElementById('sub-admin') && !document.getElementById('sub-admin').classList.contains('hidden')) renderCurrentAdminSub();
+      if(document.getElementById('sub-signed') && !document.getElementById('sub-signed').classList.contains('hidden')) renderPermitList(signedType, 'signed');
+    }
+  }
+  window.addEventListener('online', processPendingQueue);
+  setInterval(processPendingQueue, 30000);
+
   async function doSync(){
     if(!syncUrl) return;
     const jobs = [
@@ -583,7 +734,8 @@
   async function submitFormToBackend(formKey){
     if(!syncUrl) return { ok:true };
     const flatteners = { general: flattenGeneral, hotwork: flattenHotwork, height: flattenHeight };
-    return await postToBackend({ formType: formKey, action:'submit', data: flatteners[formKey]() });
+    const job = { formType: formKey, action:'submit', data: flatteners[formKey]() };
+    return await postToBackendQueued(job, FORM_LABEL[formKey] + ' submission');
   }
 
   // ================= HISTORY: unflatten a saved record back into an editable form =================
@@ -766,18 +918,17 @@
     const flatteners = { general: flattenGeneral, hotwork: flattenHotwork, height: flattenHeight };
     const data = flatteners[formKey]();
     let result = { ok:true };
-    if(syncUrl) result = await postToBackend({ formType: formKey, action:'close', submissionId, data });
+    if(syncUrl) result = await postToBackendQueued({ formType: formKey, action:'close', submissionId, data }, FORM_LABEL[formKey] + ' closure');
 
-    if(result.ok){
-      toast(FORM_LABEL[formKey] + ' closed — moved to Closed Permits.');
-      permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
-      saveState();
-      renderAll();
-    } else {
-      // Leave the form (and its _submissionId) exactly as-is so the completion signature
-      // is still there and closing can simply be retried — nothing to redo.
-      toast(FORM_LABEL[formKey] + ' signed as closed, but syncing the closure failed — ' + (result.error || 'check your connection') + '. It will retry automatically the next time this page loads.');
-    }
+    // Either way the closure is safe now: on success it's already on the server; on failure
+    // it's sitting in the offline queue and will sync itself the moment connectivity returns.
+    // So the form clears in both cases — nothing for the person to redo or retry by hand.
+    toast(result.ok
+      ? FORM_LABEL[formKey] + ' closed — moved to Closed Permits.'
+      : FORM_LABEL[formKey] + ' closed on this device — no signal right now, it\'ll sync automatically once you\'re back online.');
+    permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
+    saveState();
+    renderAll();
   }
 
   function crewLogRow(i){
@@ -1204,52 +1355,128 @@
       return;
     }
 
-    if(result.ok){
-      // Clear only this permit's own form — the other two permit types are untouched.
-      permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
-      saveState();
-      renderAll();
-      toast(formLabel + ' submitted — saved to history in the shared sheet.');
-    } else {
-      // Don't wipe the form on a real failure — the person would have to redo everything.
-      hint.innerHTML = 'Not submitted: ' + (result.error || 'the shared sheet rejected it') + ' — your entries are still here, try Submit again.';
-      hint.style.color = 'var(--danger)';
-      toast(formLabel + ' was NOT submitted — ' + (result.error || 'the shared sheet rejected it') + '. Try again.');
-    }
+    // Clear only this permit's own form — the other two permit types are untouched. This
+    // happens whether the submit reached the server or not: on failure it's already sitting
+    // in the offline queue (see postToBackendQueued) and will sync itself automatically once
+    // connectivity returns, so there's nothing left for the person to redo.
+    permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
+    saveState();
+    renderAll();
+    toast(result.ok
+      ? formLabel + ' submitted — saved to history in the shared sheet.'
+      : formLabel + ' submitted on this device — no signal right now, it\'ll sync automatically once you\'re back online.');
   }
   document.getElementById('submitBtn-general').addEventListener('click', ()=> submitOne('general'));
   document.getElementById('submitBtn-hotwork').addEventListener('click', ()=> submitOne('hotwork'));
   document.getElementById('submitBtn-height').addEventListener('click', ()=> submitOne('height'));
 
+  const PUBLIC_SUBS = ['general','hotwork','height','signed','admin'];
   document.querySelectorAll('.subtabs > .subtabbtn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
-      ['general','hotwork','height','history','closed','insights'].forEach(t=>{
+      PUBLIC_SUBS.forEach(t=>{
         document.getElementById('sub-'+t).classList.toggle('hidden', t!==btn.dataset.sub);
       });
-      if(btn.dataset.sub === 'history') loadHistoryCache().then(()=>{ renderStatsBar(); renderPermitList(activeType,'active'); });
-      if(btn.dataset.sub === 'closed') loadHistoryCache().then(()=>{ renderStatsBar(); renderPermitList(closedType,'closed'); });
-      if(btn.dataset.sub === 'insights') loadHistoryCache().then(renderInsights);
+      if(btn.dataset.sub === 'signed') loadHistoryCache().then(()=> renderPermitList(signedType,'signed'));
+      if(btn.dataset.sub === 'admin' && isAdminUnlocked) loadHistoryCache().then(renderCurrentAdminSub);
     });
   });
 
   let activeType = 'general';
   let closedType = 'general';
+  let signedType = 'general';
+  let overdueType = 'general';
   let historyCache = { general: [], hotwork: [], height: [] };
-  let activeSearchQuery = '', closedSearchQuery = '';
-  let activeSortOrder = 'new', closedSortOrder = 'new';
-  let activeExpanded = new Set(), closedExpanded = new Set();
+  let activeSearchQuery = '', closedSearchQuery = '', signedSearchQuery = '', overdueSearchQuery = '';
+  let activeSortOrder = 'new', closedSortOrder = 'new', signedSortOrder = 'new', overdueSortOrder = 'new';
+  let activeExpanded = new Set(), closedExpanded = new Set(), signedExpanded = new Set(), overdueExpanded = new Set();
   let historyHighlightId = null, historyHighlightMode = null;
 
-  document.querySelectorAll('.historytypes').forEach(group=>{
+  // ================= ADMIN ACCESS (client-side gate only — see note in chat) =================
+  const ADMIN_PASSWORD = 'ghacem2026';
+  let isAdminUnlocked = false;
+  let currentAdminSub = 'insights';
+  let pendingAdminDeepLink = null;
+
+  function renderCurrentAdminSub(){
+    if(currentAdminSub === 'insights') renderInsights();
+    else if(currentAdminSub === 'active') { renderStatsBar(); renderPermitList(activeType, 'active'); }
+    else if(currentAdminSub === 'overdue') renderPermitList(overdueType, 'overdue');
+    else { renderStatsBar(); renderPermitList(closedType, 'closed'); }
+  }
+  function showAdminContent(){
+    document.getElementById('adminAuthPanel').classList.add('hidden');
+    document.getElementById('adminContent').classList.remove('hidden');
+  }
+  document.getElementById('adminUnlockBtn').addEventListener('click', async ()=>{
+    const input = document.getElementById('adminPasswordInput');
+    const err = document.getElementById('adminAuthError');
+    if(input.value === ADMIN_PASSWORD){
+      isAdminUnlocked = true;
+      try{ sessionStorage.setItem('ghacem_admin_unlocked', '1'); }catch(e){}
+      input.value = ''; err.textContent = '';
+      showAdminContent();
+      await loadHistoryCache();
+      if(pendingAdminDeepLink){
+        const { type, id } = pendingAdminDeepLink;
+        pendingAdminDeepLink = null;
+        const rec = (historyCache[type]||[]).find((r,i)=> histKey(r,i) === id);
+        const mode = (rec && recordIsClosed(type, rec)) ? 'closed' : 'overdue';
+        if(mode === 'closed'){ closedType = type; closedExpanded.add(id); } else { overdueType = type; overdueExpanded.add(id); }
+        historyHighlightId = id; historyHighlightMode = mode;
+        currentAdminSub = mode;
+        document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.toggle('active', b.dataset.adminsub===mode));
+        document.querySelectorAll('.adminsubpane').forEach(p=> p.classList.toggle('hidden', p.id !== 'adminsub-'+mode));
+        document.querySelectorAll(`.historytypes[data-mode="${mode}"] .histtypebtn`).forEach(b=>b.classList.toggle('active', b.dataset.histtype===type));
+        if(mode === 'closed') renderStatsBar();
+        renderPermitList(type, mode);
+        setTimeout(()=>{
+          const card = document.querySelector(`[data-histkey="${CSS.escape(id)}"]`);
+          if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
+        }, 50);
+      } else {
+        renderCurrentAdminSub();
+      }
+    } else {
+      err.textContent = 'Incorrect password.';
+      const card = document.getElementById('adminlockCard');
+      card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+      input.value = '';
+      input.focus();
+    }
+  });
+  document.getElementById('adminPasswordInput').addEventListener('keydown', e=>{
+    if(e.key === 'Enter') document.getElementById('adminUnlockBtn').click();
+  });
+  document.getElementById('adminLockBtn').addEventListener('click', ()=>{
+    isAdminUnlocked = false;
+    try{ sessionStorage.removeItem('ghacem_admin_unlocked'); }catch(e){}
+    document.getElementById('adminAuthPanel').classList.remove('hidden');
+    document.getElementById('adminContent').classList.add('hidden');
+  });
+  document.querySelectorAll('[data-adminsub]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentAdminSub = btn.dataset.adminsub;
+      document.querySelectorAll('.adminsubpane').forEach(p=>{
+        p.classList.toggle('hidden', p.id !== 'adminsub-'+currentAdminSub);
+      });
+      renderCurrentAdminSub();
+    });
+  });
+
+  document.querySelectorAll('.historytypes[data-mode]').forEach(group=>{
     const mode = group.dataset.mode;
     group.querySelectorAll('.histtypebtn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         group.querySelectorAll('.histtypebtn').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
         if(mode === 'active'){ activeType = btn.dataset.histtype; activeExpanded.clear(); renderPermitList(activeType, 'active'); }
-        else { closedType = btn.dataset.histtype; closedExpanded.clear(); renderPermitList(closedType, 'closed'); }
+        else if(mode === 'closed'){ closedType = btn.dataset.histtype; closedExpanded.clear(); renderPermitList(closedType, 'closed'); }
+        else if(mode === 'overdue'){ overdueType = btn.dataset.histtype; overdueExpanded.clear(); renderPermitList(overdueType, 'overdue'); }
+        else { signedType = btn.dataset.histtype; signedExpanded.clear(); renderPermitList(signedType, 'signed'); }
       });
     });
   });
@@ -1268,6 +1495,22 @@
   document.getElementById('closedSort').addEventListener('change', e=>{
     closedSortOrder = e.target.value;
     renderPermitList(closedType, 'closed');
+  });
+  document.getElementById('signedSearch').addEventListener('input', e=>{
+    signedSearchQuery = e.target.value.trim().toLowerCase();
+    renderPermitList(signedType, 'signed');
+  });
+  document.getElementById('signedSort').addEventListener('change', e=>{
+    signedSortOrder = e.target.value;
+    renderPermitList(signedType, 'signed');
+  });
+  document.getElementById('overdueSearch').addEventListener('input', e=>{
+    overdueSearchQuery = e.target.value.trim().toLowerCase();
+    renderPermitList(overdueType, 'overdue');
+  });
+  document.getElementById('overdueSort').addEventListener('change', e=>{
+    overdueSortOrder = e.target.value;
+    renderPermitList(overdueType, 'overdue');
   });
 
   function copyText(text){
@@ -1296,6 +1539,14 @@
     renderStatsBar();
     renderPermitList(closedType, 'closed');
   });
+  document.getElementById('refreshSignedListBtn').addEventListener('click', async ()=>{
+    await loadHistoryCache();
+    renderPermitList(signedType, 'signed');
+  });
+  document.getElementById('refreshOverdueListBtn').addEventListener('click', async ()=>{
+    await loadHistoryCache();
+    renderPermitList(overdueType, 'overdue');
+  });
   document.getElementById('refreshInsightsBtn').addEventListener('click', async ()=>{
     await loadHistoryCache();
     renderInsights();
@@ -1322,6 +1573,14 @@
     if(formType==='hotwork') return !!(r['Sign Off - Mgr'] && r['Sign Off - Crew']);
     if(formType==='height') return !!(r['Closure - Crew'] && r['Closure - Mgr']);
     return false;
+  }
+
+  // Signed permits still open more than 24h after their last update — these move out of
+  // Active Permits and into the admin's "Permits to be Closed" tab so they get followed up.
+  function isOverdue(r){
+    const d = new Date(r['Last Updated']);
+    if(isNaN(d.getTime())) return false;
+    return (Date.now() - d.getTime()) > 24*60*60*1000;
   }
 
   function histKey(r, i){ return r['Submission ID'] || ('idx'+i); }
@@ -1354,9 +1613,52 @@
     bars.forEach(b=> b.innerHTML = html);
   }
 
-  // Shared renderer for both the Active Permits and Closed Permits tabs.
+  // Sheets keep every column that's ever existed (old ones are never deleted when the form
+  // changes), and a header cell can get clobbered by a stray value from very early testing.
+  // Rather than a hardcoded field whitelist (fragile — one typo and real fields silently
+  // vanish), filter out only keys that clearly aren't real field names: a JSON blob or a
+  // raw date dump sitting where a header should be.
+  function looksLikeRealField(k){
+    if(!k || k.length > 60) return false;
+    if(/[{}\[\]]/.test(k)) return false;
+    if(/\d/.test(k) && !isNaN(Date.parse(k))) return false;
+    return true;
+  }
+
+  // Crew Log / Crew store a JSON array of rows — show them as plain readable text instead
+  // of a raw JSON dump, and treat an all-blank row (the default empty row) as no data at all.
+  function formatDetailValue(key, rawValue){
+    if(key === 'Crew Log' || key === 'Crew'){
+      try{
+        const rows = JSON.parse(rawValue);
+        if(!Array.isArray(rows)) return rawValue;
+        const parts = rows.map(row=>{
+          if(key === 'Crew Log'){
+            const bits = [row.persons, row.date, (row.timeStart||row.timeStop) ? `${row.timeStart||'?'}–${row.timeStop||'?'}` : ''].filter(Boolean);
+            return bits.length ? bits.join(' · ') : '';
+          }
+          return row.name ? `${row.name}${row.trained ? ' (trained)' : ''}` : '';
+        }).filter(Boolean);
+        return parts.join('; ');
+      }catch(e){ return rawValue; }
+    }
+    return rawValue;
+  }
+
+  // Shared renderer for the Active / Overdue / Closed / Signed permit list tabs.
+  const LIST_HOST = { active:'activePermitList', closed:'closedPermitList', signed:'signedPermitList', overdue:'toClosePermitList' };
+  const LIST_LABEL = { active:'active', closed:'closed', signed:'signed', overdue:'overdue' };
+
+  function modeMatches(mode, formType, r){
+    if(mode === 'closed') return recordIsClosed(formType, r);
+    if(mode === 'overdue') return !recordIsClosed(formType, r) && isOverdue(r);
+    // active (admin) and signed (public) use the same rule: open, and not yet overdue.
+    // Overdue-but-still-open permits only surface in the admin "Permits to be Closed" tab.
+    return !recordIsClosed(formType, r) && !isOverdue(r);
+  }
+
   function renderPermitList(formType, mode){
-    const host = document.getElementById(mode === 'active' ? 'activePermitList' : 'closedPermitList');
+    const host = document.getElementById(LIST_HOST[mode]);
     if(!syncUrl){
       host.innerHTML = '<div class="histempty">Live sync isn\'t configured, so there\'s nothing shared to show yet.</div>';
       return;
@@ -1368,11 +1670,13 @@
     }
     const modeRecords = allRecords
       .map((r,i)=>({ r, key: histKey(r,i) }))
-      .filter(({r}) => mode === 'active' ? !recordIsClosed(formType, r) : recordIsClosed(formType, r));
+      .filter(({r}) => modeMatches(mode, formType, r));
 
-    const searchQuery = mode === 'active' ? activeSearchQuery : closedSearchQuery;
-    const sortOrder = mode === 'active' ? activeSortOrder : closedSortOrder;
-    const expanded = mode === 'active' ? activeExpanded : closedExpanded;
+    let searchQuery, sortOrder, expanded;
+    if(mode === 'active'){ searchQuery = activeSearchQuery; sortOrder = activeSortOrder; expanded = activeExpanded; }
+    else if(mode === 'closed'){ searchQuery = closedSearchQuery; sortOrder = closedSortOrder; expanded = closedExpanded; }
+    else if(mode === 'overdue'){ searchQuery = overdueSearchQuery; sortOrder = overdueSortOrder; expanded = overdueExpanded; }
+    else { searchQuery = signedSearchQuery; sortOrder = signedSortOrder; expanded = signedExpanded; }
     const titleField = TITLE_FIELD[formType];
     const subField = SUB_FIELD[formType];
 
@@ -1388,22 +1692,29 @@
 
     if(records.length === 0){
       host.innerHTML = modeRecords.length === 0
-        ? `<div class="histempty">No ${mode === 'active' ? 'active' : 'closed'} permits of this type right now.</div>`
+        ? `<div class="histempty">No ${LIST_LABEL[mode]} permits of this type right now.</div>`
         : '<div class="histempty">No permits match your search.</div>';
       return;
     }
 
     host.innerHTML = records.map(({r, key})=>{
       const closed = recordIsClosed(formType, r);
-      const statusPill = `<span class="statuspill ${closed ? 'closed' : 'active'}" style="float:none;">${closed ? 'Closed' : 'Active'}</span>`;
+      const overdue = !closed && isOverdue(r);
+      const statusPill = closed
+        ? '<span class="statuspill closed" style="float:none;">Closed</span>'
+        : overdue
+          ? '<span class="statuspill overdue" style="float:none;">Overdue</span>'
+          : '<span class="statuspill active" style="float:none;">Active</span>';
       const isHighlighted = !!(historyHighlightId && key === historyHighlightId && historyHighlightMode === mode);
       const linkTag = isHighlighted ? '<span class="linktag">🔗 From email</span>' : '';
       const isExpanded = expanded.has(key);
       const detailRows = Object.keys(r)
-        .filter(k => r[k] !== '' && r[k] !== null && r[k] !== undefined)
-        .map(k => `<dt>${k}</dt><dd>${String(r[k]).replace(/</g,'&lt;')}</dd>`)
+        .filter(k => r[k] !== '' && r[k] !== null && r[k] !== undefined && looksLikeRealField(k))
+        .map(k => [k, formatDetailValue(k, r[k])])
+        .filter(([,v]) => v !== '')
+        .map(([k,v]) => `<dt>${String(k).replace(/</g,'&lt;')}</dt><dd>${String(v).replace(/</g,'&lt;')}</dd>`)
         .join('');
-      const statusClass = closed ? ' is-closed' : ' is-active';
+      const statusClass = closed ? ' is-closed' : (overdue ? ' is-overdue' : ' is-active');
       const highlightClass = isHighlighted ? ' highlighted' : '';
       return `
       <div class="histcard${statusClass}${highlightClass}" data-histkey="${key}">
@@ -1419,7 +1730,7 @@
             <button class="btn btn-outline btn-sm" data-loadhist="${key}">Load for Editing</button>
           </div>
         </div>
-        <dl class="histcard-detail ${isExpanded ? '' : 'hidden'}">${detailRows}</dl>
+        <dl class="histcard-detail ${isExpanded ? '' : 'hidden'}">${detailRows || '<dd style="grid-column:1/-1;color:var(--text-dim);">No displayable fields — this record\'s column headers may need checking in the sheet.</dd>'}</dl>
       </div>`;
     }).join('');
 
@@ -1433,7 +1744,7 @@
         saveState();
         renderAll();
         document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub===formType));
-        ['general','hotwork','height','history','closed','insights'].forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!==formType));
+        PUBLIC_SUBS.forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!==formType));
         toast(mode === 'closed'
           ? 'Loaded closed record — now editing'
           : 'Loaded record — now editing. Signing the completion signature will close it automatically, no Submit needed.');
@@ -1683,11 +1994,14 @@
   async function init(){
     await loadState();
     await loadSyncUrl();
+    await loadPendingQueue();
+    processPendingQueue();
     document.getElementById('syncUrlInput').value = syncUrl === DEFAULT_SYNC_URL ? '' : syncUrl;
     document.getElementById('syncUrlInput').placeholder = syncUrl === DEFAULT_SYNC_URL
       ? 'Using built-in GHACEM sheet (leave blank, or paste a different URL to override)'
       : 'https://script.google.com/macros/s/.../exec';
     setSyncStatus(syncUrl ? 'ok' : '', syncUrl ? 'Live sync active — will sync on changes' : 'Live sync not configured');
+    try{ if(sessionStorage.getItem('ghacem_admin_unlocked') === '1'){ isAdminUnlocked = true; showAdminContent(); } }catch(e){}
     renderAll();
     await openLinkedPermitFromUrl();
     // Retry any closure that was signed but never made it to the server (e.g. the tab
@@ -1698,8 +2012,10 @@
   }
 
   // Handles links like "...?permit=hotwork&id=<Submission ID>" — the kind EHS gets in the
-  // notification email — by jumping straight to whichever tab that permit is currently in
-  // (Active or Closed), that permit type, with the exact record highlighted and expanded.
+  // notification email — by jumping straight to the right tab. A permit that's still open
+  // and under 24h goes to the public Signed Permits tab, no password needed. Closed permits
+  // and overdue-but-still-open permits are both admin-only, so a link to either prompts for
+  // the admin password first.
   async function openLinkedPermitFromUrl(){
     const params = new URLSearchParams(location.search);
     const linkType = params.get('permit');
@@ -1709,19 +2025,38 @@
     await loadHistoryCache();
     const records = historyCache[linkType] || [];
     const idx = records.findIndex((r,i)=> histKey(r,i) === linkId);
-    const mode = (idx > -1 && recordIsClosed(linkType, records[idx])) ? 'closed' : 'active';
+    const record = idx > -1 ? records[idx] : null;
+    const isClosed = !!record && recordIsClosed(linkType, record);
+    const isOverdueLink = !!record && !isClosed && isOverdue(record);
+    const needsAdmin = isClosed || isOverdueLink;
 
+    if(needsAdmin && !isAdminUnlocked){
+      pendingAdminDeepLink = { type: linkType, id: linkId };
+      document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub==='admin'));
+      PUBLIC_SUBS.forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!=='admin'));
+      toast(isClosed
+        ? 'This permit is closed — enter the admin password to view it.'
+        : 'This permit is overdue (open more than 24h) — enter the admin password to view it.');
+      return;
+    }
+
+    const mode = isClosed ? 'closed' : (isOverdueLink ? 'overdue' : 'signed');
     historyHighlightId = linkId;
     historyHighlightMode = mode;
-    if(mode === 'active'){ activeType = linkType; activeExpanded.add(linkId); }
-    else { closedType = linkType; closedExpanded.add(linkId); }
+    if(mode === 'closed'){ closedType = linkType; closedExpanded.add(linkId); currentAdminSub = 'closed'; }
+    else if(mode === 'overdue'){ overdueType = linkType; overdueExpanded.add(linkId); currentAdminSub = 'overdue'; }
+    else { signedType = linkType; signedExpanded.add(linkId); }
 
-    const targetSub = mode === 'active' ? 'history' : 'closed';
+    const targetSub = mode === 'signed' ? 'signed' : 'admin';
     document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub===targetSub));
-    ['general','hotwork','height','history','closed','insights'].forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!==targetSub));
+    PUBLIC_SUBS.forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!==targetSub));
+    if(mode === 'closed' || mode === 'overdue'){
+      document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.toggle('active', b.dataset.adminsub===mode));
+      document.querySelectorAll('.adminsubpane').forEach(p=> p.classList.toggle('hidden', p.id !== 'adminsub-'+mode));
+    }
     document.querySelectorAll(`.historytypes[data-mode="${mode}"] .histtypebtn`).forEach(b=>b.classList.toggle('active', b.dataset.histtype===linkType));
 
-    renderStatsBar();
+    if(mode === 'closed') renderStatsBar();
     renderPermitList(linkType, mode);
 
     const card = document.querySelector(`[data-histkey="${CSS.escape(linkId)}"]`);
