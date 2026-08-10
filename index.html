@@ -20,7 +20,8 @@
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-b);}
-  header.topbar{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--brand-deep);border-bottom:1px solid rgba(0,221,57,.35);position:sticky;top:0;z-index:5;}
+  header.topbar{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--brand-deep);border-bottom:1px solid rgba(0,221,57,.35);position:sticky;top:0;z-index:5;flex-wrap:wrap;row-gap:8px;}
+  header.topbar > div{min-width:0;}
   .mark{width:34px;height:34px;object-fit:contain;flex:none;}
   .brand-divider{width:1px;height:24px;background:rgba(238,243,234,.25);flex:none;}
   .hmark{width:28px;height:28px;object-fit:contain;flex:none;}
@@ -30,7 +31,7 @@
   .sitefooter-mark{width:26px;height:26px;object-fit:contain;flex:none;}
   .sitefooter-text{font-size:11px;color:#8FCBA3;font-family:var(--font-m);letter-spacing:.03em;}
   .sitefooter-text strong{color:#EEF3EA;font-family:var(--font-b);font-weight:600;letter-spacing:0;}
-  h1{font-family:var(--font-d);font-size:16px;letter-spacing:.06em;margin:0;text-transform:uppercase;color:#EEF3EA;}
+  h1{font-family:var(--font-d);font-size:16px;letter-spacing:.06em;margin:0;text-transform:uppercase;color:#EEF3EA;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;}
   header span{display:block;font-size:10.5px;color:#8FCBA3;font-family:var(--font-m);letter-spacing:.05em;}
   .sitebanner{position:relative;height:150px;overflow:hidden;background:#000;}
   .sitebanner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;}
@@ -51,7 +52,6 @@
   .adminlock{display:flex;justify-content:center;padding:44px 16px;}
   .adminlock-card{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--border);border-radius:18px;padding:38px 32px;max-width:360px;width:100%;text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.4);}
   .adminlock-card.shake{animation:missingShake .4s ease;}
-  .adminlock-icon{font-size:32px;line-height:1;margin-bottom:12px;filter:drop-shadow(0 2px 8px var(--accent-dim));}
   .adminlock-title{font-family:var(--font-d);text-transform:uppercase;font-size:19px;letter-spacing:.05em;color:var(--text);margin-bottom:10px;}
   .adminlock-sub{font-size:12.5px;color:var(--text-dim);line-height:1.55;margin:0 0 24px;}
   .adminlock-field{display:flex;gap:8px;}
@@ -89,16 +89,22 @@
   .sigrow{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:11px 12px;margin-top:8px;font-size:12.5px;}
   .sigrow.signed{border-color:var(--good);}
   .sigmeta{color:var(--good);font-size:11px;margin-top:2px;font-family:var(--font-m);}
+  .sigidwrap{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;}
+  .sigidwrap input{width:auto;flex:none;max-width:110px;font-family:var(--font-m);letter-spacing:.05em;}
+  .sigidresult{font-size:14px;color:var(--text-dim);}
+  .sigidresult.found{color:var(--good);font-weight:600;}
+  .sigidresult.notfound{color:var(--danger);}
   .btn{border:none;border-radius:8px;padding:9px 14px;font-family:var(--font-b);font-weight:600;font-size:12.5px;cursor:pointer;}
   .btn-primary{background:var(--accent);color:#14181B;}
   .btn-ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--border);}
-  .testtable{width:100%;border-collapse:collapse;margin-top:6px;}
-  .testtable th,.testtable td{border:1px solid var(--border);padding:6px 7px;font-size:11.5px;}
+  .tablescroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:6px;border-radius:6px;}
+  .testtable{width:100%;min-width:560px;border-collapse:collapse;margin-top:0;}
+  .testtable th,.testtable td{border:1px solid var(--border);padding:6px 7px;font-size:11.5px;white-space:nowrap;}
   .testtable th{background:var(--surface-2);color:var(--text-dim);font-weight:600;text-align:left;}
   .testtable input{width:100%;background:transparent;border:none;color:var(--text);font-family:var(--font-m);font-size:11.5px;padding:2px;color-scheme:dark;}
   .testtable input:focus{outline:1px solid var(--accent);}
-  .crewrow{display:flex;gap:8px;align-items:center;margin-bottom:7px;}
-  .crewrow input[type=text]{flex:1;}
+  .crewrow{display:flex;gap:8px;align-items:center;margin-bottom:7px;flex-wrap:wrap;}
+  .crewrow input[type=text]{flex:1;min-width:140px;}
   .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--good);color:#0d1a12;padding:10px 18px;border-radius:8px;font-weight:600;font-size:13px;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,.4);}
   .syncbar{display:none;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 13px;margin-bottom:14px;}
   .syncstatus{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);}
@@ -182,7 +188,8 @@
     0%,100%{box-shadow:0 0 0 3px var(--accent-dim);}
     50%{box-shadow:0 0 0 6px var(--accent-dim);}
   }
-  .histcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .histcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
+  .histcard-top > div:first-child{min-width:0;flex:1 1 200px;}
   .histcard-title{font-size:13.5px;font-weight:600;display:flex;align-items:center;flex-wrap:wrap;gap:6px;}
   .histcard-meta{font-size:11px;color:var(--text-dim);margin-top:3px;font-variant-numeric:tabular-nums;}
   .histcard-actions{display:flex;gap:6px;flex:none;flex-wrap:wrap;justify-content:flex-end;}
@@ -238,7 +245,7 @@
 </div>
 
 <main>
-  <div class="note">This screen is just the permit forms. Fill in what's needed for the job, then sign each section.</div>
+  <div class="note">Complete the relevant fields and sign each section before submitting.</div>
 
   <div class="syncbar" id="syncBar">
     <div class="syncstatus" id="syncStatus">
@@ -275,7 +282,7 @@
       <span id="submitHint-general" class="submithint"></span>
       <button class="btn btn-primary" id="submitBtn-general">Submit General Work Permit</button>
     </div>
-    <p class="formsubmit-note">Submitting notifies EHS by email and records a permanent, time-stamped entry — independent of the other two permit types.</p>
+    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record.</p>
   </div>
   <div class="subpane hidden" id="sub-hotwork">
     <span class="statuspill" id="pill-hotwork"></span>
@@ -286,7 +293,7 @@
       <span id="submitHint-hotwork" class="submithint"></span>
       <button class="btn btn-primary" id="submitBtn-hotwork">Submit Hot Work Permit</button>
     </div>
-    <p class="formsubmit-note">Submitting notifies EHS by email and records a permanent, time-stamped entry — independent of the other two permit types.</p>
+    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record.</p>
   </div>
   <div class="subpane hidden" id="sub-height">
     <span class="statuspill" id="pill-height"></span>
@@ -297,11 +304,11 @@
       <span id="submitHint-height" class="submithint"></span>
       <button class="btn btn-primary" id="submitBtn-height">Submit Working at Height Permit</button>
     </div>
-    <p class="formsubmit-note">Submitting notifies EHS by email and records a permanent, time-stamped entry — independent of the other two permit types.</p>
+    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record.</p>
   </div>
   <div class="subpane hidden" id="sub-signed">
     <div class="permittitle" style="margin-bottom:4px;">Signed Permits</div>
-    <p class="paneintro">Authorized and open for less than 24 hours, plant-wide — visible to everyone so anyone can verify a permit is legitimately signed, or sign off its completion. No admin access needed. Once closed, a permit moves to the admin-side Closed Permits record; if it's still open past 24 hours, it moves to the admin-side Permits to be Closed list instead.</p>
+    <p class="paneintro">Currently open, authorized permits — visible to everyone.</p>
     <div class="historytypes" data-mode="signed">
       <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
       <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
@@ -321,9 +328,8 @@
   <div class="subpane hidden" id="sub-admin">
     <div id="adminAuthPanel" class="adminlock">
       <div class="adminlock-card" id="adminlockCard">
-        <div class="adminlock-icon">🔒</div>
         <div class="adminlock-title">Admin Access</div>
-        <p class="adminlock-sub">Insights, Active Permits, Permits to be Closed, and Closed Permits are restricted. Enter the admin password to continue.</p>
+        <p class="adminlock-sub">Enter the admin password to continue.</p>
         <div class="adminlock-field">
           <input type="password" id="adminPasswordInput" placeholder="Admin password" autocomplete="off">
           <button class="btn btn-primary" id="adminUnlockBtn">Unlock</button>
@@ -338,12 +344,12 @@
         <button class="histtypebtn" data-adminsub="active">Active Permits</button>
         <button class="histtypebtn" data-adminsub="overdue">Permits to be Closed</button>
         <button class="histtypebtn" data-adminsub="closed">Closed Permits</button>
-        <button class="btn btn-ghost btn-sm" id="adminLockBtn" style="margin-left:auto;">🔒 Lock</button>
+        <button class="btn btn-ghost btn-sm" id="adminLockBtn" style="margin-left:auto;">Lock</button>
       </div>
 
       <div class="adminsubpane" id="adminsub-insights">
         <div class="permittitle" style="margin-bottom:4px;">Insights</div>
-        <p class="paneintro">A quick read on permit volume, plant-wide — computed live from every submitted permit on record.</p>
+        <p class="paneintro">Permit volume and trends, plant-wide.</p>
         <div class="actionrow" style="margin:0 0 14px;">
           <button class="btn btn-ghost btn-sm" id="refreshInsightsBtn">↻ Refresh</button>
         </div>
@@ -365,7 +371,7 @@
 
       <div class="adminsubpane hidden" id="adminsub-active">
         <div class="permittitle" style="margin-bottom:4px;">Active Permits</div>
-        <p class="paneintro">Authorized and signed within the last 24 hours, plant-wide. If a permit is still open past 24 hours, it automatically moves to <b>Permits to be Closed</b> so it doesn't get lost in this list. Once the completion / closure signature is added and the form is resubmitted, a permit moves to <b>Closed Permits</b> — nothing is ever deleted, every version stays on permanent record.</p>
+        <p class="paneintro">Authorized and signed within the last 24 hours.</p>
         <div class="statsbar" id="statsBar"></div>
         <div class="historytypes" data-mode="active">
           <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
@@ -385,7 +391,7 @@
 
       <div class="adminsubpane hidden" id="adminsub-overdue">
         <div class="permittitle" style="margin-bottom:4px;">Permits to be Closed</div>
-        <p class="paneintro">Signed and still open for more than 24 hours, plant-wide — these need follow-up. As soon as the completion / closure signature is added and the form is resubmitted, a permit moves to <b>Closed Permits</b> automatically.</p>
+        <p class="paneintro">Open for more than 24 hours and awaiting closure.</p>
         <div class="historytypes" data-mode="overdue">
           <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
           <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
@@ -404,7 +410,7 @@
 
       <div class="adminsubpane hidden" id="adminsub-closed">
         <div class="permittitle" style="margin-bottom:4px;">Closed Permits</div>
-        <p class="paneintro">Fully signed off and completed — retained here permanently for EHS verification and audit.</p>
+        <p class="paneintro">Signed off and completed. Retained for audit.</p>
         <div class="statsbar" id="statsBarClosed"></div>
         <div class="historytypes" data-mode="closed">
           <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
@@ -680,7 +686,7 @@
     if(!badge) return;
     if(pendingQueue.length === 0){ badge.classList.add('hidden'); return; }
     badge.classList.remove('hidden');
-    badge.textContent = '⏳ ' + pendingQueue.length + (pendingQueue.length === 1 ? ' permit waiting to sync' : ' permits waiting to sync');
+    badge.textContent = pendingQueue.length + (pendingQueue.length === 1 ? ' permit pending sync' : ' permits pending sync');
   }
 
   // Like postToBackend, but on failure it queues the job for retry instead of dropping it.
@@ -704,9 +710,7 @@
     savePendingQueue();
     pendingQueueRetryInFlight = false;
     if(syncedCount > 0){
-      toast(syncedCount === 1
-        ? 'Back online — 1 queued permit just synced.'
-        : `Back online — ${syncedCount} queued permits just synced.`);
+      toast(syncedCount === 1 ? '1 permit synced.' : `${syncedCount} permits synced.`);
       if(document.getElementById('sub-admin') && !document.getElementById('sub-admin').classList.contains('hidden')) renderCurrentAdminSub();
       if(document.getElementById('sub-signed') && !document.getElementById('sub-signed').classList.contains('hidden')) renderPermitList(signedType, 'signed');
     }
@@ -866,9 +870,22 @@
   function sigField(formKey, path, label){
     const sig = getPath(pd(formKey), path);
     if(sig && sig.name){
+      const idNote = sig.workId ? ` (ID ${sig.workId})` : '';
       return `<div class="sigrow signed" data-sigrow="${formKey}|${path}">
-        <div style="flex:1;"><strong>${label}</strong><div class="sigmeta">Signed by ${sig.name} · ${fmtSigTime(sig.at)}</div></div>
+        <div style="flex:1;"><strong>${label}</strong><div class="sigmeta">Signed by ${sig.name}${idNote} · ${fmtSigTime(sig.at)}</div></div>
         <button class="btn btn-ghost" data-unsign="${formKey}|${path}">Clear</button>
+      </div>`;
+    }
+    if(isIdLookupField(formKey, path)){
+      return `<div class="sigrow" data-sigrow="${formKey}|${path}">
+        <div style="flex:1;">
+          <strong>${label}</strong>
+          <div class="sigidwrap">
+            <input type="text" inputmode="numeric" autocomplete="off" placeholder="Work ID" data-sigworkid="${formKey}|${path}">
+            <span class="sigidresult" data-sigidresult="${formKey}|${path}">Enter your Work ID</span>
+          </div>
+        </div>
+        <button class="btn btn-primary" data-sign="${formKey}|${path}" disabled>Sign</button>
       </div>`;
     }
     return `<div class="sigrow" data-sigrow="${formKey}|${path}">
@@ -904,6 +921,28 @@
     height:  ['closureCrew','closureMgr']
   };
 
+  // ================= SUPERVISOR SIGN-IN BY WORK ID =================
+  // Supervisor/manager-role signatures are signed by Work ID instead of typing a name —
+  // the ID is looked up here and the matching name is what actually gets signed. Crew/crew
+  // leader signatures are unaffected and still take a typed name.
+  const SUPERVISOR_DIRECTORY = {
+    '11037': 'Nii Adje Bismark',
+    '11079': 'Asomah Yakubu',
+    '10108': 'Osei Emmanuel',
+    '10112': 'Prince Kissi'
+  };
+  function lookupSupervisorName(workId){
+    return SUPERVISOR_DIRECTORY[String(workId||'').trim()] || '';
+  }
+  const ID_LOOKUP_PATHS = {
+    general: ['authSig','completionSig'],
+    hotwork: ['safeCommenceMgr','signOffMgr'],
+    height:  ['authMgr','closureMgr']
+  };
+  function isIdLookupField(formKey, path){
+    return (ID_LOOKUP_PATHS[formKey]||[]).includes(path);
+  }
+
   // Silently moves an already-submitted permit (one that was Loaded for Editing from
   // history, hence has a remembered _submissionId) straight to Closed once its completion
   // signature(s) are in place — no Submit click, and it does not count as a new submission:
@@ -924,8 +963,8 @@
     // it's sitting in the offline queue and will sync itself the moment connectivity returns.
     // So the form clears in both cases — nothing for the person to redo or retry by hand.
     toast(result.ok
-      ? FORM_LABEL[formKey] + ' closed — moved to Closed Permits.'
-      : FORM_LABEL[formKey] + ' closed on this device — no signal right now, it\'ll sync automatically once you\'re back online.');
+      ? FORM_LABEL[formKey] + ' closed.'
+      : FORM_LABEL[formKey] + ' closed — will sync when back online.');
     permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
     saveState();
     renderAll();
@@ -979,10 +1018,11 @@
       </div>
       <div class="pc-section">
         <h5>Crew Log</h5>
-        <table class="testtable">
+        <div class="tablescroll"><table class="testtable">
           <tr><th>Date</th><th>No. of Persons Doing the Work</th><th>Signature of Leader</th><th>Signature of Dept. Mgr.</th><th>Time to Start Work</th><th>Time to Stop Work</th></tr>
           ${g.crewLog.map((r,i)=>crewLogRow(i)).join('')}
-        </table>
+        </table></div>
+        <p style="font-size:10.5px;color:var(--text-dim);margin:4px 0 0;">Scroll sideways to see all columns on a small screen →</p>
         <button class="btn btn-ghost" id="addCrewLogRow" type="button" style="margin-top:8px;">+ Add row</button>
       </div>
       <div class="pc-section">
@@ -1048,13 +1088,13 @@
       <div class="pc-section">
         <h5>7. Confined Space Entry Test Data</h5>
         <p style="font-size:11px;color:var(--text-dim);">List tests made, entry is prohibited if reading is outside permissible entry level (PEL)</p>
-        <table class="testtable">
+        <div class="tablescroll"><table class="testtable">
           <tr><th>Substance Tested</th><th>PEL</th><th>Reading</th><th>Date</th><th>Time</th></tr>
           ${testRow('% Oxygen','&gt;19.5 &lt;22.0','oxygen')}
           ${testRow('% Lower Explosive Limit','10','lel')}
           ${testRow('Carbon Monoxide','35ppm','co')}
           ${testRow('Temperature','40\u00b0C','temp')}
-        </table>
+        </table></div>
         <p style="font-size:11px;color:var(--text-dim);margin:8px 0 4px;">Confined space tested by:</p>
         ${textField('hotwork','confinedSpaceTestedBy','')}
       </div>
@@ -1237,10 +1277,18 @@
     if(signBtn){
       const [formKey, path] = signBtn.dataset.sign.split('|');
       const row = signBtn.closest('.sigrow');
-      const nameInput = row.querySelector('[data-signame]');
-      const name = (nameInput.value||'').trim();
-      if(!name){ toast('Type a name before signing'); return; }
-      setPath(pd(formKey), path, {name, at: Date.now()});
+      let name, workId;
+      if(isIdLookupField(formKey, path)){
+        const widInput = row.querySelector('[data-sigworkid]');
+        workId = (widInput.value||'').trim();
+        name = lookupSupervisorName(workId);
+        if(!name){ toast('Enter a valid Work ID before signing'); return; }
+      } else {
+        const nameInput = row.querySelector('[data-signame]');
+        name = (nameInput.value||'').trim();
+        if(!name){ toast('Type a name before signing'); return; }
+      }
+      setPath(pd(formKey), path, workId ? {name, at: Date.now(), workId} : {name, at: Date.now()});
       saveState(); renderAll();
       const key = formKey+'|'+path;
       const newRow = document.querySelector(`[data-sigrow="${key}"]`);
@@ -1272,6 +1320,14 @@
       return;
     }
   });
+  document.querySelector('main').addEventListener('keydown', e=>{
+    if(e.key !== 'Enter') return;
+    const wid = e.target.closest('[data-sigworkid]');
+    if(!wid) return;
+    e.preventDefault();
+    const signBtn = wid.closest('.sigrow').querySelector('[data-sign]');
+    if(signBtn && !signBtn.disabled) signBtn.click();
+  });
   document.querySelector('main').addEventListener('input', e=>{
     const t = e.target.closest('[data-text]');
     if(t){
@@ -1286,6 +1342,28 @@
       pd('height').crew[+cn.dataset.crewname].name = cn.value;
       saveState();
       updateSubmitHint('height');
+      return;
+    }
+    // Live Work ID -> name lookup for supervisor signatures. Deliberately doesn't go through
+    // saveState()/renderAll() — it only touches this row's own name display and Sign button,
+    // so the input never loses focus while someone's still typing their ID.
+    const wid = e.target.closest('[data-sigworkid]');
+    if(wid){
+      const row = wid.closest('.sigrow');
+      const resultEl = row.querySelector('[data-sigidresult]');
+      const signBtn = row.querySelector('[data-sign]');
+      const name = lookupSupervisorName(wid.value);
+      if(wid.value.trim() === ''){
+        resultEl.textContent = 'Enter your Work ID';
+        resultEl.className = 'sigidresult';
+      } else if(name){
+        resultEl.textContent = name;
+        resultEl.className = 'sigidresult found';
+      } else {
+        resultEl.textContent = 'ID not recognized';
+        resultEl.className = 'sigidresult notfound';
+      }
+      if(signBtn) signBtn.disabled = !name;
       return;
     }
   });
@@ -1318,7 +1396,7 @@
     const missing = getMissingFor(formKey);
     const hint = document.getElementById('submitHint-'+formKey);
     if(missing.length > 0){
-      toast('Cannot submit yet — see details below');
+      toast('Missing required signatures');
       hint.innerHTML = 'Missing: ' + missing.map(m=>m.label).join(' · ');
       hint.style.color = 'var(--danger)';
       let firstEl = null;
@@ -1351,7 +1429,7 @@
       permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
       saveState();
       renderAll();
-      toast(formLabel + ' submitted — saved on this device only (no live sync configured).');
+      toast(formLabel + ' submitted (this device only).');
       return;
     }
 
@@ -1363,8 +1441,8 @@
     saveState();
     renderAll();
     toast(result.ok
-      ? formLabel + ' submitted — saved to history in the shared sheet.'
-      : formLabel + ' submitted on this device — no signal right now, it\'ll sync automatically once you\'re back online.');
+      ? formLabel + ' submitted.'
+      : formLabel + ' submitted — will sync when back online.');
   }
   document.getElementById('submitBtn-general').addEventListener('click', ()=> submitOne('general'));
   document.getElementById('submitBtn-hotwork').addEventListener('click', ()=> submitOne('hotwork'));
@@ -1660,12 +1738,12 @@
   function renderPermitList(formType, mode){
     const host = document.getElementById(LIST_HOST[mode]);
     if(!syncUrl){
-      host.innerHTML = '<div class="histempty">Live sync isn\'t configured, so there\'s nothing shared to show yet.</div>';
+      host.innerHTML = '<div class="histempty">Live sync not configured.</div>';
       return;
     }
     const allRecords = historyCache[formType] || [];
     if(allRecords.length === 0){
-      host.innerHTML = '<div class="histempty">No submitted permits of this type yet. Once you Submit one, it will show up here.</div>';
+      host.innerHTML = '<div class="histempty">No permits submitted yet.</div>';
       return;
     }
     const modeRecords = allRecords
@@ -1692,7 +1770,7 @@
 
     if(records.length === 0){
       host.innerHTML = modeRecords.length === 0
-        ? `<div class="histempty">No ${LIST_LABEL[mode]} permits of this type right now.</div>`
+        ? `<div class="histempty">No ${LIST_LABEL[mode]} permits.</div>`
         : '<div class="histempty">No permits match your search.</div>';
       return;
     }
@@ -1706,7 +1784,7 @@
           ? '<span class="statuspill overdue" style="float:none;">Overdue</span>'
           : '<span class="statuspill active" style="float:none;">Active</span>';
       const isHighlighted = !!(historyHighlightId && key === historyHighlightId && historyHighlightMode === mode);
-      const linkTag = isHighlighted ? '<span class="linktag">🔗 From email</span>' : '';
+      const linkTag = isHighlighted ? '<span class="linktag">From email</span>' : '';
       const isExpanded = expanded.has(key);
       const detailRows = Object.keys(r)
         .filter(k => r[k] !== '' && r[k] !== null && r[k] !== undefined && looksLikeRealField(k))
@@ -1730,7 +1808,7 @@
             <button class="btn btn-outline btn-sm" data-loadhist="${key}">Load for Editing</button>
           </div>
         </div>
-        <dl class="histcard-detail ${isExpanded ? '' : 'hidden'}">${detailRows || '<dd style="grid-column:1/-1;color:var(--text-dim);">No displayable fields — this record\'s column headers may need checking in the sheet.</dd>'}</dl>
+        <dl class="histcard-detail ${isExpanded ? '' : 'hidden'}">${detailRows || '<dd style="grid-column:1/-1;color:var(--text-dim);">No details available.</dd>'}</dl>
       </div>`;
     }).join('');
 
@@ -1745,9 +1823,7 @@
         renderAll();
         document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub===formType));
         PUBLIC_SUBS.forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!==formType));
-        toast(mode === 'closed'
-          ? 'Loaded closed record — now editing'
-          : 'Loaded record — now editing. Signing the completion signature will close it automatically, no Submit needed.');
+        toast('Loaded — now editing.');
       });
     });
     host.querySelectorAll('[data-toggledetail]').forEach(btn=>{
@@ -1868,7 +1944,7 @@
     const host = document.getElementById('vizByType');
     const entries = [['general',byType.general], ['hotwork',byType.hotwork], ['height',byType.height]];
     if(entries.every(([,v])=>v===0)){
-      host.innerHTML = '<div class="histempty">No submitted permits yet.</div>';
+      host.innerHTML = '<div class="histempty">No permits yet.</div>';
       return;
     }
     const max = Math.max(1, ...entries.map(([,v])=>v));
@@ -1893,7 +1969,7 @@
   function renderByDeptChart(topDepts){
     const host = document.getElementById('vizByDept');
     if(topDepts.length === 0){
-      host.innerHTML = '<div class="histempty">No submitted permits yet.</div>';
+      host.innerHTML = '<div class="histempty">No permits yet.</div>';
       return;
     }
     const max = Math.max(1, ...topDepts.map(([,v])=>v));
@@ -1915,7 +1991,7 @@
   function renderTrendChart(weeks){
     const host = document.getElementById('vizTrend');
     if(weeks.every(w=>w.general+w.hotwork+w.height===0)){
-      host.innerHTML = '<div class="histempty">No submitted permits yet in this window.</div>';
+      host.innerHTML = '<div class="histempty">No data yet.</div>';
       return;
     }
     const totals = weeks.map(w=>w.general+w.hotwork+w.height);
@@ -2034,9 +2110,7 @@
       pendingAdminDeepLink = { type: linkType, id: linkId };
       document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub==='admin'));
       PUBLIC_SUBS.forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!=='admin'));
-      toast(isClosed
-        ? 'This permit is closed — enter the admin password to view it.'
-        : 'This permit is overdue (open more than 24h) — enter the admin password to view it.');
+      toast('Admin password required to view this permit.');
       return;
     }
 
@@ -2061,7 +2135,7 @@
 
     const card = document.querySelector(`[data-histkey="${CSS.escape(linkId)}"]`);
     if(card){ card.scrollIntoView({behavior:'smooth', block:'center'}); }
-    else { toast('That permit wasn\'t found — it may be from a different sheet.'); }
+    else { toast('Permit not found.'); }
   }
   init();
 })();
