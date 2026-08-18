@@ -119,6 +119,105 @@
   .submithint{font-size:11.5px;color:var(--text-dim);flex:1;min-width:180px;}
   .formsubmit-note{font-size:10.5px;color:var(--text-dim);margin:6px 0 0;}
 
+
+  /* ===== safety photo evidence ===== */
+  .photo-evidence{
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px dashed var(--border);
+  }
+  .photo-evidence h5{
+    font-family:var(--font-d);
+    text-transform:uppercase;
+    font-size:12.5px;
+    letter-spacing:.04em;
+    color:var(--accent);
+    margin:0 0 6px;
+  }
+  .photo-evidence-intro{
+    font-size:11px;
+    color:var(--text-dim);
+    line-height:1.45;
+    margin:0 0 12px;
+  }
+  .photo-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .photo-card{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:10px;
+  }
+  .photo-card.required{
+    border-left:3px solid var(--caution);
+  }
+  .photo-card-title{
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--text);
+    line-height:1.35;
+    margin-bottom:3px;
+  }
+  .photo-card-note{
+    font-size:10px;
+    color:var(--text-dim);
+    line-height:1.35;
+    min-height:27px;
+    margin-bottom:8px;
+  }
+  .photo-input{
+    width:100%;
+    font-size:10.5px;
+    color:var(--text-dim);
+    padding:8px;
+    border:1px solid var(--border);
+    border-radius:7px;
+    background:var(--surface);
+    cursor:pointer;
+  }
+  .photo-input::file-selector-button{
+    padding:7px 11px;
+    margin-right:8px;
+    border:0;
+    border-radius:6px;
+    background:var(--accent);
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .photo-preview{
+    margin-top:8px;
+    position:relative;
+    min-height:0;
+  }
+  .photo-preview img{
+    display:block;
+    width:100%;
+    max-height:190px;
+    object-fit:cover;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:#000;
+  }
+  .photo-status{
+    margin-top:6px;
+    font-size:10px;
+    color:var(--text-dim);
+  }
+  .photo-status.ok{color:var(--good);font-weight:600;}
+  .photo-status.missing{color:var(--danger);font-weight:600;}
+  .photo-remove{
+    margin-top:6px;
+    padding:5px 8px;
+    font-size:10px;
+  }
+  @media (max-width:600px){
+    .photo-grid{grid-template-columns:1fr;}
+  }
+
   /* ===== interactivity: hover, click feedback, highlighting ===== */
   .chip{transition:transform .12s ease, background-color .15s ease, border-color .15s ease, color .15s ease;}
   .chip:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px);}
@@ -282,7 +381,7 @@
       <span id="submitHint-general" class="submithint"></span>
       <button class="btn btn-primary" id="submitBtn-general">Submit General Work Permit</button>
     </div>
-    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record.</p>
+    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record. Required safety photos must be attached before submission.</p>
   </div>
   <div class="subpane hidden" id="sub-hotwork">
     <span class="statuspill" id="pill-hotwork"></span>
@@ -293,7 +392,7 @@
       <span id="submitHint-hotwork" class="submithint"></span>
       <button class="btn btn-primary" id="submitBtn-hotwork">Submit Hot Work Permit</button>
     </div>
-    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record.</p>
+    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record. Required safety photos must be attached before submission.</p>
   </div>
   <div class="subpane hidden" id="sub-height">
     <span class="statuspill" id="pill-height"></span>
@@ -304,7 +403,7 @@
       <span id="submitHint-height" class="submithint"></span>
       <button class="btn btn-primary" id="submitBtn-height">Submit Working at Height Permit</button>
     </div>
-    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record.</p>
+    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record. Required safety photos must be attached before submission.</p>
   </div>
   <div class="subpane hidden" id="sub-signed">
     <div class="permittitle" style="margin-bottom:4px;">Signed Permits</div>
@@ -452,6 +551,7 @@
       envHazards:[], safetyHazards:[],
       ppeItems:[], ppeOthers:'',
       precEnv:[], precSafety:[],
+      safetyPhotos:{isolation:'', isolationName:'', isolationAt:''},
       crewLeaderSig:null, authSig:null,
       crewLog:[{date:'',persons:'',sigLeader:'',sigMgr:'',timeStart:'',timeStop:''}],
       completionSig:null,
@@ -472,6 +572,10 @@
       entrants:'', attendants:'',
       entrantUnderstands:null, attendantUnderstands:null,
       emergencyOther:'', emergencyEquip:'',
+      safetyPhotos:{
+        isolation:'', isolationName:'', isolationAt:'',
+        fireExtinguisher:'', fireExtinguisherName:'', fireExtinguisherAt:''
+      },
       safeCommenceMgr:null, safeCommenceCrew:null,
       signOffMgr:null, signOffCrew:null,
       _submissionId:''
@@ -484,6 +588,7 @@
       dropZoneCordoned:null, dropZoneCleared:null, dropZoneSigns:null,
       lighted:null, commsAssured:null,
       emergencyOther:'', emergencyEquip:'',
+      safetyPhotos:{isolation:'', isolationName:'', isolationAt:''},
       specialInstructions:'',
       crew:[{name:'',trained:null}],
       explainNo:'',
@@ -509,11 +614,12 @@
   function saveState(){
     if(hasClaudeStorage){ try{ window.storage.set('standalone_permits', JSON.stringify(permitData), true); }catch(e){} }
     else if(hasLocalStorage){ try{ localStorage.setItem('standalone_permits', JSON.stringify(permitData)); }catch(e){} }
-    scheduleSync();
+    // IMPORTANT: local form changes are saved locally only. Network sync happens on
+    // explicit Submit/Close, not on every keystroke, chip click, signature, or photo.
   }
 
   // ================= LIVE SYNC TO GOOGLE SHEETS =================
-  // Baked-in default so this syncs automatically for anyone opening the page — no setup needed.
+  // Baked-in default so the app can submit/close permits automatically without setup.
   // The Sync Settings panel can still override this if you ever point it at a different sheet.
   const DEFAULT_SYNC_URL = 'https://script.google.com/macros/s/AKfycbz8L1Izxu4dXNaQ9uIgwIGLtxT9o3N8w3kNA7cba2r27YD3YSfEIahLCs4fkQ5W_Igv/exec';
   let syncUrl = '';
@@ -563,6 +669,9 @@
       'PPE Required': (g.ppeItems||[]).join(', '), 'PPE Others': g.ppeOthers,
       'Precautions Environmental': (g.precEnv||[]).join(', '),
       'Precautions Safety': (g.precSafety||[]).join(', '),
+      'Isolation Photo Evidence': g.safetyPhotos?.isolation || '',
+      'Isolation Photo File': g.safetyPhotos?.isolationName || '',
+      'Isolation Photo Captured At': g.safetyPhotos?.isolationAt || '',
       'Crew Leader Signed By': sigOrEmpty(g.crewLeaderSig), 'Crew Leader Signed At': sigTimeOrEmpty(g.crewLeaderSig),
       'Authorization Signed By': sigOrEmpty(g.authSig), 'Authorization Signed At': sigTimeOrEmpty(g.authSig), 'Authorization Signed By ID': sigWorkIdOrEmpty(g.authSig),
       'Completion Signed By': sigOrEmpty(g.completionSig), 'Completion Signed At': sigTimeOrEmpty(g.completionSig), 'Completion Signed By ID': sigWorkIdOrEmpty(g.completionSig),
@@ -582,6 +691,12 @@
       'Isolation - Fire Detection': h.isolation.fireDetection, 'Isolation - Pipeline': h.isolation.pipeline,
       'Isolation - Contact Maintenance': h.isolation.contactMaintenance, 'Isolation Other': h.isolationOther,
       'Isolation Checked By': h.isolationCheckedBy,
+      'Isolation Photo Evidence': h.safetyPhotos?.isolation || '',
+      'Isolation Photo File': h.safetyPhotos?.isolationName || '',
+      'Isolation Photo Captured At': h.safetyPhotos?.isolationAt || '',
+      'Fire Extinguisher Photo Evidence': h.safetyPhotos?.fireExtinguisher || '',
+      'Fire Extinguisher Photo File': h.safetyPhotos?.fireExtinguisherName || '',
+      'Fire Extinguisher Photo Captured At': h.safetyPhotos?.fireExtinguisherAt || '',
       'O2 Reading': h.testData.oxygen.reading, 'O2 Date': h.testData.oxygen.date, 'O2 Time': h.testData.oxygen.time,
       'LEL Reading': h.testData.lel.reading, 'LEL Date': h.testData.lel.date, 'LEL Time': h.testData.lel.time,
       'CO Reading': h.testData.co.reading, 'CO Date': h.testData.co.date, 'CO Time': h.testData.co.time,
@@ -613,6 +728,9 @@
       'Iso - Mechanical': h.isoMechanical, 'Iso - Electrical': h.isoElectrical,
       'Iso - Depressurized': h.isoDepressurized, 'Iso - Flushed': h.isoFlushed, 'Iso - Earthed': h.isoEarthed,
       'Isolation Checked By': h.isolationCheckedBy,
+      'Isolation Photo Evidence': h.safetyPhotos?.isolation || '',
+      'Isolation Photo File': h.safetyPhotos?.isolationName || '',
+      'Isolation Photo Captured At': h.safetyPhotos?.isolationAt || '',
       'Scaffolding?': h.scaffolding, 'Safe Access?': h.safeAccess, 'Ladder Tied?': h.ladderTied,
       'Other Access Means': h.otherAccessMeans,
       'Platforms Safe?': h.platformsSafe, 'Railings/Toe Boards?': h.railingsToeBoards, 'PPE Appropriate?': h.ppeAppropriate,
@@ -636,8 +754,10 @@
     setSyncStatus('pending', 'Syncing…');
     syncTimer = setTimeout(doSync, 800);
   }
-  // Posts a job and actually reads the server's real JSON response — no more assuming success
-  // just because the network request didn't throw. Returns {ok, submissionId?, error?}.
+  // Sends a job and handles Google Apps Script responses safely.
+  // A successful HTTP 2xx response is NOT treated as a failure just because the
+  // response body is not valid JSON. This prevents a successful Sheet write from
+  // being placed in the retry queue and submitted again.
   async function postToBackend(job){
     try{
       const res = await fetch(syncUrl, {
@@ -645,8 +765,22 @@
         headers:{'Content-Type':'text/plain;charset=utf-8'},
         body: JSON.stringify(job)
       });
-      const result = await res.json();
-      return (result && typeof result === 'object') ? result : { ok:false, error:'Unexpected response from server' };
+
+      const text = await res.text();
+      let result = null;
+      try{ result = text ? JSON.parse(text) : null; }catch(e){}
+
+      if(!res.ok){
+        return { ok:false, error:(result && result.error) || ('HTTP ' + res.status) };
+      }
+
+      // Google Apps Script can occasionally return a non-JSON body after the
+      // request has already reached doPost(). Do NOT retry that request blindly.
+      if(!result || typeof result !== 'object'){
+        return { ok:true, responseUnparsed:true };
+      }
+
+      return result;
     }catch(err){
       return { ok:false, error:String(err) };
     }
@@ -679,7 +813,19 @@
     updatePendingBadge();
   }
   function enqueuePendingJob(job, label){
-    pendingQueue.push({ queueId: Date.now()+'-'+Math.random().toString(36).slice(2), queuedAt: Date.now(), label, payload: job });
+    const id = job && (job.submissionId || job.data?.['Submission ID']);
+    if(id){
+      const alreadyQueued = pendingQueue.some(x =>
+        x.payload && (x.payload.submissionId === id || x.payload.data?.['Submission ID'] === id)
+      );
+      if(alreadyQueued) return;
+    }
+    pendingQueue.push({
+      queueId: Date.now()+'-'+Math.random().toString(36).slice(2),
+      queuedAt: Date.now(),
+      label,
+      payload: job
+    });
     savePendingQueue();
   }
   function updatePendingBadge(){
@@ -720,26 +866,33 @@
   setInterval(processPendingQueue, 30000);
 
   async function doSync(){
+    // Manual connectivity test only. Drafts are no longer pushed automatically,
+    // because doing so can create repeated rows in Sheets on every form edit.
     if(!syncUrl) return;
-    const jobs = [
-      { formType:'general', action:'draft', data: flattenGeneral() },
-      { formType:'hotwork', action:'draft', data: flattenHotwork() },
-      { formType:'height', action:'draft', data: flattenHeight() },
-    ];
-    let lastError = '';
-    for(const job of jobs){
-      const result = await postToBackend(job);
-      if(!result.ok) lastError = result.error || 'Server rejected the request';
-    }
-    if(!lastError) setSyncStatus('ok', 'Synced ' + new Date().toLocaleTimeString());
-    else setSyncStatus('err', 'Sync failed — ' + lastError);
+    const result = await postToBackend({ action:'ping', client:'permit-ui' });
+    if(result.ok) setSyncStatus('ok', 'Connection OK — ' + new Date().toLocaleTimeString());
+    else setSyncStatus('err', 'Connection failed — ' + (result.error || 'Server rejected the request'));
   }
 
-  // Appends a PERMANENT history row (never overwritten) — used only when the person hits Submit.
+  function makeSubmissionId(formKey){
+    const w = pd(formKey);
+    if(w._submissionId) return w._submissionId;
+    const id = formKey.toUpperCase() + '-' + Date.now() + '-' + Math.random().toString(36).slice(2,10);
+    w._submissionId = id;
+    saveState();
+    return id;
+  }
+
+  // Appends a PERMANENT history row — used only when the person hits Submit.
+  // The submissionId must be used by the Google Apps Script as an idempotency key:
+  // if the same ID arrives again, update/return the existing row instead of appending.
   async function submitFormToBackend(formKey){
     if(!syncUrl) return { ok:true };
     const flatteners = { general: flattenGeneral, hotwork: flattenHotwork, height: flattenHeight };
-    const job = { formType: formKey, action:'submit', data: flatteners[formKey]() };
+    const submissionId = makeSubmissionId(formKey);
+    const data = flatteners[formKey]();
+    data['Submission ID'] = submissionId;
+    const job = { formType: formKey, action:'submit', submissionId, data };
     return await postToBackendQueued(job, FORM_LABEL[formKey] + ' submission');
   }
 
@@ -957,6 +1110,7 @@
 
     const flatteners = { general: flattenGeneral, hotwork: flattenHotwork, height: flattenHeight };
     const data = flatteners[formKey]();
+    data['Submission ID'] = submissionId;
     let result = { ok:true };
     if(syncUrl) result = await postToBackendQueued({ formType: formKey, action:'close', submissionId, data }, FORM_LABEL[formKey] + ' closure');
 
@@ -981,6 +1135,96 @@
       <td><input type="time" data-text="general|crewLog.${i}.timeStart" value="${(r.timeStart||'').replace(/"/g,'&quot;')}"></td>
       <td><input type="time" data-text="general|crewLog.${i}.timeStop" value="${(r.timeStop||'').replace(/"/g,'&quot;')}"></td>
     </tr>`;
+  }
+
+
+  function safetyPhotoCard(formKey, path, title, note, required){
+    const p = pd(formKey);
+    const photos = p.safetyPhotos || {};
+    const val = photos[path] || '';
+    const name = photos[path + 'Name'] || '';
+    const requiredMark = required ? ' <span style="color:var(--caution);">*</span>' : '';
+    const requirementText = required ? 'Required for submission' : 'Optional safety evidence';
+    return `<div class="photo-card ${required?'required':''}" data-photo-card="${formKey}|${path}">
+      <div class="photo-card-title">${title}${requiredMark}</div>
+      <div class="photo-card-note">${note}</div>
+      <input class="photo-input" type="file" accept="image/*" capture="environment"
+             data-photo="${formKey}|${path}" ${required && !val ? 'aria-required="true"' : ''}
+             title="Take a photo with the camera">
+      <div style="font-size:9.5px;color:var(--text-dim);margin-top:4px;">
+        Camera access will be requested by your device/browser when you tap the photo button.
+      </div>
+      <div class="photo-preview">
+        ${val ? `<img src="${val}" alt="${title} evidence photo" loading="lazy">` : ''}
+      </div>
+      <div class="photo-status ${val?'ok':(required?'missing':'')}">${val ? 'Photo attached' + (name ? ' · '+name : '') : requirementText}</div>
+      ${val ? `<button type="button" class="btn btn-ghost photo-remove" data-photo-remove="${formKey}|${path}">Remove photo</button>` : ''}
+    </div>`;
+  }
+
+  function safetyEvidenceSection(formKey, options){
+    return `<div class="photo-evidence" data-photo-section="${formKey}">
+      <h5>Safety Evidence Photos</h5>
+      <p class="photo-evidence-intro">
+        Take clear site photographs using your device camera to provide visual evidence that safety controls are physically in place.
+        Photos are optional unless marked <strong>Required for submission</strong>. For Hot Work, the fire-extinguisher photo is mandatory.
+        Avoid photographing confidential information or people unless necessary.
+      </p>
+      <div class="photo-grid">
+        ${options.map(o=>safetyPhotoCard(formKey, o.path, o.title, o.note, !!o.required)).join('')}
+      </div>
+    </div>`;
+  }
+
+  function getMissingSafetyPhotos(formKey){
+    const w = pd(formKey);
+    const photos = w.safetyPhotos || {};
+
+    // All safety evidence photos are optional except the
+    // fire-extinguisher photo on the Hot Work Permit.
+    const required = formKey === 'hotwork'
+      ? [['fireExtinguisher','Hot Work Fire Extinguisher Photo']]
+      : [];
+
+    return required
+      .filter(([path])=>!photos[path])
+      .map(([path,label])=>({formKey, path, label}));
+  }
+
+  function updateSafetyPhotoPreview(formKey, path, file){
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const maxW = 1200;
+        const maxH = 900;
+        let w = img.naturalWidth, h = img.naturalHeight;
+        const scale = Math.min(1, maxW/w, maxH/h);
+        w = Math.max(1, Math.round(w*scale));
+        h = Math.max(1, Math.round(h*scale));
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img,0,0,w,h);
+
+        // JPEG compression keeps the permit payload manageable for browser storage/sync.
+        const dataUrl = canvas.toDataURL('image/jpeg',0.72);
+        const p = pd(formKey);
+        if(!p.safetyPhotos) p.safetyPhotos = {};
+        p.safetyPhotos[path] = dataUrl;
+        p.safetyPhotos[path+'Name'] = file.name;
+        p.safetyPhotos[path+'At'] = new Date().toLocaleString();
+        saveState();
+        renderAll();
+
+        const card = document.querySelector(`[data-photo-card="${formKey}|${path}"]`);
+        if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
   }
 
   function renderGeneralForm(){
@@ -1012,6 +1256,9 @@
         ${chipsField('general','precEnv','Environmental Aspects', ['Clean spilled chemicals, oils, raw material, cement','Storage of materials/oils appropriately','Disposal of waste (segregate and dispose appropriately)','Handling of raw materials/oils, cement appropriately to prevent spillage','Others (specify)'])}
         ${chipsField('general','precSafety','Safety', ['Required PPE supplied','Area cordoned off','Fire fighting equipment provided','Services (electricity, water, air) have been isolated and locked off','Possible leakage guarded','Warning signs has been displayed','Others (specify)'])}
       </div>
+      ${safetyEvidenceSection('general', [
+        {path:'isolation', title:'Locked & Isolated System', note:'Photograph the isolation point showing the lock/tag or equivalent physical isolation.', required:false}
+      ])}
       <div class="pc-section">
         <h5>Receipt (Crew Leader)</h5>
         <p style="font-size:11.5px;color:var(--text-dim);">I have read this form and understand the work to be carried out and the precautions to be undertaken. I confirm that these and other safety regulations at site will be followed strictly.</p>
@@ -1145,6 +1392,10 @@
         ${textField('hotwork','emergencyOther','Other Numbers')}
         ${textField('hotwork','emergencyEquip','Emergency Equipment (list)', true)}
       </div>
+      ${safetyEvidenceSection('hotwork', [
+        {path:'isolation', title:'Locked & Isolated System', note:'Show the lock/tag and isolated equipment or energy source clearly.', required:false},
+        {path:'fireExtinguisher', title:'Hot Work Fire Extinguisher', note:'Show a suitable fire extinguisher positioned and immediately available at the hot-work location.', required:true}
+      ])}
       <div class="pc-section">
         <h5>16. Safe to Commence Authorisation</h5>
         <p style="font-size:11.5px;color:var(--text-dim);">I/We have reviewed this safety form and are aware of the hazards and precautions necessary for performing the designated Hot Work/CSE authorized by this form. I therefore certify that all existing and potential hazards have been evaluated, necessary protective measures have been taken, and acceptable environmental conditions exist for safe execution of the job.</p>
@@ -1209,6 +1460,9 @@
         ${textField('height','emergencyEquip','Emergency Equipment (list)', true)}
         ${textField('height','specialInstructions','Special Instructions/Precautions to be Complied', true)}
       </div>
+      ${safetyEvidenceSection('height', [
+        {path:'isolation', title:'Locked & Isolated System', note:'Photograph the isolation point showing the lock/tag or equivalent physical isolation.', required:false}
+      ])}
       <div class="pc-section">
         <h5>Work Crew Members</h5>
         <p style="font-size:11px;color:var(--text-dim);margin:0 0 8px;">Trained for working at height?</p>
@@ -1305,7 +1559,15 @@
       return;
     }
   });
+
   document.querySelector('main').addEventListener('change', e=>{
+    const photo = e.target.closest('[data-photo]');
+    if(photo){
+      const [formKey, path] = photo.dataset.photo.split('|');
+      const file = photo.files && photo.files[0];
+      if(file) updateSafetyPhotoPreview(formKey, path, file);
+      return;
+    }
     const yn = e.target.closest('[data-yn]');
     if(yn){
       const [formKey, path] = yn.dataset.yn.split('|');
@@ -1369,6 +1631,21 @@
     }
   });
 
+
+  document.querySelector('main').addEventListener('click', e=>{
+    const remove = e.target.closest('[data-photo-remove]');
+    if(!remove) return;
+    const [formKey, path] = remove.dataset.photoRemove.split('|');
+    const p = pd(formKey);
+    if(p.safetyPhotos){
+      p.safetyPhotos[path] = '';
+      p.safetyPhotos[path+'Name'] = '';
+      p.safetyPhotos[path+'At'] = '';
+    }
+    saveState();
+    renderAll();
+  });
+
   // ================= SUBMIT (each permit type stands on its own) =================
   const REQUIRED_SIGS = {
     general: [['crewLeaderSig','Crew Leader signature'], ['authSig','Authorization signature']],
@@ -1378,7 +1655,10 @@
   const FORM_LABEL = { general:'General Work Permit', hotwork:'Hot Work Permit', height:'Working at Height Permit' };
   function getMissingFor(formKey){
     const w = pd(formKey);
-    return REQUIRED_SIGS[formKey].filter(([path])=>!w[path]).map(([path,label])=>({formKey, path, label}));
+    const missing = REQUIRED_SIGS[formKey]
+      .filter(([path])=>!w[path])
+      .map(([path,label])=>({formKey, path, label}));
+    return missing.concat(getMissingSafetyPhotos(formKey));
   }
   function updateSubmitHint(formKey){
     const hint = document.getElementById('submitHint-'+formKey);
@@ -1402,7 +1682,8 @@
       hint.style.color = 'var(--danger)';
       let firstEl = null;
       missing.forEach(m=>{
-        const el = document.querySelector(`[data-sigrow="${m.formKey}|${m.path}"]`);
+        const el = document.querySelector(`[data-sigrow="${m.formKey}|${m.path}"]`)
+          || document.querySelector(`[data-photo-card="${m.formKey}|${m.path}"]`);
         if(el){
           el.classList.add('field-missing');
           setTimeout(()=>el.classList.remove('field-missing'), 900);
@@ -2050,8 +2331,7 @@
     const url = document.getElementById('syncUrlInput').value.trim();
     if(!url){ toast('Enter a Web App URL first'); return; }
     saveSyncUrl(url);
-    setSyncStatus('pending', 'Saved — syncing…');
-    scheduleSync();
+    setSyncStatus('ok', 'Sync URL saved — ready for Submit/Close');
     toast('Sync URL saved');
   });
   document.getElementById('clearSyncUrlBtn').addEventListener('click', ()=>{
@@ -2077,7 +2357,7 @@
     document.getElementById('syncUrlInput').placeholder = syncUrl === DEFAULT_SYNC_URL
       ? 'Using built-in GHACEM sheet (leave blank, or paste a different URL to override)'
       : 'https://script.google.com/macros/s/.../exec';
-    setSyncStatus(syncUrl ? 'ok' : '', syncUrl ? 'Live sync active — will sync on changes' : 'Live sync not configured');
+    setSyncStatus(syncUrl ? 'ok' : '', syncUrl ? 'Connected — data syncs on Submit/Close' : 'Live sync not configured');
     try{ if(sessionStorage.getItem('ghacem_admin_unlocked') === '1'){ isAdminUnlocked = true; showAdminContent(); } }catch(e){}
     renderAll();
     await openLinkedPermitFromUrl();
