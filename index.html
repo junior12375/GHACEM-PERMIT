@@ -812,20 +812,52 @@
     else if(hasLocalStorage){ try{ localStorage.setItem(PENDING_QUEUE_KEY, JSON.stringify(pendingQueue)); }catch(e){} }
     updatePendingBadge();
   }
+  function getJobSubmissionId(job){
+    return String(job?.submissionId || job?.data?.['Submission ID'] || '').trim();
+  }
+
+  function removePendingJobsForSubmissionId(submissionId){
+    const id = String(submissionId || '').trim();
+    if(!id) return;
+    pendingQueue = pendingQueue.filter(item => getJobSubmissionId(item.payload) !== id);
+    savePendingQueue();
+  }
+
   function enqueuePendingJob(job, label){
-    const id = job && (job.submissionId || job.data?.['Submission ID']);
+    const id = getJobSubmissionId(job);
+
     if(id){
-      const alreadyQueued = pendingQueue.some(x =>
-        x.payload && (x.payload.submissionId === id || x.payload.data?.['Submission ID'] === id)
+      // One queue entry per permit. A newer correction replaces the older request.
+      const index = pendingQueue.findIndex(
+        item => getJobSubmissionId(item.payload) === id
       );
-      if(alreadyQueued) return;
+
+      const queued = {
+        queueId: index >= 0
+          ? pendingQueue[index].queueId
+          : Date.now()+'-'+Math.random().toString(36).slice(2),
+        queuedAt: index >= 0 ? pendingQueue[index].queuedAt : Date.now(),
+        label,
+        payload: job
+      };
+
+      if(index >= 0) pendingQueue[index] = queued;
+      else pendingQueue.push(queued);
+    } else {
+      const duplicate = pendingQueue.some(
+        item => !getJobSubmissionId(item.payload) &&
+                JSON.stringify(item.payload) === JSON.stringify(job)
+      );
+      if(!duplicate){
+        pendingQueue.push({
+          queueId: Date.now()+'-'+Math.random().toString(36).slice(2),
+          queuedAt: Date.now(),
+          label,
+          payload: job
+        });
+      }
     }
-    pendingQueue.push({
-      queueId: Date.now()+'-'+Math.random().toString(36).slice(2),
-      queuedAt: Date.now(),
-      label,
-      payload: job
-    });
+
     savePendingQueue();
   }
   function updatePendingBadge(){
@@ -846,16 +878,25 @@
   let pendingQueueRetryInFlight = false;
   async function processPendingQueue(){
     if(pendingQueueRetryInFlight || pendingQueue.length === 0 || !syncUrl || !navigator.onLine) return;
+
     pendingQueueRetryInFlight = true;
-    const stillPending = [];
     let syncedCount = 0;
-    for(const job of pendingQueue){
-      const result = await postToBackend(job.payload);
-      if(result.ok) syncedCount++; else stillPending.push(job);
+    const snapshot = pendingQueue.slice();
+
+    for(const queued of snapshot){
+      const result = await postToBackend(queued.payload);
+
+      if(result.ok){
+        // Remove only the exact request that succeeded. If a newer correction
+        // was queued while this request was running, leave that newer request.
+        pendingQueue = pendingQueue.filter(item => item.queueId !== queued.queueId);
+        syncedCount++;
+      }
     }
-    pendingQueue = stillPending;
+
     savePendingQueue();
     pendingQueueRetryInFlight = false;
+
     if(syncedCount > 0){
       toast(syncedCount === 1 ? '1 permit synced.' : `${syncedCount} permits synced.`);
       if(document.getElementById('sub-admin') && !document.getElementById('sub-admin').classList.contains('hidden')) renderCurrentAdminSub();
@@ -883,17 +924,41 @@
     return id;
   }
 
-  // Appends a PERMANENT history row — used only when the person hits Submit.
-  // The submissionId must be used by the Google Apps Script as an idempotency key:
-  // if the same ID arrives again, update/return the existing row instead of appending.
+  // Submit a new permit OR update the exact row when this permit was loaded for editing.
+  // _submissionId is retained when a history record is loaded, so corrections keep the
+  // original permit identity.
   async function submitFormToBackend(formKey){
     if(!syncUrl) return { ok:true };
+
     const flatteners = { general: flattenGeneral, hotwork: flattenHotwork, height: flattenHeight };
-    const submissionId = makeSubmissionId(formKey);
+    const existingId = pd(formKey)._submissionId || '';
+    const isEditing = !!existingId;
+    const submissionId = existingId || makeSubmissionId(formKey);
+
     const data = flatteners[formKey]();
     data['Submission ID'] = submissionId;
-    const job = { formType: formKey, action:'submit', submissionId, data };
-    return await postToBackendQueued(job, FORM_LABEL[formKey] + ' submission');
+
+    const job = {
+      formType: formKey,
+      action: isEditing ? 'update' : 'submit',
+      submissionId,
+      data
+    };
+
+    const result = await postToBackend(job);
+
+    if(result.ok){
+      // The live request succeeded, so any older queued copy is obsolete.
+      removePendingJobsForSubmissionId(submissionId);
+      return result;
+    }
+
+    // Keep exactly the newest version of this permit for retry.
+    enqueuePendingJob(
+      job,
+      FORM_LABEL[formKey] + (isEditing ? ' update' : ' submission')
+    );
+    return result;
   }
 
   // ================= HISTORY: unflatten a saved record back into an editable form =================
@@ -1695,8 +1760,11 @@
     }
 
     const btn = document.getElementById('submitBtn-'+formKey);
+    const isEditing = !!pd(formKey)._submissionId;
+    const actionLabel = isEditing ? 'Update ' + formLabel : 'Submit ' + formLabel;
+
     btn.disabled = true;
-    btn.textContent = 'Submitting…';
+    btn.textContent = isEditing ? 'Updating…' : 'Submitting…';
 
     let result = { ok:true };
     if(syncUrl){
@@ -1705,7 +1773,7 @@
     }
 
     btn.disabled = false;
-    btn.textContent = 'Submit ' + formLabel;
+    btn.textContent = actionLabel;
 
     if(!syncUrl){
       permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
@@ -1715,16 +1783,23 @@
       return;
     }
 
-    // Clear only this permit's own form — the other two permit types are untouched. This
-    // happens whether the submit reached the server or not: on failure it's already sitting
-    // in the offline queue (see postToBackendQueued) and will sync itself automatically once
-    // connectivity returns, so there's nothing left for the person to redo.
+    // A correction keeps the existing permit identity. If the update failed,
+    // keep the edited form on screen so it can be retried without creating another row.
+    if(!result.ok){
+      saveState();
+      renderAll();
+      toast(isEditing
+        ? formLabel + ' update pending — the existing permit was not replaced.'
+        : formLabel + ' submitted — will sync when back online.');
+      return;
+    }
+
     permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
     saveState();
     renderAll();
-    toast(result.ok
-      ? formLabel + ' submitted.'
-      : formLabel + ' submitted — will sync when back online.');
+    toast(isEditing
+      ? formLabel + ' updated — existing row replaced.'
+      : formLabel + ' submitted.');
   }
   document.getElementById('submitBtn-general').addEventListener('click', ()=> submitOne('general'));
   document.getElementById('submitBtn-hotwork').addEventListener('click', ()=> submitOne('hotwork'));
@@ -2103,6 +2178,13 @@
         permitData[formType]._submissionId = record['Submission ID'] || '';
         saveState();
         renderAll();
+
+        // Make it obvious that this is a correction to an existing permit.
+        const editBtn = document.getElementById('submitBtn-'+formType);
+        if(editBtn && permitData[formType]._submissionId){
+          editBtn.textContent = 'Update ' + FORM_LABEL[formType];
+        }
+
         document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub===formType));
         PUBLIC_SUBS.forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!==formType));
         toast('Loaded — now editing.');
