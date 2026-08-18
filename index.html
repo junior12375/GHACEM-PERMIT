@@ -119,6 +119,105 @@
   .submithint{font-size:11.5px;color:var(--text-dim);flex:1;min-width:180px;}
   .formsubmit-note{font-size:10.5px;color:var(--text-dim);margin:6px 0 0;}
 
+
+  /* ===== safety photo evidence ===== */
+  .photo-evidence{
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px dashed var(--border);
+  }
+  .photo-evidence h5{
+    font-family:var(--font-d);
+    text-transform:uppercase;
+    font-size:12.5px;
+    letter-spacing:.04em;
+    color:var(--accent);
+    margin:0 0 6px;
+  }
+  .photo-evidence-intro{
+    font-size:11px;
+    color:var(--text-dim);
+    line-height:1.45;
+    margin:0 0 12px;
+  }
+  .photo-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .photo-card{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:10px;
+  }
+  .photo-card.required{
+    border-left:3px solid var(--caution);
+  }
+  .photo-card-title{
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--text);
+    line-height:1.35;
+    margin-bottom:3px;
+  }
+  .photo-card-note{
+    font-size:10px;
+    color:var(--text-dim);
+    line-height:1.35;
+    min-height:27px;
+    margin-bottom:8px;
+  }
+  .photo-input{
+    width:100%;
+    font-size:10.5px;
+    color:var(--text-dim);
+    padding:8px;
+    border:1px solid var(--border);
+    border-radius:7px;
+    background:var(--surface);
+    cursor:pointer;
+  }
+  .photo-input::file-selector-button{
+    padding:7px 11px;
+    margin-right:8px;
+    border:0;
+    border-radius:6px;
+    background:var(--accent);
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .photo-preview{
+    margin-top:8px;
+    position:relative;
+    min-height:0;
+  }
+  .photo-preview img{
+    display:block;
+    width:100%;
+    max-height:190px;
+    object-fit:cover;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:#000;
+  }
+  .photo-status{
+    margin-top:6px;
+    font-size:10px;
+    color:var(--text-dim);
+  }
+  .photo-status.ok{color:var(--good);font-weight:600;}
+  .photo-status.missing{color:var(--danger);font-weight:600;}
+  .photo-remove{
+    margin-top:6px;
+    padding:5px 8px;
+    font-size:10px;
+  }
+  @media (max-width:600px){
+    .photo-grid{grid-template-columns:1fr;}
+  }
+
   /* ===== interactivity: hover, click feedback, highlighting ===== */
   .chip{transition:transform .12s ease, background-color .15s ease, border-color .15s ease, color .15s ease;}
   .chip:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px);}
@@ -233,7 +332,6 @@
   <span class="brand-divider"></span>
   <img class="hmark" src="data:image/png;base64,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" alt="Heidelberg Materials logo">
   <div><h1>GHACEM — Permits</h1><span>PERMIT FORMS</span></div>
-  <span id="pendingSyncBadge" class="pendingbadge hidden"></span>
 </header>
 
 <div class="sitebanner">
@@ -282,7 +380,7 @@
       <span id="submitHint-general" class="submithint"></span>
       <button class="btn btn-primary" id="submitBtn-general">Submit General Work Permit</button>
     </div>
-    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record.</p>
+    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record. Required safety photos must be attached before submission.</p>
   </div>
   <div class="subpane hidden" id="sub-hotwork">
     <span class="statuspill" id="pill-hotwork"></span>
@@ -293,7 +391,7 @@
       <span id="submitHint-hotwork" class="submithint"></span>
       <button class="btn btn-primary" id="submitBtn-hotwork">Submit Hot Work Permit</button>
     </div>
-    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record.</p>
+    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record. Required safety photos must be attached before submission.</p>
   </div>
   <div class="subpane hidden" id="sub-height">
     <span class="statuspill" id="pill-height"></span>
@@ -304,7 +402,7 @@
       <span id="submitHint-height" class="submithint"></span>
       <button class="btn btn-primary" id="submitBtn-height">Submit Working at Height Permit</button>
     </div>
-    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record.</p>
+    <p class="formsubmit-note">Submitting notifies EHS and creates a permanent record. Required safety photos must be attached before submission.</p>
   </div>
   <div class="subpane hidden" id="sub-signed">
     <div class="permittitle" style="margin-bottom:4px;">Signed Permits</div>
@@ -452,6 +550,7 @@
       envHazards:[], safetyHazards:[],
       ppeItems:[], ppeOthers:'',
       precEnv:[], precSafety:[],
+      safetyPhotos:{isolation:'', isolationName:'', isolationAt:''},
       crewLeaderSig:null, authSig:null,
       crewLog:[{date:'',persons:'',sigLeader:'',sigMgr:'',timeStart:'',timeStop:''}],
       completionSig:null,
@@ -472,6 +571,10 @@
       entrants:'', attendants:'',
       entrantUnderstands:null, attendantUnderstands:null,
       emergencyOther:'', emergencyEquip:'',
+      safetyPhotos:{
+        isolation:'', isolationName:'', isolationAt:'',
+        fireExtinguisher:'', fireExtinguisherName:'', fireExtinguisherAt:''
+      },
       safeCommenceMgr:null, safeCommenceCrew:null,
       signOffMgr:null, signOffCrew:null,
       _submissionId:''
@@ -484,6 +587,7 @@
       dropZoneCordoned:null, dropZoneCleared:null, dropZoneSigns:null,
       lighted:null, commsAssured:null,
       emergencyOther:'', emergencyEquip:'',
+      safetyPhotos:{isolation:'', isolationName:'', isolationAt:''},
       specialInstructions:'',
       crew:[{name:'',trained:null}],
       explainNo:'',
@@ -509,15 +613,15 @@
   function saveState(){
     if(hasClaudeStorage){ try{ window.storage.set('standalone_permits', JSON.stringify(permitData), true); }catch(e){} }
     else if(hasLocalStorage){ try{ localStorage.setItem('standalone_permits', JSON.stringify(permitData)); }catch(e){} }
-    scheduleSync();
+    // IMPORTANT: local form changes are saved locally only. Network sync happens on
+    // explicit Submit/Close, not on every keystroke, chip click, signature, or photo.
   }
 
   // ================= LIVE SYNC TO GOOGLE SHEETS =================
-  // Baked-in default so this syncs automatically for anyone opening the page — no setup needed.
+  // Baked-in default so the app can submit/close permits automatically without setup.
   // The Sync Settings panel can still override this if you ever point it at a different sheet.
   const DEFAULT_SYNC_URL = 'https://script.google.com/macros/s/AKfycbz8L1Izxu4dXNaQ9uIgwIGLtxT9o3N8w3kNA7cba2r27YD3YSfEIahLCs4fkQ5W_Igv/exec';
   let syncUrl = '';
-  let syncTimer = null;
 
   async function loadSyncUrl(){
     if(hasClaudeStorage){
@@ -563,6 +667,9 @@
       'PPE Required': (g.ppeItems||[]).join(', '), 'PPE Others': g.ppeOthers,
       'Precautions Environmental': (g.precEnv||[]).join(', '),
       'Precautions Safety': (g.precSafety||[]).join(', '),
+      'Isolation Photo Evidence': g.safetyPhotos?.isolation || '',
+      'Isolation Photo File': g.safetyPhotos?.isolationName || '',
+      'Isolation Photo Captured At': g.safetyPhotos?.isolationAt || '',
       'Crew Leader Signed By': sigOrEmpty(g.crewLeaderSig), 'Crew Leader Signed At': sigTimeOrEmpty(g.crewLeaderSig),
       'Authorization Signed By': sigOrEmpty(g.authSig), 'Authorization Signed At': sigTimeOrEmpty(g.authSig), 'Authorization Signed By ID': sigWorkIdOrEmpty(g.authSig),
       'Completion Signed By': sigOrEmpty(g.completionSig), 'Completion Signed At': sigTimeOrEmpty(g.completionSig), 'Completion Signed By ID': sigWorkIdOrEmpty(g.completionSig),
@@ -582,6 +689,12 @@
       'Isolation - Fire Detection': h.isolation.fireDetection, 'Isolation - Pipeline': h.isolation.pipeline,
       'Isolation - Contact Maintenance': h.isolation.contactMaintenance, 'Isolation Other': h.isolationOther,
       'Isolation Checked By': h.isolationCheckedBy,
+      'Isolation Photo Evidence': h.safetyPhotos?.isolation || '',
+      'Isolation Photo File': h.safetyPhotos?.isolationName || '',
+      'Isolation Photo Captured At': h.safetyPhotos?.isolationAt || '',
+      'Fire Extinguisher Photo Evidence': h.safetyPhotos?.fireExtinguisher || '',
+      'Fire Extinguisher Photo File': h.safetyPhotos?.fireExtinguisherName || '',
+      'Fire Extinguisher Photo Captured At': h.safetyPhotos?.fireExtinguisherAt || '',
       'O2 Reading': h.testData.oxygen.reading, 'O2 Date': h.testData.oxygen.date, 'O2 Time': h.testData.oxygen.time,
       'LEL Reading': h.testData.lel.reading, 'LEL Date': h.testData.lel.date, 'LEL Time': h.testData.lel.time,
       'CO Reading': h.testData.co.reading, 'CO Date': h.testData.co.date, 'CO Time': h.testData.co.time,
@@ -613,6 +726,9 @@
       'Iso - Mechanical': h.isoMechanical, 'Iso - Electrical': h.isoElectrical,
       'Iso - Depressurized': h.isoDepressurized, 'Iso - Flushed': h.isoFlushed, 'Iso - Earthed': h.isoEarthed,
       'Isolation Checked By': h.isolationCheckedBy,
+      'Isolation Photo Evidence': h.safetyPhotos?.isolation || '',
+      'Isolation Photo File': h.safetyPhotos?.isolationName || '',
+      'Isolation Photo Captured At': h.safetyPhotos?.isolationAt || '',
       'Scaffolding?': h.scaffolding, 'Safe Access?': h.safeAccess, 'Ladder Tied?': h.ladderTied,
       'Other Access Means': h.otherAccessMeans,
       'Platforms Safe?': h.platformsSafe, 'Railings/Toe Boards?': h.railingsToeBoards, 'PPE Appropriate?': h.ppeAppropriate,
@@ -636,8 +752,10 @@
     setSyncStatus('pending', 'Syncing…');
     syncTimer = setTimeout(doSync, 800);
   }
-  // Posts a job and actually reads the server's real JSON response — no more assuming success
-  // just because the network request didn't throw. Returns {ok, submissionId?, error?}.
+  // Sends a job and handles Google Apps Script responses safely.
+  // A successful HTTP 2xx response is NOT treated as a failure just because the
+  // response body is not valid JSON. This prevents a successful Sheet write from
+  // being placed in the retry queue and submitted again.
   async function postToBackend(job){
     try{
       const res = await fetch(syncUrl, {
@@ -645,102 +763,69 @@
         headers:{'Content-Type':'text/plain;charset=utf-8'},
         body: JSON.stringify(job)
       });
-      const result = await res.json();
-      return (result && typeof result === 'object') ? result : { ok:false, error:'Unexpected response from server' };
+
+      const text = await res.text();
+      let result = null;
+      try{ result = text ? JSON.parse(text) : null; }catch(e){}
+
+      if(!res.ok){
+        return { ok:false, error:(result && result.error) || ('HTTP ' + res.status) };
+      }
+
+      // Google Apps Script can occasionally return a non-JSON body after the
+      // request has already reached doPost(). Do NOT retry that request blindly.
+      if(!result || typeof result !== 'object'){
+        return { ok:true, responseUnparsed:true };
+      }
+
+      return result;
     }catch(err){
       return { ok:false, error:String(err) };
     }
   }
 
-  // ================= OFFLINE QUEUE (for poor/no network coverage) =================
-  // Submit/Close are the two actions that must never be silently lost. If either can't reach
-  // the server (offline, dropped signal, mid-lock "busy" response), the job is saved here and
-  // retried automatically — on the 'online' event, on a periodic timer, and on page load —
-  // until it succeeds. Drafts are NOT queued: each autosave supersedes the last one anyway, so
-  // there's nothing worth preserving beyond what's already sitting in the person's own form.
-  const PENDING_QUEUE_KEY = 'ghacem_pending_queue';
-  let pendingQueue = [];
 
-  async function loadPendingQueue(){
-    if(hasClaudeStorage){
-      try{ const r = await window.storage.get(PENDING_QUEUE_KEY, true); pendingQueue = JSON.parse(r.value) || []; }
-      catch(e){ pendingQueue = []; }
-    } else if(hasLocalStorage){
-      try{ pendingQueue = JSON.parse(localStorage.getItem(PENDING_QUEUE_KEY)) || []; }
-      catch(e){ pendingQueue = []; }
-    } else {
-      pendingQueue = [];
-    }
-    updatePendingBadge();
-  }
-  function savePendingQueue(){
-    if(hasClaudeStorage){ try{ window.storage.set(PENDING_QUEUE_KEY, JSON.stringify(pendingQueue), true); }catch(e){} }
-    else if(hasLocalStorage){ try{ localStorage.setItem(PENDING_QUEUE_KEY, JSON.stringify(pendingQueue)); }catch(e){} }
-    updatePendingBadge();
-  }
-  function enqueuePendingJob(job, label){
-    pendingQueue.push({ queueId: Date.now()+'-'+Math.random().toString(36).slice(2), queuedAt: Date.now(), label, payload: job });
-    savePendingQueue();
-  }
-  function updatePendingBadge(){
-    const badge = document.getElementById('pendingSyncBadge');
-    if(!badge) return;
-    if(pendingQueue.length === 0){ badge.classList.add('hidden'); return; }
-    badge.classList.remove('hidden');
-    badge.textContent = pendingQueue.length + (pendingQueue.length === 1 ? ' permit pending sync' : ' permits pending sync');
-  }
-
-  // Like postToBackend, but on failure it queues the job for retry instead of dropping it.
-  async function postToBackendQueued(job, label){
-    const result = await postToBackend(job);
-    if(!result.ok) enqueuePendingJob(job, label);
-    return result;
-  }
-
-  let pendingQueueRetryInFlight = false;
-  async function processPendingQueue(){
-    if(pendingQueueRetryInFlight || pendingQueue.length === 0 || !syncUrl || !navigator.onLine) return;
-    pendingQueueRetryInFlight = true;
-    const stillPending = [];
-    let syncedCount = 0;
-    for(const job of pendingQueue){
-      const result = await postToBackend(job.payload);
-      if(result.ok) syncedCount++; else stillPending.push(job);
-    }
-    pendingQueue = stillPending;
-    savePendingQueue();
-    pendingQueueRetryInFlight = false;
-    if(syncedCount > 0){
-      toast(syncedCount === 1 ? '1 permit synced.' : `${syncedCount} permits synced.`);
-      if(document.getElementById('sub-admin') && !document.getElementById('sub-admin').classList.contains('hidden')) renderCurrentAdminSub();
-      if(document.getElementById('sub-signed') && !document.getElementById('sub-signed').classList.contains('hidden')) renderPermitList(signedType, 'signed');
-    }
-  }
-  window.addEventListener('online', processPendingQueue);
-  setInterval(processPendingQueue, 30000);
-
-  async function doSync(){
+async function doSync(){
+    // Manual connectivity test only. Drafts are no longer pushed automatically,
+    // because doing so can create repeated rows in Sheets on every form edit.
     if(!syncUrl) return;
-    const jobs = [
-      { formType:'general', action:'draft', data: flattenGeneral() },
-      { formType:'hotwork', action:'draft', data: flattenHotwork() },
-      { formType:'height', action:'draft', data: flattenHeight() },
-    ];
-    let lastError = '';
-    for(const job of jobs){
-      const result = await postToBackend(job);
-      if(!result.ok) lastError = result.error || 'Server rejected the request';
-    }
-    if(!lastError) setSyncStatus('ok', 'Synced ' + new Date().toLocaleTimeString());
-    else setSyncStatus('err', 'Sync failed — ' + lastError);
+    const result = await postToBackend({ action:'ping', client:'permit-ui' });
+    if(result.ok) setSyncStatus('ok', 'Connection OK — ' + new Date().toLocaleTimeString());
+    else setSyncStatus('err', 'Connection failed — ' + (result.error || 'Server rejected the request'));
   }
 
-  // Appends a PERMANENT history row (never overwritten) — used only when the person hits Submit.
+  function makeSubmissionId(formKey){
+    const w = pd(formKey);
+    if(w._submissionId) return w._submissionId;
+    const id = formKey.toUpperCase() + '-' + Date.now() + '-' + Math.random().toString(36).slice(2,10);
+    w._submissionId = id;
+    saveState();
+    return id;
+  }
+
+  // Submit a new permit OR update the exact row when this permit was loaded for editing.
+  // _submissionId is retained when a history record is loaded, so corrections keep the
+  // original permit identity.
   async function submitFormToBackend(formKey){
-    if(!syncUrl) return { ok:true };
+    if(!syncUrl) return { ok:false, error:'Sync URL is not configured.' };
+
     const flatteners = { general: flattenGeneral, hotwork: flattenHotwork, height: flattenHeight };
-    const job = { formType: formKey, action:'submit', data: flatteners[formKey]() };
-    return await postToBackendQueued(job, FORM_LABEL[formKey] + ' submission');
+    const existingId = pd(formKey)._submissionId || '';
+    const isEditing = !!existingId;
+    const submissionId = existingId || makeSubmissionId(formKey);
+
+    const data = flatteners[formKey]();
+    data['Submission ID'] = submissionId;
+
+    const job = {
+      formType: formKey,
+      action: isEditing ? 'update' : 'submit',
+      submissionId,
+      data
+    };
+
+    // Direct network request only. No offline storage, queue, or automatic retry.
+    return await postToBackend(job);
   }
 
   // ================= HISTORY: unflatten a saved record back into an editable form =================
@@ -905,8 +990,6 @@
     return false;
   }
   // Completion / closure signatures — distinct from the initial authorization above.
-  // Signing these on a permit that was loaded from history closes it out immediately
-  // (see CLOSING_PATHS / autoCloseSync below) — no Submit click needed.
   function formIsClosed(formKey){
     const w = pd(formKey);
     if(formKey==='general') return !!w.completionSig;
@@ -949,27 +1032,7 @@
   // signature(s) are in place — no Submit click, and it does not count as a new submission:
   // the backend updates that same row in place instead of appending a new one, and never
   // emails EHS a second time for it.
-  async function autoCloseSync(formKey){
-    const w = pd(formKey);
-    const submissionId = w._submissionId;
-    if(!submissionId) return; // not a record loaded from history — nothing to close in place
-    if(!formIsClosed(formKey)) return;
 
-    const flatteners = { general: flattenGeneral, hotwork: flattenHotwork, height: flattenHeight };
-    const data = flatteners[formKey]();
-    let result = { ok:true };
-    if(syncUrl) result = await postToBackendQueued({ formType: formKey, action:'close', submissionId, data }, FORM_LABEL[formKey] + ' closure');
-
-    // Either way the closure is safe now: on success it's already on the server; on failure
-    // it's sitting in the offline queue and will sync itself the moment connectivity returns.
-    // So the form clears in both cases — nothing for the person to redo or retry by hand.
-    toast(result.ok
-      ? FORM_LABEL[formKey] + ' closed.'
-      : FORM_LABEL[formKey] + ' closed — will sync when back online.');
-    permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
-    saveState();
-    renderAll();
-  }
 
   function crewLogRow(i){
     const r = pd('general').crewLog[i];
@@ -981,6 +1044,96 @@
       <td><input type="time" data-text="general|crewLog.${i}.timeStart" value="${(r.timeStart||'').replace(/"/g,'&quot;')}"></td>
       <td><input type="time" data-text="general|crewLog.${i}.timeStop" value="${(r.timeStop||'').replace(/"/g,'&quot;')}"></td>
     </tr>`;
+  }
+
+
+  function safetyPhotoCard(formKey, path, title, note, required){
+    const p = pd(formKey);
+    const photos = p.safetyPhotos || {};
+    const val = photos[path] || '';
+    const name = photos[path + 'Name'] || '';
+    const requiredMark = required ? ' <span style="color:var(--caution);">*</span>' : '';
+    const requirementText = required ? 'Required for submission' : 'Optional safety evidence';
+    return `<div class="photo-card ${required?'required':''}" data-photo-card="${formKey}|${path}">
+      <div class="photo-card-title">${title}${requiredMark}</div>
+      <div class="photo-card-note">${note}</div>
+      <input class="photo-input" type="file" accept="image/*" capture="environment"
+             data-photo="${formKey}|${path}" ${required && !val ? 'aria-required="true"' : ''}
+             title="Take a photo with the camera">
+      <div style="font-size:9.5px;color:var(--text-dim);margin-top:4px;">
+        Camera access will be requested by your device/browser when you tap the photo button.
+      </div>
+      <div class="photo-preview">
+        ${val ? `<img src="${val}" alt="${title} evidence photo" loading="lazy">` : ''}
+      </div>
+      <div class="photo-status ${val?'ok':(required?'missing':'')}">${val ? 'Photo attached' + (name ? ' · '+name : '') : requirementText}</div>
+      ${val ? `<button type="button" class="btn btn-ghost photo-remove" data-photo-remove="${formKey}|${path}">Remove photo</button>` : ''}
+    </div>`;
+  }
+
+  function safetyEvidenceSection(formKey, options){
+    return `<div class="photo-evidence" data-photo-section="${formKey}">
+      <h5>Safety Evidence Photos</h5>
+      <p class="photo-evidence-intro">
+        Take clear site photographs using your device camera to provide visual evidence that safety controls are physically in place.
+        Photos are optional unless marked <strong>Required for submission</strong>. For Hot Work, the fire-extinguisher photo is mandatory.
+        Avoid photographing confidential information or people unless necessary.
+      </p>
+      <div class="photo-grid">
+        ${options.map(o=>safetyPhotoCard(formKey, o.path, o.title, o.note, !!o.required)).join('')}
+      </div>
+    </div>`;
+  }
+
+  function getMissingSafetyPhotos(formKey){
+    const w = pd(formKey);
+    const photos = w.safetyPhotos || {};
+
+    // All safety evidence photos are optional except the
+    // fire-extinguisher photo on the Hot Work Permit.
+    const required = formKey === 'hotwork'
+      ? [['fireExtinguisher','Hot Work Fire Extinguisher Photo']]
+      : [];
+
+    return required
+      .filter(([path])=>!photos[path])
+      .map(([path,label])=>({formKey, path, label}));
+  }
+
+  function updateSafetyPhotoPreview(formKey, path, file){
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const maxW = 1200;
+        const maxH = 900;
+        let w = img.naturalWidth, h = img.naturalHeight;
+        const scale = Math.min(1, maxW/w, maxH/h);
+        w = Math.max(1, Math.round(w*scale));
+        h = Math.max(1, Math.round(h*scale));
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img,0,0,w,h);
+
+        // JPEG compression keeps the permit payload manageable for browser storage/sync.
+        const dataUrl = canvas.toDataURL('image/jpeg',0.72);
+        const p = pd(formKey);
+        if(!p.safetyPhotos) p.safetyPhotos = {};
+        p.safetyPhotos[path] = dataUrl;
+        p.safetyPhotos[path+'Name'] = file.name;
+        p.safetyPhotos[path+'At'] = new Date().toLocaleString();
+        saveState();
+        renderAll();
+
+        const card = document.querySelector(`[data-photo-card="${formKey}|${path}"]`);
+        if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
   }
 
   function renderGeneralForm(){
@@ -1012,6 +1165,9 @@
         ${chipsField('general','precEnv','Environmental Aspects', ['Clean spilled chemicals, oils, raw material, cement','Storage of materials/oils appropriately','Disposal of waste (segregate and dispose appropriately)','Handling of raw materials/oils, cement appropriately to prevent spillage','Others (specify)'])}
         ${chipsField('general','precSafety','Safety', ['Required PPE supplied','Area cordoned off','Fire fighting equipment provided','Services (electricity, water, air) have been isolated and locked off','Possible leakage guarded','Warning signs has been displayed','Others (specify)'])}
       </div>
+      ${safetyEvidenceSection('general', [
+        {path:'isolation', title:'Locked & Isolated System', note:'Photograph the isolation point showing the lock/tag or equivalent physical isolation.', required:false}
+      ])}
       <div class="pc-section">
         <h5>Receipt (Crew Leader)</h5>
         <p style="font-size:11.5px;color:var(--text-dim);">I have read this form and understand the work to be carried out and the precautions to be undertaken. I confirm that these and other safety regulations at site will be followed strictly.</p>
@@ -1145,6 +1301,10 @@
         ${textField('hotwork','emergencyOther','Other Numbers')}
         ${textField('hotwork','emergencyEquip','Emergency Equipment (list)', true)}
       </div>
+      ${safetyEvidenceSection('hotwork', [
+        {path:'isolation', title:'Locked & Isolated System', note:'Show the lock/tag and isolated equipment or energy source clearly.', required:false},
+        {path:'fireExtinguisher', title:'Hot Work Fire Extinguisher', note:'Show a suitable fire extinguisher positioned and immediately available at the hot-work location.', required:true}
+      ])}
       <div class="pc-section">
         <h5>16. Safe to Commence Authorisation</h5>
         <p style="font-size:11.5px;color:var(--text-dim);">I/We have reviewed this safety form and are aware of the hazards and precautions necessary for performing the designated Hot Work/CSE authorized by this form. I therefore certify that all existing and potential hazards have been evaluated, necessary protective measures have been taken, and acceptable environmental conditions exist for safe execution of the job.</p>
@@ -1209,6 +1369,9 @@
         ${textField('height','emergencyEquip','Emergency Equipment (list)', true)}
         ${textField('height','specialInstructions','Special Instructions/Precautions to be Complied', true)}
       </div>
+      ${safetyEvidenceSection('height', [
+        {path:'isolation', title:'Locked & Isolated System', note:'Photograph the isolation point showing the lock/tag or equivalent physical isolation.', required:false}
+      ])}
       <div class="pc-section">
         <h5>Work Crew Members</h5>
         <p style="font-size:11px;color:var(--text-dim);margin:0 0 8px;">Trained for working at height?</p>
@@ -1294,7 +1457,7 @@
       const key = formKey+'|'+path;
       const newRow = document.querySelector(`[data-sigrow="${key}"]`);
       if(newRow){ newRow.classList.add('just-signed'); setTimeout(()=>newRow.classList.remove('just-signed'), 650); }
-      if((CLOSING_PATHS[formKey]||[]).includes(path)) autoCloseSync(formKey);
+      if((CLOSING_PATHS[formKey]||[]).includes(path)) ;
       return;
     }
     const unsignBtn = e.target.closest('[data-unsign]');
@@ -1305,7 +1468,15 @@
       return;
     }
   });
+
   document.querySelector('main').addEventListener('change', e=>{
+    const photo = e.target.closest('[data-photo]');
+    if(photo){
+      const [formKey, path] = photo.dataset.photo.split('|');
+      const file = photo.files && photo.files[0];
+      if(file) updateSafetyPhotoPreview(formKey, path, file);
+      return;
+    }
     const yn = e.target.closest('[data-yn]');
     if(yn){
       const [formKey, path] = yn.dataset.yn.split('|');
@@ -1369,6 +1540,21 @@
     }
   });
 
+
+  document.querySelector('main').addEventListener('click', e=>{
+    const remove = e.target.closest('[data-photo-remove]');
+    if(!remove) return;
+    const [formKey, path] = remove.dataset.photoRemove.split('|');
+    const p = pd(formKey);
+    if(p.safetyPhotos){
+      p.safetyPhotos[path] = '';
+      p.safetyPhotos[path+'Name'] = '';
+      p.safetyPhotos[path+'At'] = '';
+    }
+    saveState();
+    renderAll();
+  });
+
   // ================= SUBMIT (each permit type stands on its own) =================
   const REQUIRED_SIGS = {
     general: [['crewLeaderSig','Crew Leader signature'], ['authSig','Authorization signature']],
@@ -1378,7 +1564,10 @@
   const FORM_LABEL = { general:'General Work Permit', hotwork:'Hot Work Permit', height:'Working at Height Permit' };
   function getMissingFor(formKey){
     const w = pd(formKey);
-    return REQUIRED_SIGS[formKey].filter(([path])=>!w[path]).map(([path,label])=>({formKey, path, label}));
+    const missing = REQUIRED_SIGS[formKey]
+      .filter(([path])=>!w[path])
+      .map(([path,label])=>({formKey, path, label}));
+    return missing.concat(getMissingSafetyPhotos(formKey));
   }
   function updateSubmitHint(formKey){
     const hint = document.getElementById('submitHint-'+formKey);
@@ -1402,7 +1591,8 @@
       hint.style.color = 'var(--danger)';
       let firstEl = null;
       missing.forEach(m=>{
-        const el = document.querySelector(`[data-sigrow="${m.formKey}|${m.path}"]`);
+        const el = document.querySelector(`[data-sigrow="${m.formKey}|${m.path}"]`)
+          || document.querySelector(`[data-photo-card="${m.formKey}|${m.path}"]`);
         if(el){
           el.classList.add('field-missing');
           setTimeout(()=>el.classList.remove('field-missing'), 900);
@@ -1414,17 +1604,19 @@
     }
 
     const btn = document.getElementById('submitBtn-'+formKey);
+    const isEditing = !!pd(formKey)._submissionId;
+    const actionLabel = isEditing ? 'Update ' + formLabel : 'Submit ' + formLabel;
+
     btn.disabled = true;
-    btn.textContent = 'Submitting…';
+    btn.textContent = isEditing ? 'Updating…' : 'Submitting…';
 
     let result = { ok:true };
     if(syncUrl){
-      clearTimeout(syncTimer);
       result = await submitFormToBackend(formKey);
     }
 
     btn.disabled = false;
-    btn.textContent = 'Submit ' + formLabel;
+    btn.textContent = actionLabel;
 
     if(!syncUrl){
       permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
@@ -1434,16 +1626,23 @@
       return;
     }
 
-    // Clear only this permit's own form — the other two permit types are untouched. This
-    // happens whether the submit reached the server or not: on failure it's already sitting
-    // in the offline queue (see postToBackendQueued) and will sync itself automatically once
-    // connectivity returns, so there's nothing left for the person to redo.
+    // A correction keeps the existing permit identity. If the update failed,
+    // keep the edited form on screen so it can be retried without creating another row.
+    if(!result.ok){
+      saveState();
+      renderAll();
+      toast(isEditing
+        ? formLabel + ' update failed — no changes were made to the sheet. Please try again.'
+        : formLabel + ' submitted — connection failed; please try again.');
+      return;
+    }
+
     permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
     saveState();
     renderAll();
-    toast(result.ok
-      ? formLabel + ' submitted.'
-      : formLabel + ' submitted — will sync when back online.');
+    toast(result.action === 'updated-existing' || isEditing
+      ? formLabel + ' updated — existing row updated.'
+      : formLabel + ' submitted — new row created.');
   }
   document.getElementById('submitBtn-general').addEventListener('click', ()=> submitOne('general'));
   document.getElementById('submitBtn-hotwork').addEventListener('click', ()=> submitOne('hotwork'));
@@ -1822,6 +2021,13 @@
         permitData[formType]._submissionId = record['Submission ID'] || '';
         saveState();
         renderAll();
+
+        // Make it obvious that this is a correction to an existing permit.
+        const editBtn = document.getElementById('submitBtn-'+formType);
+        if(editBtn && permitData[formType]._submissionId){
+          editBtn.textContent = 'Update ' + FORM_LABEL[formType];
+        }
+
         document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub===formType));
         PUBLIC_SUBS.forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!==formType));
         toast('Loaded — now editing.');
@@ -2050,8 +2256,7 @@
     const url = document.getElementById('syncUrlInput').value.trim();
     if(!url){ toast('Enter a Web App URL first'); return; }
     saveSyncUrl(url);
-    setSyncStatus('pending', 'Saved — syncing…');
-    scheduleSync();
+    setSyncStatus('ok', 'Sync URL saved — ready for Submit/Close');
     toast('Sync URL saved');
   });
   document.getElementById('clearSyncUrlBtn').addEventListener('click', ()=>{
@@ -2071,22 +2276,15 @@
   async function init(){
     await loadState();
     await loadSyncUrl();
-    await loadPendingQueue();
-    processPendingQueue();
     document.getElementById('syncUrlInput').value = syncUrl === DEFAULT_SYNC_URL ? '' : syncUrl;
     document.getElementById('syncUrlInput').placeholder = syncUrl === DEFAULT_SYNC_URL
       ? 'Using built-in GHACEM sheet (leave blank, or paste a different URL to override)'
       : 'https://script.google.com/macros/s/.../exec';
-    setSyncStatus(syncUrl ? 'ok' : '', syncUrl ? 'Live sync active — will sync on changes' : 'Live sync not configured');
+    setSyncStatus(syncUrl ? 'ok' : '', syncUrl ? 'Connected — data syncs on Submit/Close' : 'Live sync not configured');
     try{ if(sessionStorage.getItem('ghacem_admin_unlocked') === '1'){ isAdminUnlocked = true; showAdminContent(); } }catch(e){}
     renderAll();
     await openLinkedPermitFromUrl();
-    // Retry any closure that was signed but never made it to the server (e.g. the tab
-    // closed before the sync finished) — picks up right where it left off, silently.
-    ['general','hotwork','height'].forEach(k=>{
-      if(pd(k)._submissionId && formIsClosed(k)) autoCloseSync(k);
-    });
-  }
+}
 
   // Handles links like "...?permit=hotwork&id=<Submission ID>" — the kind EHS gets in the
   // notification email — by jumping straight to the right tab. A permit that's still open
