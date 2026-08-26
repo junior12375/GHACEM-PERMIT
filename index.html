@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GHACEM  Permits</title>
+<title>GHACEM — Permits</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -429,7 +429,7 @@
       <button class="btn btn-ghost btn-sm" id="refreshSignedListBtn" style="margin-left:auto;">↻ Refresh</button>
     </div>
     <div class="histtoolbar">
-      <input type="text" id="signedSearch" placeholder="Search by location or description…">
+      <input type="text" id="signedSearch" placeholder="Search by work order, location or description…">
       <select id="signedSort">
         <option value="new">Newest first</option>
         <option value="old">Oldest first</option>
@@ -493,7 +493,7 @@
           <button class="btn btn-ghost btn-sm" id="refreshActiveListBtn" style="margin-left:auto;">↻ Refresh</button>
         </div>
         <div class="histtoolbar">
-          <input type="text" id="activeSearch" placeholder="Search by location or description…">
+          <input type="text" id="activeSearch" placeholder="Search by work order, location or description…">
           <select id="activeSort">
             <option value="new">Newest first</option>
             <option value="old">Oldest first</option>
@@ -512,7 +512,7 @@
           <button class="btn btn-ghost btn-sm" id="refreshOverdueListBtn" style="margin-left:auto;">↻ Refresh</button>
         </div>
         <div class="histtoolbar">
-          <input type="text" id="overdueSearch" placeholder="Search by location or description…">
+          <input type="text" id="overdueSearch" placeholder="Search by work order, location or description…">
           <select id="overdueSort">
             <option value="new">Newest first</option>
             <option value="old">Oldest first</option>
@@ -532,7 +532,7 @@
           <button class="btn btn-ghost btn-sm" id="refreshClosedListBtn" style="margin-left:auto;">↻ Refresh</button>
         </div>
         <div class="histtoolbar">
-          <input type="text" id="closedSearch" placeholder="Search by location or description…">
+          <input type="text" id="closedSearch" placeholder="Search by work order, location or description…">
           <select id="closedSort">
             <option value="new">Newest first</option>
             <option value="old">Oldest first</option>
@@ -2073,10 +2073,12 @@ async function doSync(){
 
     let records = modeRecords;
     if(searchQuery){
-      records = records.filter(({r})=>
-        (r[titleField]||'').toLowerCase().includes(searchQuery) ||
-        (r[subField]||'').toLowerCase().includes(searchQuery)
-      );
+      records = records.filter(({r})=>{
+        const workOrder = String(workOrderForRecord(formType, r) || '').toLowerCase();
+        const title = String(r[titleField] || '').toLowerCase();
+        const subtitle = String(r[subField] || '').toLowerCase();
+        return title.includes(searchQuery) || subtitle.includes(searchQuery) || workOrder.includes(searchQuery);
+      });
     }
     // Cache arrives newest-first from the backend; only re-order when "oldest first" is picked.
     if(sortOrder === 'old') records = records.slice().reverse();
