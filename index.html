@@ -57,8 +57,9 @@
   .adminlock-card.shake{animation:missingShake .4s ease;}
   .adminlock-title{font-family:var(--font-d);text-transform:uppercase;font-size:19px;letter-spacing:.05em;color:var(--text);margin-bottom:10px;}
   .adminlock-sub{font-size:12.5px;color:var(--text-dim);line-height:1.55;margin:0 0 24px;}
-  .adminlock-field{display:flex;gap:8px;}
+  .adminlock-field{display:flex;gap:8px;align-items:center;}
   .adminlock-field input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-family:var(--font-m);font-size:13px;letter-spacing:.08em;transition:border-color .15s ease, box-shadow .15s ease;}
+  .admin-toggle-password{flex:none;min-width:58px;}
   .adminlock-field input::placeholder{color:var(--text-dim);letter-spacing:normal;}
   .adminlock-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
   .adminlock-field .btn{flex:none;}
@@ -277,9 +278,11 @@
   .histtypebtn{background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);font-family:var(--font-b);font-weight:600;font-size:11.5px;padding:8px 13px;border-radius:20px;cursor:pointer;transition:background-color .15s ease, border-color .15s ease, color .15s ease;}
   .histtypebtn:hover{border-color:var(--accent);color:var(--text);}
   .histtypebtn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
-  .histtoolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
-  .histtoolbar input[type=text]{flex:2;min-width:180px;}
-  .histtoolbar select{flex:1;min-width:120px;width:auto;}
+  .histtoolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:stretch;}
+  .histtoolbar .toolbar-search{position:relative;flex:2;min-width:180px;}
+  .histtoolbar .toolbar-search input[type=text]{padding-left:34px;flex:1;min-width:180px;}
+  .histtoolbar .toolbar-search::before{content:'⌕';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text-dim);pointer-events:none;}
+  .histtoolbar select{flex:1;min-width:120px;width:auto;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 11px;color:var(--text);font-family:var(--font-b);font-size:12.5px;color-scheme:dark;}
   .histcard{background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;transition:border-color .2s ease, box-shadow .2s ease, transform .1s ease;}
   .histcard:hover{border-color:var(--text-dim);box-shadow:0 2px 10px rgba(0,0,0,.25);}
   .histcard.is-active{border-left-color:var(--caution);}
@@ -429,7 +432,14 @@
       <button class="btn btn-ghost btn-sm" id="refreshSignedListBtn" style="margin-left:auto;">↻ Refresh</button>
     </div>
     <div class="histtoolbar">
-      <input type="text" id="signedSearch" placeholder="Search by work order, location or description…">
+      <div class="toolbar-search"><input type="text" id="signedSearch" placeholder="Search by work order, location or description…"></div>
+      <select id="signedFilter" aria-label="Filter signed permits by status">
+        <option value="all">All statuses</option>
+        <option value="active">Active</option>
+        <option value="overdue">Overdue</option>
+        <option value="closed">Closed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
       <select id="signedSort">
         <option value="new">Newest first</option>
         <option value="old">Oldest first</option>
@@ -445,6 +455,7 @@
         <p class="adminlock-sub">Enter the admin password to continue.</p>
         <div class="adminlock-field">
           <input type="password" id="adminPasswordInput" placeholder="Admin password" autocomplete="off">
+          <button type="button" class="btn btn-ghost btn-sm admin-toggle-password" data-toggle-password>Show</button>
           <button class="btn btn-primary" id="adminUnlockBtn">Unlock</button>
         </div>
         <p id="adminAuthError" class="adminlock-error"></p>
@@ -493,7 +504,14 @@
           <button class="btn btn-ghost btn-sm" id="refreshActiveListBtn" style="margin-left:auto;">↻ Refresh</button>
         </div>
         <div class="histtoolbar">
-          <input type="text" id="activeSearch" placeholder="Search by work order, location or description…">
+          <div class="toolbar-search"><input type="text" id="activeSearch" placeholder="Search by work order, location or description…"></div>
+          <select id="activeFilter" aria-label="Filter active permits by status">
+            <option value="all">All statuses</option>
+            <option value="active">Active</option>
+            <option value="overdue">Overdue</option>
+            <option value="closed">Closed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
           <select id="activeSort">
             <option value="new">Newest first</option>
             <option value="old">Oldest first</option>
@@ -512,7 +530,14 @@
           <button class="btn btn-ghost btn-sm" id="refreshOverdueListBtn" style="margin-left:auto;">↻ Refresh</button>
         </div>
         <div class="histtoolbar">
-          <input type="text" id="overdueSearch" placeholder="Search by work order, location or description…">
+          <div class="toolbar-search"><input type="text" id="overdueSearch" placeholder="Search by work order, location or description…"></div>
+          <select id="overdueFilter" aria-label="Filter overdue permits by status">
+            <option value="all">All statuses</option>
+            <option value="active">Active</option>
+            <option value="overdue">Overdue</option>
+            <option value="closed">Closed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
           <select id="overdueSort">
             <option value="new">Newest first</option>
             <option value="old">Oldest first</option>
@@ -532,7 +557,14 @@
           <button class="btn btn-ghost btn-sm" id="refreshClosedListBtn" style="margin-left:auto;">↻ Refresh</button>
         </div>
         <div class="histtoolbar">
-          <input type="text" id="closedSearch" placeholder="Search by work order, location or description…">
+          <div class="toolbar-search"><input type="text" id="closedSearch" placeholder="Search by work order, location or description…"></div>
+          <select id="closedFilter" aria-label="Filter closed permits by status">
+            <option value="all">All statuses</option>
+            <option value="active">Active</option>
+            <option value="overdue">Overdue</option>
+            <option value="closed">Closed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
           <select id="closedSort">
             <option value="new">Newest first</option>
             <option value="old">Oldest first</option>
@@ -549,6 +581,27 @@
     <div id="permitViewerContent"></div>
   </div>
 </section>
+
+<datalist id="departmentSuggestions">
+  <option value="General"></option>
+  <option value="Operations"></option>
+  <option value="Maintenance"></option>
+  <option value="Mechanical"></option>
+  <option value="Electrical"></option>
+  <option value="Instrumentation"></option>
+  <option value="Civil"></option>
+  <option value="Process"></option>
+  <option value="Production"></option>
+  <option value="Warehouse"></option>
+  <option value="Safety"></option>
+  <option value="Fire Safety"></option>
+  <option value="Plant Services"></option>
+  <option value="Utilities"></option>
+  <option value="Engineering"></option>
+  <option value="Administration"></option>
+  <option value="Logistics"></option>
+  <option value="Security"></option>
+</datalist>
 
 <footer class="sitefooter">
   <img class="sitefooter-mark" src="data:image/png;base64,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" alt="Heidelberg Materials mark">
@@ -999,11 +1052,58 @@ async function doSync(){
       </div>
     </div>`;
   }
+  const DEPARTMENT_SUGGESTIONS = [
+    'General', 'Operations', 'Maintenance', 'Mechanical', 'Electrical', 'Instrumentation', 'Civil', 'Process', 'Warehouse',
+    'Safety', 'Fire Safety', 'Production', 'Logistics', 'Engineering', 'Administration', 'Security', 'Plant Services', 'Utilities'
+  ];
+  function normalizeDepartmentName(raw){
+    const value = String(raw || '').trim();
+    if(!value) return '';
+    const normalized = value.toLowerCase().replace(/[^a-z0-9\s&/()-]/g, ' ').replace(/\s+/g, ' ').trim();
+    const map = {
+      'general work permit': 'General',
+      'general': 'General',
+      'maintenance': 'Maintenance',
+      'maint': 'Maintenance',
+      'mech': 'Mechanical',
+      'mechanical': 'Mechanical',
+      'electrical': 'Electrical',
+      'elec': 'Electrical',
+      'instrumentation': 'Instrumentation',
+      'inst': 'Instrumentation',
+      'civil': 'Civil',
+      'process': 'Process',
+      'prod': 'Production',
+      'production': 'Production',
+      'warehouse': 'Warehouse',
+      'logistics': 'Logistics',
+      'security': 'Security',
+      'engineering': 'Engineering',
+      'admin': 'Administration',
+      'administration': 'Administration',
+      'safety': 'Safety',
+      'fire safety': 'Fire Safety',
+      'plant services': 'Plant Services',
+      'utilities': 'Utilities',
+      'operations': 'Operations',
+      'op': 'Operations',
+      'plant operations': 'Operations'
+    };
+    const direct = map[normalized];
+    if(direct) return direct;
+    const title = normalized.split(' ').map(part => part ? part.charAt(0).toUpperCase() + part.slice(1) : '').join(' ');
+    return title.replace(/\s+and\s+/i, ' & ').replace(/\s+\/\s+/g, ' / ');
+  }
+  function isDepartmentField(formKey, path){
+    const field = String(path || '').toLowerCase();
+    return field.includes('department') || field.includes('deptlocation') || field.includes('dept');
+  }
   function textField(formKey, path, label, isArea, kind){
     const val = getPath(pd(formKey), path) || '';
-    if(isArea) return `<label class="f">${label}</label><textarea data-text="${formKey}|${path}">${val}</textarea>`;
+    const suggestionAttr = isDepartmentField(formKey, path) ? ' list="departmentSuggestions"' : '';
+    if(isArea) return `<label class="f">${label}</label><textarea data-text="${formKey}|${path}"${suggestionAttr}>${val}</textarea>`;
     const type = kind || 'text';
-    return `<label class="f">${label}</label><input type="${type}" data-text="${formKey}|${path}" value="${String(val).replace(/"/g,'&quot;')}">`;
+    return `<label class="f">${label}</label><input type="${type}" data-text="${formKey}|${path}" value="${String(val).replace(/"/g,'&quot;')}"${suggestionAttr}>`;
   }
   function sigField(formKey, path, label){
     const sig = getPath(pd(formKey), path);
@@ -1575,7 +1675,11 @@ async function doSync(){
     const t = e.target.closest('[data-text]');
     if(t){
       const [formKey, path] = t.dataset.text.split('|');
-      setPath(pd(formKey), path, t.value);
+      const corrected = isDepartmentField(formKey, path) ? normalizeDepartmentName(t.value) : t.value;
+      if(corrected !== t.value){
+        t.value = corrected;
+      }
+      setPath(pd(formKey), path, corrected);
       saveState();
       updateSubmitHint(formKey);
       return;
@@ -1738,6 +1842,7 @@ async function doSync(){
   let overdueType = 'general';
   let historyCache = { general: [], hotwork: [], height: [] };
   let activeSearchQuery = '', closedSearchQuery = '', signedSearchQuery = '', overdueSearchQuery = '';
+  let activeStatusFilter = 'all', closedStatusFilter = 'all', signedStatusFilter = 'all', overdueStatusFilter = 'all';
   let activeSortOrder = 'new', closedSortOrder = 'new', signedSortOrder = 'new', overdueSortOrder = 'new';
   let activeExpanded = new Set(), closedExpanded = new Set(), signedExpanded = new Set(), overdueExpanded = new Set();
   let historyHighlightId = null, historyHighlightMode = null;
@@ -1758,6 +1863,14 @@ async function doSync(){
     document.getElementById('adminAuthPanel').classList.add('hidden');
     document.getElementById('adminContent').classList.remove('hidden');
   }
+  document.querySelector('[data-toggle-password]').addEventListener('click', ()=>{
+    const input = document.getElementById('adminPasswordInput');
+    const btn = document.querySelector('[data-toggle-password]');
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    btn.textContent = show ? 'Hide' : 'Show';
+    input.focus();
+  });
   document.getElementById('adminUnlockBtn').addEventListener('click', async ()=>{
     const input = document.getElementById('adminPasswordInput');
     const err = document.getElementById('adminAuthError');
@@ -1833,12 +1946,20 @@ async function doSync(){
     activeSearchQuery = e.target.value.trim().toLowerCase();
     renderPermitList(activeType, 'active');
   });
+  document.getElementById('activeFilter').addEventListener('change', e=>{
+    activeStatusFilter = e.target.value;
+    renderPermitList(activeType, 'active');
+  });
   document.getElementById('activeSort').addEventListener('change', e=>{
     activeSortOrder = e.target.value;
     renderPermitList(activeType, 'active');
   });
   document.getElementById('closedSearch').addEventListener('input', e=>{
     closedSearchQuery = e.target.value.trim().toLowerCase();
+    renderPermitList(closedType, 'closed');
+  });
+  document.getElementById('closedFilter').addEventListener('change', e=>{
+    closedStatusFilter = e.target.value;
     renderPermitList(closedType, 'closed');
   });
   document.getElementById('closedSort').addEventListener('change', e=>{
@@ -1849,12 +1970,20 @@ async function doSync(){
     signedSearchQuery = e.target.value.trim().toLowerCase();
     renderPermitList(signedType, 'signed');
   });
+  document.getElementById('signedFilter').addEventListener('change', e=>{
+    signedStatusFilter = e.target.value;
+    renderPermitList(signedType, 'signed');
+  });
   document.getElementById('signedSort').addEventListener('change', e=>{
     signedSortOrder = e.target.value;
     renderPermitList(signedType, 'signed');
   });
   document.getElementById('overdueSearch').addEventListener('input', e=>{
     overdueSearchQuery = e.target.value.trim().toLowerCase();
+    renderPermitList(overdueType, 'overdue');
+  });
+  document.getElementById('overdueFilter').addEventListener('change', e=>{
+    overdueStatusFilter = e.target.value;
     renderPermitList(overdueType, 'overdue');
   });
   document.getElementById('overdueSort').addEventListener('change', e=>{
@@ -2063,15 +2192,28 @@ async function doSync(){
       .map((r,i)=>({ r, key: histKey(r,i) }))
       .filter(({r}) => modeMatches(mode, formType, r));
 
-    let searchQuery, sortOrder, expanded;
-    if(mode === 'active'){ searchQuery = activeSearchQuery; sortOrder = activeSortOrder; expanded = activeExpanded; }
-    else if(mode === 'closed'){ searchQuery = closedSearchQuery; sortOrder = closedSortOrder; expanded = closedExpanded; }
-    else if(mode === 'overdue'){ searchQuery = overdueSearchQuery; sortOrder = overdueSortOrder; expanded = overdueExpanded; }
-    else { searchQuery = signedSearchQuery; sortOrder = signedSortOrder; expanded = signedExpanded; }
+    let searchQuery, sortOrder, expanded, statusFilter;
+    if(mode === 'active'){ searchQuery = activeSearchQuery; sortOrder = activeSortOrder; expanded = activeExpanded; statusFilter = activeStatusFilter; }
+    else if(mode === 'closed'){ searchQuery = closedSearchQuery; sortOrder = closedSortOrder; expanded = closedExpanded; statusFilter = closedStatusFilter; }
+    else if(mode === 'overdue'){ searchQuery = overdueSearchQuery; sortOrder = overdueSortOrder; expanded = overdueExpanded; statusFilter = overdueStatusFilter; }
+    else { searchQuery = signedSearchQuery; sortOrder = signedSortOrder; expanded = signedExpanded; statusFilter = signedStatusFilter; }
     const titleField = TITLE_FIELD[formType];
     const subField = SUB_FIELD[formType];
 
     let records = modeRecords;
+    if(statusFilter && statusFilter !== 'all'){
+      records = records.filter(({r})=>{
+        const cancelled = recordIsCancelled(r);
+        const closed = recordIsClosed(formType, r);
+        const overdue = !closed && isOverdue(r);
+        const active = !closed && !overdue && !cancelled;
+        if(statusFilter === 'active') return active;
+        if(statusFilter === 'overdue') return overdue;
+        if(statusFilter === 'closed') return closed;
+        if(statusFilter === 'cancelled') return cancelled;
+        return true;
+      });
+    }
     if(searchQuery){
       records = records.filter(({r})=>{
         const haystack = Object.values(r)
@@ -2546,3 +2688,4 @@ async function doSync(){
 </script>
 </body>
 </html>
+update_
