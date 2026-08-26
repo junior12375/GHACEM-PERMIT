@@ -2074,10 +2074,11 @@ async function doSync(){
     let records = modeRecords;
     if(searchQuery){
       records = records.filter(({r})=>{
-        const workOrder = String(workOrderForRecord(formType, r) || '').toLowerCase();
-        const title = String(r[titleField] || '').toLowerCase();
-        const subtitle = String(r[subField] || '').toLowerCase();
-        return title.includes(searchQuery) || subtitle.includes(searchQuery) || workOrder.includes(searchQuery);
+        const haystack = Object.values(r)
+          .map(v => String(v ?? ''))
+          .join(' ')
+          .toLowerCase();
+        return haystack.includes(searchQuery);
       });
     }
     // Cache arrives newest-first from the backend; only re-order when "oldest first" is picked.
