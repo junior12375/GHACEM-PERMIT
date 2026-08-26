@@ -71,6 +71,7 @@
   .statuspill.active{background:var(--caution-dim);color:var(--caution);}
   .statuspill.closed{background:var(--good-dim);color:var(--good);}
   .statuspill.overdue{background:var(--danger-dim);color:var(--danger);}
+  .statuspill.cancelled{background:var(--danger-dim);color:var(--danger);}
 
   .pc-section{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
   .pc-section:first-of-type{margin-top:14px;}
@@ -284,6 +285,7 @@
   .histcard.is-active{border-left-color:var(--caution);}
   .histcard.is-overdue{border-left-color:var(--danger);}
   .histcard.is-closed{border-left-color:var(--good);}
+  .histcard.is-cancelled{border-left-color:var(--danger);}
   .histcard.is-draft{border-left-color:var(--text-dim);}
   .histcard.highlighted{border-color:var(--accent);border-left-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);animation:histPulse 1.8s ease 2;}
   @keyframes histPulse{
@@ -571,7 +573,7 @@
       precEnv:[], precSafety:[],
       safetyPhotos:{isolation:'', isolationName:'', isolationAt:''},
       crewLeaderSig:null, authSig:null,
-      crewLog:[{date:'',persons:'',sigLeader:'',sigMgr:'',timeStart:'',timeStop:''}],
+      crewLog:[{date:'',persons:'',sigLeader:false,sigMgr:false,timeStart:'',timeStop:''}],
       completionSig:null,
       _submissionId:''
     },
@@ -675,13 +677,14 @@
 
   // A phone cannot open a file:/// URL or a computer's localhost URL. Use the
   // deployed portal address when this page is being run locally.
-  function permitPublicUrl(formType, key){
+  function permitPublicUrl(formType, key, workOrder){
     const pageUrl = /^https?:$/.test(location.protocol) ? location.href : publicPortalUrl;
     if(!pageUrl) return '';
     try{
       const url = new URL(pageUrl);
       if(!/^https?:$/.test(url.protocol)) return '';
       url.search = '?permit=' + encodeURIComponent(formType) + '&id=' + encodeURIComponent(key);
+      if(workOrder) url.searchParams.set('workorder', workOrder);
       return url.toString();
     }catch(e){ return ''; }
   }
@@ -892,7 +895,7 @@ async function doSync(){
       crewLeaderSig:sigFromRecord(r['Crew Leader Signed By'], r['Crew Leader Signed At']),
       authSig:sigFromRecord(r['Authorization Signed By'], r['Authorization Signed At'], r['Authorization Signed By ID']),
       completionSig:sigFromRecord(r['Completion Signed By'], r['Completion Signed At'], r['Completion Signed By ID']),
-      crewLog:safeJSON(r['Crew Log'], [{date:'',persons:'',sigLeader:'',sigMgr:'',timeStart:'',timeStop:''}])
+      crewLog:safeJSON(r['Crew Log'], [{date:'',persons:'',sigLeader:false,sigMgr:false,timeStart:'',timeStop:''}])
     };
   }
   function unflattenHotwork(r){
@@ -1088,8 +1091,8 @@ async function doSync(){
     return `<tr>
       <td><input type="date" data-text="general|crewLog.${i}.date" value="${(r.date||'').replace(/"/g,'&quot;')}"></td>
       <td><input type="text" data-text="general|crewLog.${i}.persons" value="${(r.persons||'').replace(/"/g,'&quot;')}"></td>
-      <td><input type="text" data-text="general|crewLog.${i}.sigLeader" value="${(r.sigLeader||'').replace(/"/g,'&quot;')}"></td>
-      <td><input type="text" data-text="general|crewLog.${i}.sigMgr" value="${(r.sigMgr||'').replace(/"/g,'&quot;')}"></td>
+      <td style="text-align:center;"><input type="checkbox" data-crewlog-sign="leader|${i}" ${r.sigLeader === true || r.sigLeader === 'Yes' ? 'checked' : ''} aria-label="Crew Leader signature confirmed"></td>
+      <td style="text-align:center;"><input type="checkbox" data-crewlog-sign="manager|${i}" ${r.sigMgr === true || r.sigMgr === 'Yes' ? 'checked' : ''} aria-label="Department Manager signature confirmed"></td>
       <td><input type="time" data-text="general|crewLog.${i}.timeStart" value="${(r.timeStart||'').replace(/"/g,'&quot;')}"></td>
       <td><input type="time" data-text="general|crewLog.${i}.timeStop" value="${(r.timeStop||'').replace(/"/g,'&quot;')}"></td>
     </tr>`;
@@ -1190,13 +1193,13 @@ async function doSync(){
     return `
       <p style="font-size:11px;color:var(--text-dim);margin:0 0 4px;">The permit is valid for only the work described below. This must be filled-in before work is started and notify EHS Dept.</p>
       <div class="pc-section" style="border-top:none;margin-top:12px;">
+        ${textField('general','workOrderNumber','Work Order Number')}
         ${textField('general','deptLocation','Department/Location of the Work (Activity)')}
         ${textField('general','description','Description of the Work (Activity) being undertaken', true)}
         <div style="display:flex;gap:10px;">
           <div style="flex:1;">${textField('general','dateIssue','Date of Issue of GWP', false, 'date')}</div>
           <div style="flex:1;">${textField('general','timeIssue','Time of Issue', false, 'time')}</div>
         </div>
-        ${textField('general','workOrderNumber','Work Order Number')}
         <p style="font-size:11.5px;color:var(--caution);margin:8px 0 0;">Duration of GWP: valid for one day, subject to daily renewal.</p>
         ${textField('general','contractor','Contractor/Department Undertaking the Work (Activity)')}
         <label class="f">Authorization (Dept. Manager/SH/SUP.)</label>
@@ -1257,12 +1260,12 @@ async function doSync(){
       <p style="font-size:11px;color:var(--text-dim);margin:0 0 12px;">This GHA.OCPF 34 must be completed, and signed prior to all Hot Work/Confined Space Entry and EHS Dept. must be notified.</p>
       <div class="pc-section" style="border-top:none;margin-top:0;">
         <h5>1. Identification</h5>
+        ${textField('hotwork','workOrderNumber','Work Order Number')}
         ${textField('hotwork','no','No.')}
         ${textField('hotwork','dateActivity','Date of Activity', false, 'date')}
         <p style="font-size:11px;color:var(--text-dim);margin:0 0 8px;">Valid until: end of day</p>
         ${textField('hotwork','location','Location')}
         ${textField('hotwork','equipmentId','Equipment ID')}
-        ${textField('hotwork','workOrderNumber','Work Order Number')}
       </div>
       <div class="pc-section">
         <h5>2. Dept./Contractor</h5>
@@ -1375,11 +1378,11 @@ async function doSync(){
     return `
       <p style="font-size:11px;color:var(--text-dim);margin:0 0 12px;">This permit must be completed, and signed before starting work and EHS Dept. must be notified.</p>
       <div class="pc-section" style="border-top:none;margin-top:0;">
+        ${textField('height','workOrderNo','Work Order Number')}
         ${textField('height','location','Location')}
         ${textField('height','department','Department')}
         ${textField('height','equipmentId','Equipment ID')}
         ${textField('height','formNo','No.')}
-        ${textField('height','workOrderNo','Work Order No.')}
         ${textField('height','dateOfWork','Date of Work at Height', false, 'date')}
         <p style="font-size:11px;color:var(--text-dim);margin:0 0 8px;">Valid until: end of day</p>
         ${textField('height','description','Description of Activity', true)}
@@ -1470,7 +1473,7 @@ async function doSync(){
     });
     const addLogBtn = document.getElementById('addCrewLogRow');
     if(addLogBtn) addLogBtn.addEventListener('click', ()=>{
-      pd('general').crewLog.push({date:'',persons:'',sigLeader:'',sigMgr:'',timeStart:'',timeStop:''});
+      pd('general').crewLog.push({date:'',persons:'',sigLeader:false,sigMgr:false,timeStart:'',timeStop:''});
       saveState(); renderAll();
     });
   }
@@ -1520,6 +1523,24 @@ async function doSync(){
   });
 
   document.querySelector('main').addEventListener('change', e=>{
+    const crewLogSign = e.target.closest('[data-crewlog-sign]');
+    if(crewLogSign){
+      const [role, indexText] = crewLogSign.dataset.crewlogSign.split('|');
+      const general = pd('general');
+      const crewLeaderName = general.crewLeaderSig && general.crewLeaderSig.name;
+      const managerWorkId = general.authSig && general.authSig.workId;
+      if(!crewLeaderName || !managerWorkId){
+        crewLogSign.checked = false;
+        const missing = [!crewLeaderName && 'Crew Leader name/signature', !managerWorkId && 'Department Manager Work ID/signature']
+          .filter(Boolean).join(' and ');
+        toast('Complete ' + missing + ' before ticking the Crew Log signatures.');
+        return;
+      }
+      const field = role === 'leader' ? 'sigLeader' : 'sigMgr';
+      general.crewLog[+indexText][field] = crewLogSign.checked;
+      saveState();
+      return;
+    }
     const photo = e.target.closest('[data-photo]');
     if(photo){
       const [formKey, path] = photo.dataset.photo.split('|');
@@ -1896,7 +1917,9 @@ async function doSync(){
   // Whether a fetched record has its completion/closure signatures — read straight off the
   // record's own fields rather than a stored Status label, so permits submitted before this
   // feature existed still land in the right tab.
+  function recordIsCancelled(r){ return String(r['Status']||'').trim().toLowerCase() === 'cancelled'; }
   function recordIsClosed(formType, r){
+    if(recordIsCancelled(r)) return true;
     if(formType==='general') return !!r['Completion Signed By'];
     if(formType==='hotwork') return !!(r['Sign Off - Mgr'] && r['Sign Off - Crew']);
     if(formType==='height') return !!(r['Closure - Crew'] && r['Closure - Mgr']);
@@ -1912,6 +1935,12 @@ async function doSync(){
   }
 
   function histKey(r, i){ return r['Submission ID'] || ('idx'+i); }
+  function workOrderForRecord(formType, r){
+    return String(formType === 'height' ? (r['Work Order No.'] || '') : (r['Work Order Number'] || '')).trim();
+  }
+  function sameWorkOrder(a, b){
+    return String(a||'').trim().toLowerCase() === String(b||'').trim().toLowerCase();
+  }
 
   function renderStatsBar(){
     const bars = [document.getElementById('statsBar'), document.getElementById('statsBarClosed')].filter(Boolean);
@@ -1985,6 +2014,40 @@ async function doSync(){
     return !recordIsClosed(formType, r) && !isOverdue(r);
   }
 
+  async function cancelPermit(formType, submissionId, record, mode){
+    if(recordIsCancelled(record)){
+      toast('This permit is already cancelled.');
+      return;
+    }
+    if(!isAdminUnlocked){ toast('Admin access is required to cancel a permit.'); return; }
+    const reason = window.prompt('Reason for cancelling this permit (required):', '');
+    if(reason === null) return;
+    if(!reason.trim()){
+      toast('A cancellation reason is required.');
+      return;
+    }
+    if(!window.confirm('Cancel this permit? This cannot be undone from the permit list.')) return;
+
+    const result = await postToBackend({
+      action:'update', formType, submissionId,
+      data:{
+        'Submission ID': submissionId,
+        'Status':'Cancelled',
+        'Cancellation Reason':reason.trim(),
+        'Cancelled At':new Date().toLocaleString(),
+        'Cancelled By':'Admin'
+      }
+    });
+    if(!result.ok){
+      toast('Permit cancellation failed — ' + (result.error || 'please try again.'));
+      return;
+    }
+    toast('Permit cancelled.');
+    await loadHistoryCache();
+    if(mode === 'active') renderStatsBar();
+    renderPermitList(formType, mode);
+  }
+
   function renderPermitList(formType, mode){
     const host = document.getElementById(LIST_HOST[mode]);
     if(!syncUrl){
@@ -2026,9 +2089,12 @@ async function doSync(){
     }
 
     host.innerHTML = records.map(({r, key})=>{
+      const cancelled = recordIsCancelled(r);
       const closed = recordIsClosed(formType, r);
       const overdue = !closed && isOverdue(r);
-      const statusPill = closed
+      const statusPill = cancelled
+        ? '<span class="statuspill cancelled" style="float:none;">Cancelled</span>'
+        : closed
         ? '<span class="statuspill closed" style="float:none;">Closed</span>'
         : overdue
           ? '<span class="statuspill overdue" style="float:none;">Overdue</span>'
@@ -2042,8 +2108,10 @@ async function doSync(){
         .filter(([,v]) => v !== '')
         .map(([k,v]) => `<dt>${String(k).replace(/</g,'&lt;')}</dt><dd>${String(v).replace(/</g,'&lt;')}</dd>`)
         .join('');
-      const statusClass = closed ? ' is-closed' : (overdue ? ' is-overdue' : ' is-active');
+      const statusClass = cancelled ? ' is-cancelled' : (closed ? ' is-closed' : (overdue ? ' is-overdue' : ' is-active'));
       const highlightClass = isHighlighted ? ' highlighted' : '';
+      const cancelButton = isAdminUnlocked && !closed
+        ? `<button class="btn btn-ghost btn-sm" data-cancelpermit="${String(key).replace(/"/g,'&quot;')}">Cancel Permit</button>` : '';
       const qrCodeHtml = isExpanded ? `<div class="qr-box"><div class="qr-label">Permit QR</div><img data-qr-img="${String(key).replace(/"/g,'&quot;')}" alt="Permit QR code" style="width:150px;height:150px;object-fit:contain;background:#fff;border-radius:6px;padding:6px;" /></div>` : '';
       return `
       <div class="histcard${statusClass}${highlightClass}" data-histkey="${key}">
@@ -2056,6 +2124,7 @@ async function doSync(){
           <div class="histcard-actions">
             <button class="btn btn-ghost btn-sm" data-toggledetail="${key}">${isExpanded ? 'Hide Details' : 'View Details'}</button>
             <button class="btn btn-ghost btn-sm" data-copylink="${key}">Copy Link</button>
+            ${cancelButton}
           </div>
         </div>
         <dl class="histcard-detail ${isExpanded ? '' : 'hidden'}">${detailRows || '<dd style="grid-column:1/-1;color:var(--text-dim);">No details available.</dd>'}${qrCodeHtml ? `<dd style="grid-column:1/-1;">${qrCodeHtml}</dd>` : ''}</dl>
@@ -2066,7 +2135,7 @@ async function doSync(){
       records.forEach(({key, r}) => {
         const img = host.querySelector(`[data-qr-img="${CSS.escape(String(key))}"]`);
         if (!img) return;
-        const permitUrl = permitPublicUrl(formType, key);
+        const permitUrl = permitPublicUrl(formType, key, workOrderForRecord(formType, r));
         if(!permitUrl){
           img.alt = 'Set the Public Permit Portal URL in Sync Settings before scanning from a phone';
           img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><rect width="220" height="220" fill="#0f1c16"/><text x="50%" y="45%" text-anchor="middle" font-size="15" fill="#EEF3EA" font-family="sans-serif">Public portal URL</text><text x="50%" y="58%" text-anchor="middle" font-size="15" fill="#EEF3EA" font-family="sans-serif">required for QR</text></svg>');
@@ -2106,11 +2175,17 @@ async function doSync(){
     host.querySelectorAll('[data-copylink]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const key = btn.dataset.copylink;
-        copyText(url);
-        const url = permitPublicUrl(formType, key);
+        const record = records.find(item=>item.key === key);
+        const url = permitPublicUrl(formType, key, record ? workOrderForRecord(formType, record.r) : '');
         if(!url){ toast('Set the Public Permit Portal URL in Sync Settings first.'); return; }
         copyText(url);
-        copyText(url);
+      });
+    });
+    host.querySelectorAll('[data-cancelpermit]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const key = btn.dataset.cancelpermit;
+        const record = records.find(item=>item.key === key);
+        if(record) cancelPermit(formType, key, record.r, mode);
       });
     });
   }
@@ -2371,28 +2446,35 @@ async function doSync(){
   // the admin password first.
   // Renders the same permit layout used for data entry, but with every control disabled.
   // This keeps QR and admin history views read-only while still showing the full permit.
-  function openReadOnlyPermit(formType, record, submissionId){
-    const viewer = document.getElementById('permitViewer');
-    const content = document.getElementById('permitViewerContent');
+  function readOnlyPermitMarkup(formType, record, submissionId){
     const savedForm = permitData[formType];
     const renderers = { general:renderGeneralForm, hotwork:renderHotworkForm, height:renderHeightForm };
-    let permitHtml = '';
     try{
       permitData[formType] = UNFLATTEN[formType](record);
       permitData[formType]._submissionId = submissionId;
-      permitHtml = renderers[formType]();
+      return `<section class="pc-section" style="border-top:none;margin-top:0;">
+        <div class="permittitle" style="font-size:16px;">${FORM_LABEL[formType]}</div>
+        <p class="permitviewer-sub">Permit ID: ${String(submissionId).replace(/</g,'&lt;')}</p>
+        ${renderers[formType]()}
+      </section>`;
     } finally {
       permitData[formType] = savedForm;
     }
+  }
+  function openReadOnlyPermit(formType, record, submissionId, relatedPermits){
+    const viewer = document.getElementById('permitViewer');
+    const content = document.getElementById('permitViewerContent');
+    const workOrder = workOrderForRecord(formType, record);
+    const permits = [{formType, record, submissionId}].concat(relatedPermits || []);
     content.innerHTML = `
       <div class="permitviewer-head">
         <div>
-          <div class="permittitle">${FORM_LABEL[formType]} <span class="linktag">Read only</span></div>
-          <p class="permitviewer-sub">Permit ID: ${String(submissionId).replace(/</g,'&lt;')}</p>
+          <div class="permittitle">Work Order ${workOrder ? String(workOrder).replace(/</g,'&lt;') : 'Permit'} <span class="linktag">Read only</span></div>
+          <p class="permitviewer-sub">${permits.length} permit${permits.length===1?'':'s'} linked to this work order</p>
         </div>
         <button type="button" class="btn btn-ghost btn-sm" data-close-permit-view>Close</button>
       </div>
-      <div class="readonly-permit">${permitHtml}</div>`;
+      <div class="readonly-permit">${permits.map(p=>readOnlyPermitMarkup(p.formType, p.record, p.submissionId)).join('')}</div>`;
     content.querySelectorAll('.readonly-permit input, .readonly-permit textarea, .readonly-permit select, .readonly-permit button')
       .forEach(el=>{ el.disabled = true; });
     viewer.classList.remove('hidden');
@@ -2446,7 +2528,15 @@ async function doSync(){
     if(mode === 'closed') renderStatsBar();
     // QR links open the complete read-only permit, never the editable form or
     // a history summary. The same rule applies after an admin has authenticated.
-    openReadOnlyPermit(linkType, record, linkId);
+    const workOrder = params.get('workorder') || workOrderForRecord(linkType, record);
+    const linkedPermits = workOrder ? Object.entries(historyCache)
+      .flatMap(([type, rows]) => rows.map((row, i)=>({ formType:type, record:row, submissionId:histKey(row, i) })))
+      .filter(p => p.submissionId !== linkId && sameWorkOrder(workOrderForRecord(p.formType, p.record), workOrder))
+      // The public QR view follows the existing access rule: closed and overdue
+      // permits remain admin-only, while an authenticated admin can read all matches.
+      .filter(p => isAdminUnlocked || (!recordIsClosed(p.formType, p.record) && !isOverdue(p.record)))
+      : [];
+    openReadOnlyPermit(linkType, record, linkId, linkedPermits);
   }
   init();
 })();
