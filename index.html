@@ -452,11 +452,14 @@
     <div id="adminAuthPanel" class="adminlock">
       <div class="adminlock-card" id="adminlockCard">
         <div class="adminlock-title">Admin Access</div>
-        <p class="adminlock-sub">Enter the admin password to continue.</p>
-        <div class="adminlock-field">
-          <input type="password" id="adminPasswordInput" placeholder="Admin password" autocomplete="off">
-          <button type="button" class="btn btn-ghost btn-sm admin-toggle-password" data-toggle-password>Show</button>
-          <button class="btn btn-primary" id="adminUnlockBtn">Unlock</button>
+        <p class="adminlock-sub">Sign in with your administrator email and password to continue.</p>
+        <div class="adminlock-field" style="display:block;">
+          <input type="email" id="adminEmailInput" placeholder="admin@ghacem.local" autocomplete="email" style="margin-bottom:10px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="password" id="adminPasswordInput" placeholder="Password" autocomplete="current-password">
+            <button type="button" class="btn btn-ghost btn-sm admin-toggle-password" data-toggle-password>Show</button>
+          </div>
+          <button class="btn btn-primary" id="adminUnlockBtn" style="margin-top:12px;width:100%;">Unlock</button>
         </div>
         <p id="adminAuthError" class="adminlock-error"></p>
       </div>
@@ -691,11 +694,11 @@
     // explicit Submit/Close, not on every keystroke, chip click, signature, or photo.
   }
 
-  // ================= LIVE SYNC TO GOOGLE SHEETS =================
-  // Baked-in default so the app can submit/close permits automatically without setup.
-  // The Sync Settings panel can still override this if you ever point it at a different sheet.
-  const DEFAULT_SYNC_URL = 'https://script.google.com/macros/s/AKfycbz8L1Izxu4dXNaQ9uIgwIGLtxT9o3N8w3kNA7cba2r27YD3YSfEIahLCs4fkQ5W_Igv/exec';
-  const DEFAULT_PUBLIC_PORTAL_URL = 'https://junior12375.github.io/GHACEM-PERMIT/';
+  // ================= LIVE SYNC =================
+  // The app now defaults to the local secure backend so permit updates happen through
+  // authenticated API endpoints instead of a public client-side password check.
+  const DEFAULT_SYNC_URL = '/api/permits';
+  const DEFAULT_PUBLIC_PORTAL_URL = window.location.origin || 'http://localhost:3000';
   let syncUrl = '';
   let publicPortalUrl = '';
 
@@ -1847,11 +1850,29 @@ async function doSync(){
   let activeExpanded = new Set(), closedExpanded = new Set(), signedExpanded = new Set(), overdueExpanded = new Set();
   let historyHighlightId = null, historyHighlightMode = null;
 
-  // ================= ADMIN ACCESS (client-side gate only — see note in chat) =================
-  const ADMIN_PASSWORD = 'ghacem2026';
+  // ================= ADMIN ACCESS (server-side session gate) =================
   let isAdminUnlocked = false;
   let currentAdminSub = 'insights';
   let pendingAdminDeepLink = null;
+
+  async function refreshAdminSession(){
+    try{
+      const res = await fetch('/api/session', { credentials: 'same-origin' });
+      const json = await res.json();
+      const user = json && json.user ? json.user : null;
+      isAdminUnlocked = !!(user && user.role === 'admin');
+      if(isAdminUnlocked){
+        showAdminContent();
+        await loadHistoryCache();
+        renderCurrentAdminSub();
+      } else {
+        document.getElementById('adminAuthPanel').classList.remove('hidden');
+        document.getElementById('adminContent').classList.add('hidden');
+      }
+    }catch(e){
+      isAdminUnlocked = false;
+    }
+  }
 
   function renderCurrentAdminSub(){
     if(currentAdminSub === 'insights') renderInsights();
@@ -1872,51 +1893,65 @@ async function doSync(){
     input.focus();
   });
   document.getElementById('adminUnlockBtn').addEventListener('click', async ()=>{
+    const emailInput = document.getElementById('adminEmailInput');
     const input = document.getElementById('adminPasswordInput');
     const err = document.getElementById('adminAuthError');
-    if(input.value === ADMIN_PASSWORD){
-      isAdminUnlocked = true;
-      try{ sessionStorage.setItem('ghacem_admin_unlocked', '1'); }catch(e){}
-      input.value = ''; err.textContent = '';
-      showAdminContent();
-      await loadHistoryCache();
-      if(pendingAdminDeepLink){
-        const { type, id } = pendingAdminDeepLink;
-        pendingAdminDeepLink = null;
-        const rec = (historyCache[type]||[]).find((r,i)=> histKey(r,i) === id);
-        const mode = (rec && recordIsClosed(type, rec)) ? 'closed' : 'overdue';
-        if(mode === 'closed'){ closedType = type; closedExpanded.add(id); } else { overdueType = type; overdueExpanded.add(id); }
-        historyHighlightId = id; historyHighlightMode = mode;
-        currentAdminSub = mode;
-        document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.toggle('active', b.dataset.adminsub===mode));
-        document.querySelectorAll('.adminsubpane').forEach(p=> p.classList.toggle('hidden', p.id !== 'adminsub-'+mode));
-        document.querySelectorAll(`.historytypes[data-mode="${mode}"] .histtypebtn`).forEach(b=>b.classList.toggle('active', b.dataset.histtype===type));
-        if(mode === 'closed') renderStatsBar();
-        renderPermitList(type, mode);
-        setTimeout(()=>{
-          const card = document.querySelector(`[data-histkey="${CSS.escape(id)}"]`);
-          if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
-        }, 50);
-      } else {
-        renderCurrentAdminSub();
+    try{
+      const res = await fetch('/api/login', {
+        method:'POST',
+        credentials:'same-origin',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ email: emailInput.value.trim(), password: input.value })
+      });
+      const json = await res.json();
+      if(res.ok && json.ok && json.user && json.user.role === 'admin'){
+        isAdminUnlocked = true;
+        emailInput.value = '';
+        input.value = '';
+        err.textContent = '';
+        showAdminContent();
+        await loadHistoryCache();
+        if(pendingAdminDeepLink){
+          const { type, id } = pendingAdminDeepLink;
+          pendingAdminDeepLink = null;
+          const rec = (historyCache[type]||[]).find((r,i)=> histKey(r,i) === id);
+          const mode = (rec && recordIsClosed(type, rec)) ? 'closed' : 'overdue';
+          if(mode === 'closed'){ closedType = type; closedExpanded.add(id); } else { overdueType = type; overdueExpanded.add(id); }
+          historyHighlightId = id; historyHighlightMode = mode;
+          currentAdminSub = mode;
+          document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.toggle('active', b.dataset.adminsub===mode));
+          document.querySelectorAll('.adminsubpane').forEach(p=> p.classList.toggle('hidden', p.id !== 'adminsub-'+mode));
+          document.querySelectorAll(`.historytypes[data-mode="${mode}"] .histtypebtn`).forEach(b=>b.classList.toggle('active', b.dataset.histtype===type));
+          if(mode === 'closed') renderStatsBar();
+          renderPermitList(type, mode);
+          setTimeout(()=>{
+            const card = document.querySelector(`[data-histkey="${CSS.escape(id)}"]`);
+            if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
+          }, 50);
+        } else {
+          renderCurrentAdminSub();
+        }
+        return;
       }
-    } else {
-      err.textContent = 'Incorrect password.';
+      err.textContent = (json && json.error) || 'Incorrect email or password.';
       const card = document.getElementById('adminlockCard');
       card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
       input.value = '';
       input.focus();
+    }catch(err){
+      err.textContent = 'Unable to contact the secure backend.';
     }
   });
   document.getElementById('adminPasswordInput').addEventListener('keydown', e=>{
     if(e.key === 'Enter') document.getElementById('adminUnlockBtn').click();
   });
-  document.getElementById('adminLockBtn').addEventListener('click', ()=>{
+  document.getElementById('adminLockBtn').addEventListener('click', async ()=>{
     isAdminUnlocked = false;
-    try{ sessionStorage.removeItem('ghacem_admin_unlocked'); }catch(e){}
+    try{ await fetch('/api/logout', { method:'POST', credentials:'same-origin' }); }catch(e){}
     document.getElementById('adminAuthPanel').classList.remove('hidden');
     document.getElementById('adminContent').classList.add('hidden');
   });
+  refreshAdminSession();
   document.querySelectorAll('[data-adminsub]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.remove('active'));
@@ -2688,4 +2723,3 @@ async function doSync(){
 </script>
 </body>
 </html>
-update_
