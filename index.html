@@ -41,6 +41,10 @@
   .brand-dash{color:var(--accent);font-size:14px;font-family:var(--font-m);}
   .topbar h1{font-size:0;}
   .topbar h1::after{content:"GHACEM Permit";font-size:clamp(18px,3vw,26px);font-weight:800;letter-spacing:.02em;}
+  .renewal-card{max-width:560px;}
+  .renewal-checks{display:grid;gap:10px;margin:16px 0;}
+  .renewal-checks label{display:flex;gap:9px;align-items:flex-start;padding:11px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);font-size:12px;line-height:1.4;}
+  .renewal-checks input{margin-top:2px;accent-color:var(--accent);}
   .sitebanner{position:relative;height:150px;overflow:hidden;background:#000;}
   .sitebanner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;}
   .sitebanner::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg, rgba(3,15,9,.94) 0%, rgba(4,20,12,.55) 42%, rgba(4,20,12,.15) 75%);}
@@ -561,6 +565,7 @@
       <div class="historytypes" style="margin-bottom:16px;">
         <button class="histtypebtn active" data-adminsub="overview">Overview</button>
         <button class="histtypebtn" data-adminsub="active">Active Permits</button>
+        <button class="histtypebtn" data-adminsub="renewal">Renewal History</button>
         <button class="histtypebtn" data-adminsub="overdue">Permits to be Closed</button>
         <button class="histtypebtn" data-adminsub="closed">Closed Permits</button>
         <button class="btn btn-ghost btn-sm" id="adminLockBtn" style="margin-left:auto;">Lock</button>
@@ -601,6 +606,18 @@
           <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
           <button class="histtypebtn" data-histtype="height">Working at Height</button>
           <button class="btn btn-ghost btn-sm" id="refreshActiveListBtn" style="margin-left:auto;">↻ Refresh</button>
+        </div>
+
+        <div class="adminsubpane hidden" id="adminsub-renewal">
+          <div class="permittitle" style="margin-bottom:4px;">Renewal History</div>
+          <p class="paneintro">Completed renewals for General Work and Working at Height permits.</p>
+          <div class="historytypes" data-mode="renewal">
+            <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
+            <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
+            <button class="histtypebtn" data-histtype="height">Working at Height</button>
+            <button class="btn btn-ghost btn-sm" id="refreshRenewalListBtn" style="margin-left:auto;">↻ Refresh</button>
+          </div>
+          <div id="renewalPermitList"></div>
         </div>
         <div class="histtoolbar">
           <input type="text" id="activeSearch" placeholder="Search by location or description…">
@@ -657,6 +674,26 @@
 <section id="permitViewer" class="permitviewer hidden" role="dialog" aria-modal="true" aria-label="Read-only permit">
   <div class="permitviewer-card">
     <div id="permitViewerContent"></div>
+  </div>
+</section>
+
+<section id="renewalModal" class="permitviewer hidden" role="dialog" aria-modal="true" aria-labelledby="renewalTitle">
+  <div class="permitviewer-card renewal-card">
+    <div class="permitviewer-head">
+      <div><div id="renewalTitle" class="permittitle">Request permit renewal</div>
+        <p class="permitviewer-sub">Reconfirm the controls before issuing another 24-hour permit.</p></div>
+      <button type="button" class="btn btn-ghost btn-sm" data-close-renewal>Close</button>
+    </div>
+    <form id="renewalForm">
+      <input type="hidden" id="renewalFormType"><input type="hidden" id="renewalParentId">
+      <div class="renewal-checks">
+        <label><input type="checkbox" name="scope" required> Work scope and location are unchanged</label>
+        <label><input type="checkbox" name="controls" required> Hazards, controls and PPE remain effective</label>
+        <label><input type="checkbox" name="equipment" required> Equipment, isolation and emergency arrangements are ready</label>
+      </div>
+      <label class="f">Renewal remarks <textarea id="renewalReason" required rows="3" placeholder="Briefly explain why the work continues"></textarea></label>
+      <div class="histcard-actions"><button type="submit" class="btn btn-primary">Renew Permit</button></div>
+    </form>
   </div>
 </section>
 
@@ -925,7 +962,6 @@
         headers:{'Content-Type':'text/plain;charset=utf-8'},
         body: JSON.stringify(job)
       });
-
       const text = await res.text();
       let result = null;
       try{ result = text ? JSON.parse(text) : null; }catch(e){}
@@ -1846,6 +1882,7 @@ async function doSync(){
   });
 
   let activeType = 'general';
+  let renewalType = 'general';
   let closedType = 'general';
   let signedType = 'general';
   let overdueType = 'general';
@@ -1864,6 +1901,7 @@ async function doSync(){
   function renderCurrentAdminSub(){
     if(currentAdminSub === 'overview') renderExecutiveOverview();
     else if(currentAdminSub === 'active') { renderStatsBar(); renderPermitList(activeType, 'active'); }
+    else if(currentAdminSub === 'renewal') renderPermitList(renewalType, 'renewal');
     else if(currentAdminSub === 'overdue') renderPermitList(overdueType, 'overdue');
     else { renderStatsBar(); renderPermitList(closedType, 'closed'); }
   }
@@ -1938,6 +1976,7 @@ async function doSync(){
         if(mode === 'active'){ activeType = btn.dataset.histtype; activeExpanded.clear(); renderPermitList(activeType, 'active'); }
         else if(mode === 'closed'){ closedType = btn.dataset.histtype; closedExpanded.clear(); renderPermitList(closedType, 'closed'); }
         else if(mode === 'overdue'){ overdueType = btn.dataset.histtype; overdueExpanded.clear(); renderPermitList(overdueType, 'overdue'); }
+        else if(mode === 'renewal'){ renewalType = btn.dataset.histtype; renderPermitList(renewalType, 'renewal'); }
         else { signedType = btn.dataset.histtype; signedExpanded.clear(); renderPermitList(signedType, 'signed'); }
       });
     });
@@ -2013,6 +2052,10 @@ async function doSync(){
     await loadHistoryCache();
     renderExecutiveOverview();
   });
+  document.getElementById('refreshRenewalListBtn').addEventListener('click', async ()=>{
+    await loadHistoryCache();
+    renderPermitList(renewalType, 'renewal');
+  });
   document.getElementById('exportManagementCsvBtn').addEventListener('click', downloadManagementCsv);
   document.getElementById('printManagementReportBtn').addEventListener('click', ()=>{
     const previous = currentAdminSub;
@@ -2031,6 +2074,9 @@ async function doSync(){
       hotwork: h.ok ? (h.records||[]) : [],
       height: ht.ok ? (ht.records||[]) : [],
     };
+    const pending = Object.values(historyCache).reduce((sum, records)=>sum + records.filter(r=>String(r['Renewal Status']||'') === 'Pending Approval').length, 0);
+    const badge = document.getElementById('renewalRequestCount');
+    if(badge){ badge.textContent = String(pending); badge.classList.toggle('hidden', pending === 0); }
   }
 
   const TITLE_FIELD = { general:'Department/Location', hotwork:'Location', height:'Location' };
@@ -2125,12 +2171,13 @@ async function doSync(){
   }
 
   // Shared renderer for the Active / Overdue / Closed / Signed permit list tabs.
-  const LIST_HOST = { active:'activePermitList', closed:'closedPermitList', signed:'signedPermitList', overdue:'toClosePermitList' };
-  const LIST_LABEL = { active:'active', closed:'closed', signed:'signed', overdue:'overdue' };
+  const LIST_HOST = { active:'activePermitList', closed:'closedPermitList', signed:'signedPermitList', overdue:'toClosePermitList', renewal:'renewalPermitList' };
+  const LIST_LABEL = { active:'active', closed:'closed', signed:'signed', overdue:'overdue', renewal:'renewal requests' };
 
   function modeMatches(mode, formType, r){
     if(mode === 'closed') return recordIsClosed(formType, r);
     if(mode === 'overdue') return !recordIsClosed(formType, r) && isOverdue(r);
+    if(mode === 'renewal') return Boolean(String(r['Renewal Of'] || '').trim());
     // active (admin) and signed (public) use the same rule: open, and not yet overdue.
     // Overdue-but-still-open permits only surface in the admin "Permits to be Closed" tab.
     return !recordIsClosed(formType, r) && !isOverdue(r);
@@ -2153,6 +2200,7 @@ async function doSync(){
     const result = await postToBackend({
       action:'update', formType, submissionId,
       data:{
+        ...record,
         'Submission ID': submissionId,
         'Status':'Cancelled',
         'Cancellation Reason':reason.trim(),
@@ -2168,6 +2216,90 @@ async function doSync(){
     await loadHistoryCache();
     if(mode === 'active') renderStatsBar();
     renderPermitList(formType, mode);
+  }
+
+  let renewalContext = null;
+  function openRenewalModal(formType, submissionId){
+    const record = (historyCache[formType] || []).find(r => String(r['Submission ID'] || '') === String(submissionId));
+    if(!record){ toast('Permit details could not be loaded. Refresh and try again.'); return; }
+    renewalContext = { formType, submissionId, record };
+    document.getElementById('renewalFormType').value = formType;
+    document.getElementById('renewalParentId').value = submissionId;
+    document.getElementById('renewalReason').value = '';
+    document.querySelectorAll('#renewalForm input[type="checkbox"]').forEach(input => { input.checked = false; });
+    document.getElementById('renewalModal').classList.remove('hidden');
+  }
+  function closeRenewalModal(){
+    renewalContext = null;
+    document.getElementById('renewalModal').classList.add('hidden');
+  }
+  function nextRenewalId(formType, parentId){
+    const baseId = String(parentId).replace(/-R\d+$/, '');
+    const renewalPattern = new RegExp(`^${baseId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-R(\\d+)$`);
+    const versions = (historyCache[formType] || [])
+      .map(r => renewalPattern.exec(String(r['Submission ID'] || '')))
+      .filter(Boolean)
+      .map(match => Number(match[1]));
+    return `${baseId}-R${(versions.length ? Math.max(...versions) : 0) + 1}`;
+  }
+  async function submitRenewalRequest(event){
+    event.preventDefault();
+    if(!renewalContext){ closeRenewalModal(); return; }
+    if(!syncUrl){ toast('Live sync must be configured before requesting a renewal.'); return; }
+    const { formType, submissionId, record } = renewalContext;
+    if(!['general','height'].includes(formType)){
+      toast('Renewal is available only for General Work and Working at Height permits.');
+      return;
+    }
+    const reason = document.getElementById('renewalReason').value.trim();
+    if(!reason){ toast('Renewal remarks are required.'); return; }
+    const renewalId = nextRenewalId(formType, submissionId);
+    const data = { ...record };
+    delete data['Last Updated'];
+    data['Submission ID'] = renewalId;
+    data['Renewal Of'] = submissionId;
+    data['Renewal Version'] = renewalId.slice(renewalId.lastIndexOf('-') + 1);
+    const renewedAt = new Date();
+    data['Renewal Status'] = 'Approved';
+    data['Renewal Requested At'] = new Date().toLocaleString();
+    data['Renewal Remarks'] = reason;
+    data['Renewal Approved At'] = renewedAt.toLocaleString();
+    data['Renewal Expires At'] = new Date(renewedAt.getTime() + 24*60*60*1000).toLocaleString();
+    data['EHS Notification'] = 'Permit renewed - EHS notified';
+    data['EHS Notified At'] = renewedAt.toLocaleString();
+    data['Status'] = 'Active';
+    const result = await postToBackend({ action:'submit', formType, submissionId:renewalId, data });
+    if(!result.ok){ toast('Renewal request failed — ' + (result.error || 'please try again.')); return; }
+    closeRenewalModal();
+    await loadHistoryCache();
+    renderPermitList(formType, 'signed');
+    renderPermitList(formType, 'overdue');
+    renderPermitList(formType, 'active');
+    renderPermitList(formType, 'renewal');
+    toast(`Renewal ${renewalId} approved. EHS has been notified.`);
+  }
+  async function approveRenewal(formType, submissionId){
+    if(!isAdminUnlocked){ toast('Admin access is required to approve a renewal.'); return; }
+    const record = (historyCache[formType] || []).find(r => String(r['Submission ID'] || '') === String(submissionId));
+    if(!record || record['Renewal Status'] !== 'Pending Approval') return;
+    if(!window.confirm(`Approve renewal ${submissionId} for the next 24 hours?`)) return;
+    const approvedAt = new Date();
+    const expiresAt = new Date(approvedAt.getTime() + 24*60*60*1000);
+    const result = await postToBackend({
+      action:'update', formType, submissionId,
+      data:{
+        ...record,
+        'Renewal Status':'Approved',
+        'Renewal Approved At':approvedAt.toLocaleString(),
+        'Renewal Expires At':expiresAt.toLocaleString(),
+        'Status':'Active'
+      }
+    });
+    if(!result.ok){ toast('Renewal approval failed — ' + (result.error || 'please try again.')); return; }
+    await loadHistoryCache();
+    renderPermitList(formType, 'active');
+    renderPermitList(formType, 'overdue');
+    toast(`Renewal ${submissionId} approved for 24 hours.`);
   }
 
   function renderPermitList(formType, mode){
@@ -2189,6 +2321,7 @@ async function doSync(){
     if(mode === 'active'){ searchQuery = activeSearchQuery; sortOrder = activeSortOrder; expanded = activeExpanded; }
     else if(mode === 'closed'){ searchQuery = closedSearchQuery; sortOrder = closedSortOrder; expanded = closedExpanded; }
     else if(mode === 'overdue'){ searchQuery = overdueSearchQuery; sortOrder = overdueSortOrder; expanded = overdueExpanded; }
+    else if(mode === 'renewal'){ searchQuery = ''; sortOrder = 'new'; expanded = new Set(); }
     else { searchQuery = signedSearchQuery; sortOrder = signedSortOrder; expanded = signedExpanded; }
     const titleField = TITLE_FIELD[formType];
     const subField = SUB_FIELD[formType];
@@ -2214,10 +2347,13 @@ async function doSync(){
       const cancelled = recordIsCancelled(r);
       const closed = recordIsClosed(formType, r);
       const overdue = !closed && isOverdue(r);
+      const renewalPending = String(r['Renewal Status'] || '') === 'Pending Approval';
       const statusPill = cancelled
         ? '<span class="statuspill cancelled" style="float:none;">Cancelled</span>'
         : closed
         ? '<span class="statuspill closed" style="float:none;">Closed</span>'
+        : renewalPending
+          ? '<span class="statuspill draft" style="float:none;">Renewal pending</span>'
         : overdue
           ? '<span class="statuspill overdue" style="float:none;">Overdue</span>'
           : '<span class="statuspill active" style="float:none;">Active</span>';
@@ -2234,6 +2370,9 @@ async function doSync(){
       const highlightClass = isHighlighted ? ' highlighted' : '';
       const cancelButton = isAdminUnlocked && !closed
         ? `<button class="btn btn-ghost btn-sm" data-cancelpermit="${String(key).replace(/"/g,'&quot;')}">Cancel Permit</button>` : '';
+      const renewalButton = mode !== 'renewal' && ['general','height'].includes(formType) && !closed && !cancelled && !renewalPending
+        ? `<button class="btn btn-ghost btn-sm" data-renewpermit="${String(key).replace(/"/g,'&quot;')}">Request Renewal</button>` : '';
+      const approveButton = '';
       const qrCodeHtml = isExpanded ? `<div class="qr-box"><div class="qr-label">Permit QR</div><img data-qr-img="${String(key).replace(/"/g,'&quot;')}" alt="Permit QR code" style="width:150px;height:150px;object-fit:contain;background:#fff;border-radius:6px;padding:6px;" /></div>` : '';
       return `
       <div class="histcard${statusClass}${highlightClass}" data-histkey="${key}">
@@ -2246,6 +2385,8 @@ async function doSync(){
           <div class="histcard-actions">
             <button class="btn btn-ghost btn-sm" data-toggledetail="${key}">${isExpanded ? 'Hide Details' : 'View Details'}</button>
             <button class="btn btn-ghost btn-sm" data-copylink="${key}">Copy Link</button>
+            ${renewalButton}
+            ${approveButton}
             ${cancelButton}
           </div>
         </div>
@@ -2309,6 +2450,12 @@ async function doSync(){
         const record = records.find(item=>item.key === key);
         if(record) cancelPermit(formType, key, record.r, mode);
       });
+    });
+    host.querySelectorAll('[data-renewpermit]').forEach(btn=>{
+      btn.addEventListener('click', ()=> openRenewalModal(formType, btn.dataset.renewpermit));
+    });
+    host.querySelectorAll('[data-approverenewal]').forEach(btn=>{
+      btn.addEventListener('click', ()=> approveRenewal(formType, btn.dataset.approverenewal));
     });
   }
 
@@ -2730,6 +2877,10 @@ async function doSync(){
   }
   document.getElementById('permitViewer').addEventListener('click', e=>{
     if(e.target === e.currentTarget || e.target.closest('[data-close-permit-view]')) closeReadOnlyPermit();
+  });
+  document.getElementById('renewalForm').addEventListener('submit', submitRenewalRequest);
+  document.getElementById('renewalModal').addEventListener('click', e=>{
+    if(e.target === e.currentTarget || e.target.closest('[data-close-renewal]')) closeRenewalModal();
   });
 
   async function openLinkedPermitFromUrl(){
