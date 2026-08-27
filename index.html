@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GHACEM — Permits</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Space+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0A1712; --surface:#11201A; --surface-2:#172A21; --border:#28402F;
@@ -16,7 +16,7 @@
     --good:#4F9D69; --good-dim:rgba(79,157,105,.16);
     --caution:#E8B93A; --caution-dim:rgba(232,185,58,.16);
     --series-general:#3987e5; --series-hotwork:#d95926; --series-height:#199e70;
-    --font-d:'Oswald',sans-serif; --font-b:'IBM Plex Sans',sans-serif; --font-m:'IBM Plex Mono',monospace;
+    --font-d:'Manrope',sans-serif; --font-b:'DM Sans',sans-serif; --font-m:'Space Mono',monospace;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-b);}
@@ -36,6 +36,11 @@
   .qr-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);font-weight:700;}
   h1{font-family:var(--font-d);font-size:16px;letter-spacing:.06em;margin:0;text-transform:uppercase;color:#EEF3EA;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;}
   header span{display:block;font-size:10.5px;color:#8FCBA3;font-family:var(--font-m);letter-spacing:.05em;}
+  .brand-name{display:flex;align-items:baseline;gap:8px;}
+  .brand-name h1{font-weight:800;letter-spacing:.02em;}
+  .brand-dash{color:var(--accent);font-size:14px;font-family:var(--font-m);}
+  .topbar h1{font-size:0;}
+  .topbar h1::after{content:"GHACEM Permit";font-size:clamp(18px,3vw,26px);font-weight:800;letter-spacing:.02em;}
   .sitebanner{position:relative;height:150px;overflow:hidden;background:#000;}
   .sitebanner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;}
   .sitebanner::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg, rgba(3,15,9,.94) 0%, rgba(4,20,12,.55) 42%, rgba(4,20,12,.15) 75%);}
@@ -399,6 +404,9 @@
     .histcard-actions{margin-top:9px;justify-content:flex-start;}
     .histcard-actions .btn{flex:1 1 auto;min-width:0;padding:7px 8px;font-size:10.5px;}
     .histcard-detail{grid-template-columns:1fr;gap:3px 0;}
+    .issue-datetime{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px !important;}
+    .issue-datetime > div{min-width:0;}
+    .issue-datetime input{font-size:12px;padding:9px 7px;}
     .histcard-detail dt{margin-top:5px;}
     .adminlock{padding:28px 0;}
     .adminlock-card{padding:28px 18px;}
@@ -1088,7 +1096,7 @@ async function doSync(){
     return `<div class="ynrow">
       <span class="ynlabel">${label}</span>
       <div class="ynopts">
-        ${opts.map(o=>`<label class="ynopt ${val===o?'sel':''}"><input type="radio" data-yn="${formKey}|${path}" value="${o}" ${val===o?'checked':''}> ${o}</label>`).join('')}
+        ${opts.map(o=>`<label class="ynopt ${val===o?'sel':''}" data-yn="${formKey}|${path}"><input type="radio" data-yn="${formKey}|${path}" value="${o}" ${val===o?'checked':''}> ${o}</label>`).join('')}
       </div>
     </div>`;
   }
@@ -1298,7 +1306,7 @@ async function doSync(){
         ${textField('general','workOrderNumber','Work Order Number')}
         ${textField('general','deptLocation','Department/Location of the Work (Activity)')}
         ${textField('general','description','Description of the Work (Activity) being undertaken', true)}
-        <div style="display:flex;gap:10px;">
+        <div class="issue-datetime" style="display:flex;gap:10px;">
           <div style="flex:1;">${textField('general','dateIssue','Date of Issue of GWP', false, 'date')}</div>
           <div style="flex:1;">${textField('general','timeIssue','Time of Issue', false, 'time')}</div>
         </div>
@@ -1652,8 +1660,11 @@ async function doSync(){
     }
     const yn = e.target.closest('[data-yn]');
     if(yn){
+      const input = yn.matches('input') ? yn : yn.querySelector('input[data-yn]');
+      if(!input) return;
       const [formKey, path] = yn.dataset.yn.split('|');
-      setPath(pd(formKey), path, yn.value);
+      const current = pd(formKey)[path];
+      setPath(pd(formKey), path, current === input.value ? '' : input.value);
       saveState(); renderAll();
       return;
     }
