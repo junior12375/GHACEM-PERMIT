@@ -539,7 +539,7 @@
       <button class="btn btn-ghost btn-sm" id="refreshSignedListBtn" style="margin-left:auto;">↻ Refresh</button>
     </div>
     <div class="histtoolbar">
-      <input type="text" id="signedSearch" placeholder="Search by location or description…">
+      <input type="text" id="signedSearch" placeholder="Search by location, description, or work order…">
       <select id="signedSort">
         <option value="new">Newest first</option>
         <option value="old">Oldest first</option>
@@ -620,7 +620,7 @@
           <div id="renewalPermitList"></div>
         </div>
         <div class="histtoolbar">
-          <input type="text" id="activeSearch" placeholder="Search by location or description…">
+          <input type="text" id="activeSearch" placeholder="Search by location, description, or work order…">
           <select id="activeSort">
             <option value="new">Newest first</option>
             <option value="old">Oldest first</option>
@@ -639,7 +639,7 @@
           <button class="btn btn-ghost btn-sm" id="refreshOverdueListBtn" style="margin-left:auto;">↻ Refresh</button>
         </div>
         <div class="histtoolbar">
-          <input type="text" id="overdueSearch" placeholder="Search by location or description…">
+          <input type="text" id="overdueSearch" placeholder="Search by location, description, or work order…">
           <select id="overdueSort">
             <option value="new">Newest first</option>
             <option value="old">Oldest first</option>
@@ -659,7 +659,7 @@
           <button class="btn btn-ghost btn-sm" id="refreshClosedListBtn" style="margin-left:auto;">↻ Refresh</button>
         </div>
         <div class="histtoolbar">
-          <input type="text" id="closedSearch" placeholder="Search by location or description…">
+          <input type="text" id="closedSearch" placeholder="Search by location, description, or work order…">
           <select id="closedSort">
             <option value="new">Newest first</option>
             <option value="old">Oldest first</option>
@@ -1956,13 +1956,14 @@ async function doSync(){
     document.getElementById('adminContent').classList.add('hidden');
   });
   document.querySelectorAll('[data-adminsub]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
+    btn.addEventListener('click', async ()=>{
       document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       currentAdminSub = btn.dataset.adminsub;
       document.querySelectorAll('.adminsubpane').forEach(p=>{
         p.classList.toggle('hidden', p.id !== 'adminsub-'+currentAdminSub);
       });
+      await loadHistoryCache();
       renderCurrentAdminSub();
     });
   });
@@ -2174,10 +2175,16 @@ async function doSync(){
   const LIST_HOST = { active:'activePermitList', closed:'closedPermitList', signed:'signedPermitList', overdue:'toClosePermitList', renewal:'renewalPermitList' };
   const LIST_LABEL = { active:'active', closed:'closed', signed:'signed', overdue:'overdue', renewal:'renewal requests' };
 
+  function isRenewalRecord(r){
+    const id = String(r['Submission ID'] || '').trim();
+    return Boolean(String(r['Renewal Of'] || '').trim())
+      || /-R\d+$/i.test(id)
+      || Boolean(String(r['Renewal Status'] || '').trim());
+  }
   function modeMatches(mode, formType, r){
     if(mode === 'closed') return recordIsClosed(formType, r);
     if(mode === 'overdue') return !recordIsClosed(formType, r) && isOverdue(r);
-    if(mode === 'renewal') return Boolean(String(r['Renewal Of'] || '').trim());
+    if(mode === 'renewal') return isRenewalRecord(r);
     // active (admin) and signed (public) use the same rule: open, and not yet overdue.
     // Overdue-but-still-open permits only surface in the admin "Permits to be Closed" tab.
     return !recordIsClosed(formType, r) && !isOverdue(r);
@@ -2260,6 +2267,18 @@ async function doSync(){
     data['Renewal Of'] = submissionId;
     data['Renewal Version'] = renewalId.slice(renewalId.lastIndexOf('-') + 1);
     const renewedAt = new Date();
+    const renewedDate = [
+      renewedAt.getFullYear(),
+      String(renewedAt.getMonth() + 1).padStart(2, '0'),
+      String(renewedAt.getDate()).padStart(2, '0')
+    ].join('-');
+    const renewedTime = [
+      String(renewedAt.getHours()).padStart(2, '0'),
+      String(renewedAt.getMinutes()).padStart(2, '0')
+    ].join(':');
+    data['Date of Issue'] = renewedDate;
+    data['Time of Issue'] = renewedTime;
+    if(formType === 'height') data['Date of Work'] = renewedDate;
     data['Renewal Status'] = 'Approved';
     data['Renewal Requested At'] = new Date().toLocaleString();
     data['Renewal Remarks'] = reason;
@@ -2330,7 +2349,8 @@ async function doSync(){
     if(searchQuery){
       records = records.filter(({r})=>
         (r[titleField]||'').toLowerCase().includes(searchQuery) ||
-        (r[subField]||'').toLowerCase().includes(searchQuery)
+        (r[subField]||'').toLowerCase().includes(searchQuery) ||
+        workOrderForRecord(formType, r).toLowerCase().includes(searchQuery)
       );
     }
     // Cache arrives newest-first from the backend; only re-order when "oldest first" is picked.
