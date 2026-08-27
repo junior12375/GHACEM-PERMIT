@@ -373,6 +373,67 @@
     .exec-card,.vizcard,.statcard,.exec-banner{break-inside:avoid;background:#fff;border-color:#bbb;color:#111;}
     .exec-risk.green,.exec-risk.amber,.exec-risk.red{border:1px solid #777;}
   }
+  html,body{max-width:100%;overflow-x:hidden;}
+  img,svg,canvas,video{max-width:100%;}
+  @media (max-width:600px){
+    header.topbar{padding:10px 12px;gap:7px;}
+    header.topbar h1{font-size:14px;}
+    header.topbar span{font-size:9px;}
+    .mark{width:29px;height:29px;}
+    .brand-divider{height:20px;}
+    .pendingbadge{margin-left:auto;padding:4px 8px;font-size:9px;}
+    main{width:100%;max-width:100vw;padding:12px 10px 34px;}
+    .sitebanner{height:118px;}
+    .sitebanner-text{left:12px;right:12px;bottom:11px;}
+    .sitebanner-title{font-size:18px;line-height:1.08;}
+    .subtabs{position:static;gap:5px;padding:0;margin-bottom:10px;}
+    .subtabbtn{flex:1 1 calc(50% - 5px);min-width:0;padding:8px 7px;font-size:11px;white-space:normal;line-height:1.2;}
+    .subpane{padding:12px 10px 16px;border-radius:8px;}
+    .historytypes{gap:5px;}
+    .histtypebtn{flex:1 1 calc(50% - 5px);min-width:0;padding:8px 7px;font-size:10.5px;line-height:1.2;white-space:normal;}
+    .historytypes .btn{margin-left:0 !important;flex:1 1 100%;}
+    .histtoolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(105px,.65fr);}
+    .histtoolbar input,.histtoolbar select{min-width:0;width:100%;}
+    .histcard{padding:10px 11px;}
+    .histcard-top{display:block;}
+    .histcard-actions{margin-top:9px;justify-content:flex-start;}
+    .histcard-actions .btn{flex:1 1 auto;min-width:0;padding:7px 8px;font-size:10.5px;}
+    .histcard-detail{grid-template-columns:1fr;gap:3px 0;}
+    .histcard-detail dt{margin-top:5px;}
+    .adminlock{padding:28px 0;}
+    .adminlock-card{padding:28px 18px;}
+    .adminlock-field{display:block;}
+    .adminlock-field input,.adminlock-field .btn{width:100%;margin:0 0 8px;}
+    .statsbar{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
+    .statcard{padding:8px 6px;}
+    .statcard .n{font-size:18px;}
+    .statcard .l{font-size:8.5px;line-height:1.2;}
+    .vizgrid,.exec-grid{grid-template-columns:1fr;gap:10px;}
+    .vizcard,.exec-card{min-width:0;padding:11px 10px 9px;overflow:hidden;}
+    .exec-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+    .exec-actions .btn{min-width:0;padding:8px 6px;font-size:10px;}
+    .exec-actions .btn:first-child{grid-column:1 / -1;}
+    .exec-banner{padding:11px 10px;}
+    .exec-banner h4{font-size:14px;}
+    .exec-banner p{font-size:10.5px;}
+    .exec-risk{font-size:10px;padding:7px 9px;white-space:normal;text-align:center;}
+    .exec-table{min-width:0;width:100%;font-size:10px;table-layout:fixed;}
+    .exec-table th,.exec-table td{padding:6px 4px;word-break:break-word;}
+    .exec-table th:first-child,.exec-table td:first-child{width:40%;}
+    .exec-table .btn{max-width:100%;padding:6px 5px;font-size:9.5px;white-space:normal;}
+    .permitviewer{padding:8px;}
+    .permitviewer-card{padding:11px 9px;border-radius:9px;}
+    .permitviewer-head{display:block;}
+    .permitviewer-head > .btn{margin-top:9px;width:100%;}
+    .permitviewer-tabs{gap:5px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:8px;}
+    .permitviewer-tab{flex:0 0 auto;font-size:10px;padding:7px 8px;max-width:75vw;white-space:normal;}
+    .photo-grid{grid-template-columns:1fr;}
+    .formsubmit{display:block;}
+    .formsubmit .btn{width:100%;margin-top:8px;}
+    .submithint{display:block;}
+    .crewrow{display:block;}
+    .crewrow input,.crewrow .btn{width:100%;margin-bottom:6px;}
+  }
 </style>
 </head>
 <body>
