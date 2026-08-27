@@ -340,6 +340,39 @@
   .viz-tooltip .n{font-family:var(--font-m);font-weight:600;color:var(--text);}
   .viz-tooltip .l{color:var(--text-dim);}
   @media (max-width:760px){ .vizgrid{grid-template-columns:1fr;} }
+  .exec-banner{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,var(--surface-2),var(--surface));border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+  .exec-banner h4{font-family:var(--font-d);font-size:16px;text-transform:uppercase;margin:0 0 4px;}
+  .exec-banner p{font-size:11.5px;color:var(--text-dim);margin:0;max-width:70ch;}
+  .exec-risk{font-family:var(--font-m);font-size:12px;font-weight:700;text-transform:uppercase;padding:8px 12px;border-radius:7px;white-space:nowrap;}
+  .exec-risk.green{background:var(--good-dim);color:var(--good);}
+  .exec-risk.amber{background:var(--caution-dim);color:var(--caution);}
+  .exec-risk.red{background:var(--danger-dim);color:var(--danger);}
+  .exec-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-top:14px;}
+  .exec-card{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .exec-card h5{font-family:var(--font-d);text-transform:uppercase;font-size:12.5px;letter-spacing:.04em;color:var(--accent);margin:0 0 10px;}
+  .exec-card p{font-size:12px;line-height:1.55;margin:0;color:var(--text-dim);}
+  .exec-list{list-style:none;padding:0;margin:0;}
+  .exec-list li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border);font-size:11.5px;}
+  .exec-list li:last-child{border-bottom:0;}
+  .exec-list .muted{color:var(--text-dim);}
+  .exec-badge{border-radius:12px;padding:2px 7px;font-size:9px;font-weight:700;text-transform:uppercase;white-space:nowrap;}
+  .exec-badge.high{background:var(--danger-dim);color:var(--danger);}
+  .exec-badge.medium{background:var(--caution-dim);color:var(--caution);}
+  .exec-badge.low{background:var(--good-dim);color:var(--good);}
+  .exec-table{width:100%;border-collapse:collapse;font-size:11px;}
+  .exec-table th,.exec-table td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top;}
+  .exec-table th{font-size:9.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;}
+  .exec-table td strong{color:var(--text);}
+  .exec-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:12px;}
+  .exec-meta{font-size:10.5px;color:var(--text-dim);margin-top:10px;}
+  @media (max-width:760px){ .exec-grid{grid-template-columns:1fr;} .exec-table{min-width:560px;} }
+  @media print{
+    body{background:#fff;color:#111;}
+    .topbar,.subtabs,.sitefooter,#adminAuthPanel,#adminLockBtn,.exec-actions{display:none !important;}
+    #sub-admin,#adminContent,#adminsub-overview{display:block !important;}
+    .exec-card,.vizcard,.statcard,.exec-banner{break-inside:avoid;background:#fff;border-color:#bbb;color:#111;}
+    .exec-risk.green,.exec-risk.amber,.exec-risk.red{border:1px solid #777;}
+  }
 </style>
 </head>
 <body>
@@ -457,33 +490,37 @@
 
     <div id="adminContent" class="hidden">
       <div class="historytypes" style="margin-bottom:16px;">
-        <button class="histtypebtn active" data-adminsub="insights">Insights</button>
+        <button class="histtypebtn active" data-adminsub="overview">Overview</button>
         <button class="histtypebtn" data-adminsub="active">Active Permits</button>
         <button class="histtypebtn" data-adminsub="overdue">Permits to be Closed</button>
         <button class="histtypebtn" data-adminsub="closed">Closed Permits</button>
         <button class="btn btn-ghost btn-sm" id="adminLockBtn" style="margin-left:auto;">Lock</button>
       </div>
 
-      <div class="adminsubpane" id="adminsub-insights">
-        <div class="permittitle" style="margin-bottom:4px;">Insights</div>
-        <p class="paneintro">Permit volume and trends, plant-wide.</p>
-        <div class="actionrow" style="margin:0 0 14px;">
-          <button class="btn btn-ghost btn-sm" id="refreshInsightsBtn">↻ Refresh</button>
+      <div class="adminsubpane" id="adminsub-overview">
+        <div class="permittitle" style="margin-bottom:4px;">Operations Overview</div>
+        <p class="paneintro">A management view of permit activity, risk, accountability, and required decisions.</p>
+        <div class="exec-actions">
+          <button class="btn btn-ghost btn-sm" id="refreshOverviewBtn">↻ Refresh</button>
+          <button class="btn btn-ghost btn-sm" id="printManagementReportBtn">Print / Save PDF</button>
+          <button class="btn btn-ghost btn-sm" id="exportManagementCsvBtn">Export Management CSV</button>
         </div>
-        <div class="vizgrid">
-          <div class="vizcard">
-            <h5>Permits by Type</h5>
-            <div id="vizByType"></div>
-          </div>
-          <div class="vizcard">
-            <h5>Top Departments / Locations</h5>
-            <div id="vizByDept"></div>
-          </div>
-          <div class="vizcard vizcard-wide">
-            <h5>Weekly Submission Trend <span class="vizcard-sub">last 8 weeks</span></h5>
-            <div id="vizTrend"></div>
-          </div>
+        <div id="executiveBanner"></div>
+        <div id="executiveKpis" class="statsbar"></div>
+        <div class="exec-grid">
+          <div class="exec-card"><h5>Management Attention Required</h5><div id="executiveActions"></div></div>
+          <div class="exec-card"><h5>Executive Summary</h5><div id="executiveSummary"></div></div>
         </div>
+        <div class="exec-grid">
+          <div class="exec-card"><h5>Department Scorecards</h5><div id="departmentScorecards"></div></div>
+          <div class="exec-card"><h5>Accountability & Ownership</h5><div id="accountabilityList"></div></div>
+        </div>
+        <div class="vizgrid" style="margin-top:14px;">
+          <div class="vizcard"><h5>Permit Mix</h5><div id="vizByTypeExecutive"></div></div>
+          <div class="vizcard"><h5>Department Activity</h5><div id="vizByDeptExecutive"></div></div>
+          <div class="vizcard vizcard-wide"><h5>Activity Trend <span class="vizcard-sub">last 8 weeks</span></h5><div id="vizTrendExecutive"></div></div>
+        </div>
+        <div class="exec-meta" id="executiveUpdatedAt"></div>
       </div>
 
       <div class="adminsubpane hidden" id="adminsub-active">
@@ -1749,11 +1786,11 @@ async function doSync(){
   // ================= ADMIN ACCESS (client-side gate only — see note in chat) =================
   const ADMIN_PASSWORD = 'ghacem2026';
   let isAdminUnlocked = false;
-  let currentAdminSub = 'insights';
+  let currentAdminSub = 'overview';
   let pendingAdminDeepLink = null;
 
   function renderCurrentAdminSub(){
-    if(currentAdminSub === 'insights') renderInsights();
+    if(currentAdminSub === 'overview') renderExecutiveOverview();
     else if(currentAdminSub === 'active') { renderStatsBar(); renderPermitList(activeType, 'active'); }
     else if(currentAdminSub === 'overdue') renderPermitList(overdueType, 'overdue');
     else { renderStatsBar(); renderPermitList(closedType, 'closed'); }
@@ -1900,9 +1937,18 @@ async function doSync(){
     await loadHistoryCache();
     renderPermitList(overdueType, 'overdue');
   });
-  document.getElementById('refreshInsightsBtn').addEventListener('click', async ()=>{
+  document.getElementById('refreshOverviewBtn').addEventListener('click', async ()=>{
     await loadHistoryCache();
-    renderInsights();
+    renderExecutiveOverview();
+  });
+  document.getElementById('exportManagementCsvBtn').addEventListener('click', downloadManagementCsv);
+  document.getElementById('printManagementReportBtn').addEventListener('click', ()=>{
+    const previous = currentAdminSub;
+    currentAdminSub = 'overview';
+    document.querySelectorAll('.adminsubpane').forEach(p=>p.classList.toggle('hidden', p.id !== 'adminsub-overview'));
+    renderExecutiveOverview();
+    window.print();
+    currentAdminSub = previous;
   });
 
   async function loadHistoryCache(){
@@ -2292,8 +2338,9 @@ async function doSync(){
     return `M${x},${y} L${x+w-r},${y} Q${x+w},${y} ${x+w},${y+r} L${x+w},${y+h-r} Q${x+w},${y+h} ${x+w-r},${y+h} L${x},${y+h} Z`;
   }
 
-  function renderByTypeChart(byType){
-    const host = document.getElementById('vizByType');
+  function renderByTypeChart(byType, hostId='vizByType'){
+    const host = document.getElementById(hostId);
+    if(!host) return;
     const entries = [['general',byType.general], ['hotwork',byType.hotwork], ['height',byType.height]];
     if(entries.every(([,v])=>v===0)){
       host.innerHTML = '<div class="histempty">No permits yet.</div>';
@@ -2318,8 +2365,9 @@ async function doSync(){
     wireVizBarTooltips(host, 'permits');
   }
 
-  function renderByDeptChart(topDepts){
-    const host = document.getElementById('vizByDept');
+  function renderByDeptChart(topDepts, hostId='vizByDept'){
+    const host = document.getElementById(hostId);
+    if(!host) return;
     if(topDepts.length === 0){
       host.innerHTML = '<div class="histempty">No permits yet.</div>';
       return;
@@ -2340,8 +2388,9 @@ async function doSync(){
     wireVizBarTooltips(host, 'permits');
   }
 
-  function renderTrendChart(weeks){
-    const host = document.getElementById('vizTrend');
+  function renderTrendChart(weeks, hostId='vizTrend'){
+    const host = document.getElementById(hostId);
+    if(!host) return;
     if(weeks.every(w=>w.general+w.hotwork+w.height===0)){
       host.innerHTML = '<div class="histempty">No data yet.</div>';
       return;
@@ -2387,11 +2436,110 @@ async function doSync(){
     wireVizBarTooltips(host, 'permits');
   }
 
-  function renderInsights(){
-    const { byType, topDepts, weeks } = computeInsights();
-    renderByTypeChart(byType);
-    renderByDeptChart(topDepts);
-    renderTrendChart(weeks);
+  function executiveRecords(){
+    return ['general','hotwork','height'].flatMap(formType =>
+      (historyCache[formType] || []).map((record, index) => ({
+        formType, record, key: histKey(record, index),
+        location: String(record[TITLE_FIELD[formType]] || '').trim() || 'Unspecified',
+        owner: String(record['Supervisor'] || record['Department Manager'] || record['Manager'] || record['Crew Leader'] || '').trim() || 'Unassigned'
+      }))
+    );
+  }
+
+  function executiveSummary(){
+    const records = executiveRecords();
+    const closed = records.filter(item => recordIsClosed(item.formType, item.record));
+    const overdue = records.filter(item => !recordIsClosed(item.formType, item.record) && isOverdue(item.record));
+    const open = records.filter(item => !recordIsClosed(item.formType, item.record));
+    const missing = records.filter(item => {
+      const r = item.record;
+      if(item.formType === 'general') return !r['Authorization Signed By'] || !r['Crew Leader Signed By'];
+      if(item.formType === 'hotwork') return !(r['Safe Commence - Mgr'] && r['Safe Commence - Crew']);
+      return !(r['Auth - Mgr'] && r['Auth - Crew']);
+    });
+    const evidence = records.filter(item => {
+      const r = item.record;
+      if(item.formType === 'hotwork') return !r['Fire Extinguisher Photo'] && !r['Fire Extinguisher Photo Evidence'];
+      return !r['Isolation Photo Evidence'] && !r['Isolation Photo File'];
+    });
+    const byDepartment = {};
+    records.forEach(item => {
+      const current = byDepartment[item.location] || { total:0, closed:0, overdue:0, actions:0, formType:item.formType };
+      current.total++;
+      if(recordIsClosed(item.formType, item.record)) current.closed++;
+      if(overdue.includes(item)) current.overdue++;
+      if(missing.includes(item) || evidence.includes(item)) current.actions++;
+      byDepartment[item.location] = current;
+    });
+    const departments = Object.entries(byDepartment).sort((a,b)=>b[1].total-a[1].total);
+    const risk = overdue.length || missing.length || evidence.length
+      ? (overdue.length > 3 || missing.length > 3 ? 'red' : 'amber') : 'green';
+    return { records, closed, overdue, open, missing, evidence, departments, risk };
+  }
+
+  function managementReportRows(){
+    return executiveRecords().map(item => ({
+      'Permit Type': FORM_LABEL[item.formType],
+      'Submission ID': item.key,
+      'Location / Department': item.location,
+      'Status': recordIsClosed(item.formType, item.record) ? 'Closed' : (isOverdue(item.record) ? 'Overdue' : 'Open'),
+      'Owner': item.owner,
+      'Last Updated': item.record['Last Updated'] || '',
+      'Work Order': workOrderForRecord(item.formType, item.record)
+    }));
+  }
+
+  function downloadManagementCsv(){
+    const rows = managementReportRows();
+    const headers = ['Permit Type','Submission ID','Location / Department','Status','Owner','Last Updated','Work Order'];
+    const csv = [headers, ...rows.map(row => headers.map(header => `"${String(row[header] || '').replace(/"/g,'""')}"`))]
+      .map(row => row.join(',')).join('\n');
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+    link.download = `ghacem-management-report-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(link); link.click(); link.remove();
+    toast('Management CSV downloaded.');
+  }
+
+  function renderExecutiveOverview(){
+    const s = executiveSummary();
+    const banner = document.getElementById('executiveBanner');
+    const kpis = document.getElementById('executiveKpis');
+    const actions = document.getElementById('executiveActions');
+    const summaryHost = document.getElementById('executiveSummary');
+    const scorecards = document.getElementById('departmentScorecards');
+    const accountability = document.getElementById('accountabilityList');
+    if(!banner || !kpis) return;
+    const riskText = s.risk === 'green' ? 'Operations controlled' : (s.risk === 'amber' ? 'Management attention required' : 'Immediate intervention required');
+    banner.innerHTML = `<div><h4>GHACEM Permit Control Centre</h4><p>Executive snapshot of operational readiness, safety compliance, and closure discipline.</p></div><span class="exec-risk ${s.risk}">${riskText}</span>`;
+    const compliance = s.records.length ? Math.round((s.closed.length / s.records.length) * 100) : 0;
+    kpis.innerHTML = [
+      ['Total permits',s.records.length],['Open',s.open.length],['Overdue',s.overdue.length],
+      ['Compliance',compliance+'%'],['Missing sign-off',s.missing.length],['Missing evidence',s.evidence.length]
+    ].map(([label,value])=>`<div class="statcard"><div class="n">${value}</div><div class="l">${label}</div></div>`).join('');
+    const attention = s.overdue.concat(s.missing.filter(item=>!s.overdue.includes(item))).slice(0,8);
+    actions.innerHTML = attention.length ? `<ul class="exec-list">${attention.map(item=>`<li><span><strong>${escText(item.location)}</strong><br><span class="muted">${escText(FORM_LABEL[item.formType])} · owner: ${escText(item.owner)}</span></span><span class="exec-badge ${s.overdue.includes(item)?'high':'medium'}">${s.overdue.includes(item)?'Overdue':'Action'}</span></li>`).join('')}</ul>` : '<p>No urgent management actions are currently outstanding.</p>';
+    summaryHost.innerHTML = `<p><strong>${s.records.length}</strong> permits are recorded, with <strong>${s.open.length}</strong> open and <strong>${s.overdue.length}</strong> overdue. Overall closure compliance is <strong>${compliance}%</strong>. ${s.evidence.length ? `<strong>${s.evidence.length}</strong> permit(s) need evidence follow-up.` : 'Evidence requirements are currently satisfied.'}</p><div class="exec-meta">Reporting period: live records · Updated ${new Date().toLocaleString()}</div>`;
+    scorecards.innerHTML = s.departments.length ? `<table class="exec-table"><thead><tr><th>Department / location</th><th>Permits</th><th>Closed</th><th>Rate</th></tr></thead><tbody>${s.departments.slice(0,8).map(([name,d])=>`<tr><td><button class="btn btn-ghost btn-sm" data-exec-dept="${escAttr(name)}" data-exec-type="${d.formType}">${escText(name)}</button></td><td>${d.total}</td><td>${d.closed}</td><td>${d.total ? Math.round(d.closed/d.total*100) : 0}%</td></tr>`).join('')}</tbody></table>` : '<p>No department activity recorded.</p>';
+    const owners = {};
+    s.records.forEach(item => { owners[item.owner] = (owners[item.owner] || 0) + 1; });
+    accountability.innerHTML = Object.entries(owners).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([owner,count])=>`<div class="exec-list"><li><span>${escText(owner)}</span><strong>${count} permit${count===1?'':'s'}</strong></li></div>`).join('') || '<p>No ownership data captured.</p>';
+    scorecards.querySelectorAll('[data-exec-dept]').forEach(button => button.addEventListener('click', ()=>{
+      activeType = button.dataset.execType;
+      activeSearchQuery = button.dataset.execDept.toLowerCase();
+      currentAdminSub = 'active';
+      document.querySelectorAll('[data-adminsub]').forEach(item=>item.classList.toggle('active', item.dataset.adminsub === 'active'));
+      document.querySelectorAll('.adminsubpane').forEach(item=>item.classList.toggle('hidden', item.id !== 'adminsub-active'));
+      const search = document.getElementById('activeSearch');
+      if(search) search.value = button.dataset.execDept;
+      document.querySelectorAll('.historytypes[data-mode="active"] .histtypebtn').forEach(item=>item.classList.toggle('active', item.dataset.histtype === activeType));
+      renderStatsBar();
+      renderPermitList(activeType, 'active');
+    }));
+    renderByTypeChart({general:historyCache.general.length,hotwork:historyCache.hotwork.length,height:historyCache.height.length}, 'vizByTypeExecutive');
+    renderByDeptChart(s.departments.map(([name,d])=>[name,d.total]), 'vizByDeptExecutive');
+    renderTrendChart(computeInsights().weeks, 'vizTrendExecutive');
+    document.getElementById('executiveUpdatedAt').textContent = `Live dashboard · ${new Date().toLocaleString()}`;
   }
 
   document.getElementById('syncSettingsBtn').addEventListener('click', ()=>{
