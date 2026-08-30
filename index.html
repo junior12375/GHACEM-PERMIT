@@ -894,7 +894,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
         Select <strong>Confined Space Entry</strong> under Type of Work. This button is available before the final permit submission.
         The system will first create/save the permit record, then EHS will only be alerted after Site Supervisor / Department Authorization.
       </div>
-      <button type="button" class="btn btn-primary btn-sm" id="notifyEhsConfinedBtn" disabled title="Enter a valid Site Supervisor Work ID first">Notify EHS for Confined Space Test</button>
+      <div id="ehsMailDeploymentNote" style="font-size:12px;color:var(--text-dim);margin:8px 0 0;">EHS notification is sent by the Apps Script deployment owner; the Site Supervisor does not receive an email.</div><button type="button" class="btn btn-primary btn-sm" id="notifyEhsConfinedBtn" disabled title="Enter a valid Site Supervisor Work ID first">Notify EHS for Confined Space Test</button>
       <span id="notifyEhsConfinedStatus" style="display:block;font-size:11px;margin-top:9px;"></span>
     </div>
     <div class="formsubmit">
@@ -3913,8 +3913,8 @@ BACKEND WORKFLOW CONTRACT
       );
 
       st.textContent=r.ok
-        ? '✓ Site Supervisor authorized. EHS has been notified for the confined-space test.'
-        : (r.error||'EHS request failed.');
+        ? '✓ Site Supervisor authorized. EHS email sent to the configured EHS address.'
+        : '⚠ Site Supervisor authorization was recorded, BUT the EHS email was NOT sent. ' + (r.error||'Check the Apps Script deployment/email permissions.');
 
       await loadHistoryCache();
       await syncConfinedPanelFromHistory();
