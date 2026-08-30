@@ -894,7 +894,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
         Select <strong>Confined Space Entry</strong> under Type of Work. This button is available before the final permit submission.
         The system will first create/save the permit record, then EHS will only be alerted after Site Supervisor / Department Authorization.
       </div>
-      <button type="button" class="btn btn-primary btn-sm" id="notifyEhsConfinedBtn" disabled title="Site Supervisor approval is required first">🔒 Notify EHS for Confined Space Test</button>
+      <button type="button" class="btn btn-primary btn-sm" id="notifyEhsConfinedBtn" disabled title="Enter a valid Site Supervisor Work ID first">Notify EHS for Confined Space Test</button>
       <span id="notifyEhsConfinedStatus" style="display:block;font-size:11px;margin-top:9px;"></span>
     </div>
     <div class="formsubmit">
@@ -2197,6 +2197,9 @@ async function doSync(){
         resultEl.className = 'sigidresult notfound';
       }
       if(signBtn) signBtn.disabled = !name;
+      if(typeof updateConfinedSpaceAction === 'function' && wid.closest('.sigrow[data-sigrow="hotwork|safeCommenceMgr"]')){
+        updateConfinedSpaceAction();
+      }
       return;
     }
   });
@@ -2309,8 +2312,8 @@ async function doSync(){
       : formLabel + ' submitted — new row created.');
   }
 
-  async function workflowPost(action, formType, submissionId, approvedBy) {
-    const data = {'Approved By': approvedBy || ''};
+  async function workflowPost(action, formType, submissionId, approvedBy, extraData) {
+    const data = Object.assign({'Approved By': approvedBy || ''}, extraData || {});
     return await postToBackend({action, formType, submissionId, data});
   }
 
@@ -3598,7 +3601,7 @@ async function doSync(){
 
   <div id="confinedSpaceEhsBox" style="display:none;margin-top:16px;padding:16px;border-radius:12px;background:#fff8e6;border:1px solid #f0c36e;">
     <b>Confined Space: EHS Test Required</b>
-    <p style="margin:7px 0 12px;">Site Supervisor / Department Authorization must be completed before EHS can receive the request to test the space.</p>
+    <p style="margin:7px 0 12px;">The Site Supervisor authorizes this permit by entering a valid Work ID below. Once the Work ID is recognized, EHS can be notified directly.</p>
     <button id="requestEhsTestBtn" type="button" style="padding:10px 16px;border:0;border-radius:10px;font-weight:700;cursor:pointer;">
       Request EHS Space Test
     </button>
@@ -3819,42 +3822,73 @@ BACKEND WORKFLOW CONTRACT
   document.getElementById('refreshManagerBtn')?.addEventListener('click', refreshWorkflowQueues);
 
   // Confined-space action button: visible while filling 04B. The permit is submitted first; the button can then request the EHS test once Site Supervisor authorization exists.
+  function getConfinedSupervisorWorkId_(){
+    const row = document.querySelector('.sigrow[data-sigrow="hotwork|safeCommenceMgr"]');
+    const input = row ? row.querySelector('[data-sigworkid]') : null;
+    return input ? String(input.value || '').trim() : '';
+  }
+
+  function getConfinedSupervisorName_(){
+    const id = getConfinedSupervisorWorkId_();
+    if(typeof lookupSupervisorName === 'function') return lookupSupervisorName(id);
+    return '';
+  }
+
   function updateConfinedSpaceAction() {
-    const panel=document.getElementById('confinedSpaceActionPanel'), btn=document.getElementById('notifyEhsConfinedBtn');
+    const panel=document.getElementById('confinedSpaceActionPanel');
+    const btn=document.getElementById('notifyEhsConfinedBtn');
     if(!panel||!btn) return;
+
     const h=pd('hotwork');
     const confined=(h.typeOfWork||[]).some(v=>/confined\s*space/i.test(v));
     panel.style.display=confined?'block':'none';
+
     const id=h._submissionId || ghacemLastSubmissionIds.hotwork || '';
-    const authorized=!!(h.departmentAuthorized || h.supervisorApproved);
-    const submitted=!!id;
-    btn.disabled=!confined;
+    const workId=getConfinedSupervisorWorkId_();
+    const supervisorName=getConfinedSupervisorName_();
+    const hasValidWorkId=!!supervisorName;
+
+    // Work ID itself is the Site Supervisor authorization.
+    btn.disabled=!confined || !hasValidWorkId;
+
     const st=document.getElementById('notifyEhsConfinedStatus');
-    if(confined && !submitted) st.textContent='Click this button to submit the permit first; EHS will only be alerted after Site Supervisor authorization.';
-    else if(confined && !authorized) st.textContent='Permit submitted. Waiting for Site Supervisor / Department Authorization.';
-    else if(confined) st.textContent='Site Supervisor authorized. EHS can be requested.';
+    if(!confined) {
+      if(st) st.textContent='';
+    } else if(!workId) {
+      if(st) st.textContent='Enter the Site Supervisor Work ID in the authorization section. EHS notification will unlock immediately when the ID is recognized.';
+    } else if(!hasValidWorkId) {
+      if(st) st.textContent='ID not recognized. Enter a valid Site Supervisor Work ID.';
+    } else if(id) {
+      if(st) st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). EHS can be notified.';
+    } else {
+      if(st) st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). Click the button to save the permit and notify EHS.';
+    }
   }
+
   document.getElementById('notifyEhsConfinedBtn')?.addEventListener('click', async()=>{
     const h=pd('hotwork');
     const st=document.getElementById('notifyEhsConfinedStatus');
-    const authorized=!!(h.departmentAuthorized || h.supervisorApproved);
-    if(!authorized){
-      if(st) st.textContent='🔒 Site Supervisor / Department Authorization is required before EHS can be notified.';
-      updateConfinedSpaceAction();
+    const confined=(h.typeOfWork||[]).some(v=>/confined\s*space/i.test(v));
+
+    if(!confined){
+      if(st) st.textContent='Please select “Confined Space Entry” first.';
       return;
     }
-    const confined=(h.typeOfWork||[]).some(v=>/confined\s*space/i.test(v));
-    if(!confined){
-      st.textContent='Please select “Confined Space Entry” first.';
+
+    const supervisorWorkId=getConfinedSupervisorWorkId_();
+    const supervisorName=getConfinedSupervisorName_();
+
+    if(!supervisorName){
+      if(st) st.textContent='🔒 Enter a valid Site Supervisor Work ID first.';
+      updateConfinedSpaceAction();
       return;
     }
 
     try{
       let id=h._submissionId || ghacemLastSubmissionIds.hotwork || '';
 
-      // Before the normal Submit button is pressed, save the permit into the
-      // approval workflow so it has a permanent Submission ID. This is not a
-      // second row if the user later presses Submit; the same ID is reused.
+      // Save the permit once if it does not yet have a Submission ID.
+      // The same ID is reused later; this does not create a second workflow row.
       if(!id){
         st.textContent='Saving permit for EHS test workflow…';
         const result=await submitFormToBackend('hotwork');
@@ -3866,25 +3900,24 @@ BACKEND WORKFLOW CONTRACT
         h._submissionId=id;
         ghacemLastSubmissionIds.hotwork=id;
         try{ localStorage.setItem('ghacem_last_hotwork', id); }catch(e){}
-        st.textContent='Permit saved as Pending Approval. 🔒 EHS is locked until Site Supervisor / Department Authorization.';
       }
 
-      await loadHistoryCache();
-      const rec=(window.historyCache && window.historyCache.hotwork||[])
-        .find(r=>String(r['Submission ID']||'')===String(id));
+      st.textContent='Recording Site Supervisor authorization and notifying EHS…';
 
-      const authorized=rec && String(rec['Department Authorization']||'').toLowerCase()==='approved';
-      if(!authorized){
-        updateConfinedSpaceAction();
-        return;
-      }
+      const r=await workflowPost(
+        'request_ehs_test',
+        'hotwork',
+        id,
+        supervisorName,
+        {'Supervisor Work ID': supervisorWorkId}
+      );
 
-      st.textContent='Notifying EHS…';
-      const r=await workflowPost('request_ehs_test','hotwork',id,'Site Supervisor');
       st.textContent=r.ok
-        ? '✓ EHS has been notified for the confined-space test.'
+        ? '✓ Site Supervisor authorized. EHS has been notified for the confined-space test.'
         : (r.error||'EHS request failed.');
+
       await loadHistoryCache();
+      await syncConfinedPanelFromHistory();
       renderWorkflowQueues();
       updateConfinedSpaceAction();
     }catch(err){
