@@ -3846,24 +3846,30 @@ BACKEND WORKFLOW CONTRACT
     const id=h._submissionId || ghacemLastSubmissionIds.hotwork || '';
     const workId=getConfinedSupervisorWorkId_();
     const supervisorName=getConfinedSupervisorName_();
-    const hasValidWorkId=!!supervisorName;
+    const hasWorkId=!!workId.trim();
 
-    // Work ID itself is the Site Supervisor authorization.
-    btn.disabled=!confined || !hasValidWorkId;
+    // Any non-empty Site Supervisor Work ID is the authorization.
+    // The backend records the exact ID entered.
+    btn.disabled=!confined || !hasWorkId;
 
     const st=document.getElementById('notifyEhsConfinedStatus');
     if(!confined) {
       if(st) st.textContent='';
     } else if(!workId) {
       if(st) st.textContent='Enter the Site Supervisor Work ID in the authorization section. EHS notification will unlock immediately when the ID is recognized.';
-    } else if(!hasValidWorkId) {
-      if(st) st.textContent='ID not recognized. Enter a valid Site Supervisor Work ID.';
+    } else if(!hasWorkId) {
+      if(st) st.textContent='Enter the Site Supervisor Work ID to authorize this permit.';
     } else if(id) {
       if(st) st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). EHS can be notified.';
     } else {
       if(st) st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). Click the button to save the permit and notify EHS.';
     }
   }
+
+  document.querySelectorAll('[data-sigworkid]').forEach(function(workIdInput){
+    workIdInput.addEventListener('input', updateConfinedSpaceAction);
+    workIdInput.addEventListener('change', updateConfinedSpaceAction);
+  });
 
   document.getElementById('notifyEhsConfinedBtn')?.addEventListener('click', async()=>{
     const h=pd('hotwork');
@@ -3878,8 +3884,8 @@ BACKEND WORKFLOW CONTRACT
     const supervisorWorkId=getConfinedSupervisorWorkId_();
     const supervisorName=getConfinedSupervisorName_();
 
-    if(!supervisorName){
-      if(st) st.textContent='🔒 Enter a valid Site Supervisor Work ID first.';
+    if(!supervisorWorkId){
+      if(st) st.textContent='🔒 Enter the Site Supervisor Work ID first.';
       updateConfinedSpaceAction();
       return;
     }
