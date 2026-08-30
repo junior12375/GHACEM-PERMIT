@@ -656,6 +656,164 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
 }
 </style>
 
+
+<style id="full-page-scroll-fix">
+  /* =========================================================
+     FULL FORM VISIBILITY / SCROLL FIX
+     Prevent lower permit sections from being hidden by the
+     viewport or footer. Applies to every permit and dashboard.
+     ========================================================= */
+  html{
+    height:auto !important;
+    min-height:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+  }
+  body{
+    height:auto !important;
+    min-height:100vh !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    position:relative !important;
+  }
+  main{
+    height:auto !important;
+    min-height:0 !important;
+    overflow:visible !important;
+    padding-bottom:110px !important;
+  }
+  .subpane{
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+  #sub-general,
+  #sub-hotwork,
+  #sub-height,
+  #sub-signed,
+  #sub-admin,
+  #sub-supervisor,
+  #sub-ehsmanager,
+  #sub-manager{
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+
+  /* Keep every generated form section in normal document flow. */
+  .pc-section,
+  .formsubmit,
+  .formsubmit-note{
+    overflow:visible !important;
+    height:auto !important;
+    max-height:none !important;
+  }
+
+  /* The right reference column may be absolute, but it must never
+     clip or force the permit form to a viewport height. */
+  .reference-sidebar{
+    max-height:none !important;
+    overflow:visible !important;
+  }
+
+  /* Footer is part of the document, never an overlay on the form. */
+  .sitefooter{
+    position:static !important;
+    bottom:auto !important;
+    left:auto !important;
+    right:auto !important;
+    width:100% !important;
+    z-index:1 !important;
+    clear:both !important;
+  }
+
+  /* Extra breathing room before the footer so the final buttons,
+     signatures and safety sections can always be reached. */
+  body > main{
+    margin-bottom:0 !important;
+  }
+
+  @media(max-width:1050px){
+    main{
+      padding-bottom:80px !important;
+    }
+    .subpane{
+      padding-bottom:40px !important;
+    }
+    .reference-sidebar{
+      position:static !important;
+      width:auto !important;
+    }
+  }
+
+  @media(max-width:700px){
+    main{
+      padding-bottom:70px !important;
+    }
+    .subpane{
+      padding-bottom:35px !important;
+    }
+  }
+</style>
+
+
+<style id="mobile-permit-fix-v2">
+  *, *::before, *::after { box-sizing:border-box !important; }
+  .issue-datetime, .issue-datetime > div { min-width:0 !important; }
+  .issue-datetime input, .issue-datetime select, .issue-datetime textarea {
+    width:100% !important; max-width:100% !important; min-width:0 !important;
+  }
+  .tablescroll {
+    width:100% !important; max-width:100% !important; overflow-x:auto !important;
+    overflow-y:hidden !important; -webkit-overflow-scrolling:touch !important;
+  }
+  .tablescroll table {
+    border-collapse:separate !important; border-spacing:0 !important;
+    min-width:760px !important; width:max-content !important;
+  }
+  .tablescroll th,.tablescroll td { vertical-align:top !important; box-sizing:border-box !important; }
+  .tablescroll input,.tablescroll select,.tablescroll textarea {
+    width:100% !important; min-width:110px !important; box-sizing:border-box !important;
+  }
+  #approvalControls {
+    color:#eef2ef !important;
+    background:linear-gradient(180deg,#07100d,#050b09) !important;
+    border:1px solid #2a6b40 !important; overflow:visible !important;
+  }
+  #approvalControls h3,#approvalControls b { color:#f0f3f1 !important; }
+  #approvalControls p,#approvalControls span { color:#cdd3cf; }
+  #approvalControls .approval-step {
+    background:#101a16 !important; border:1px solid #28402f !important;
+    color:#f0f3f1 !important;
+  }
+  #approvalControls #confinedSpaceEhsBox {
+    background:#151b13 !important; border:1px solid #7d6b2b !important;
+    color:#f0f3f1 !important;
+  }
+  #approvalControls #dualApprovalBox {
+    background:#0d151d !important; border:1px solid #48658f !important;
+    color:#f0f3f1 !important;
+  }
+  @media (max-width:700px) {
+    .issue-datetime { display:grid !important; grid-template-columns:1fr !important; gap:10px !important; }
+    .issue-datetime > div { width:100% !important; }
+    .pc-section { width:100% !important; min-width:0 !important; }
+    #approvalControls { margin:14px 0 !important; padding:14px !important; border-radius:13px !important; }
+    #approvalControls > div:first-child { display:block !important; }
+    #approvalControls #approvalStatusBadge {
+      display:block !important; width:100% !important; margin-top:10px !important; text-align:center !important;
+    }
+    #approvalControls #approvalSteps { grid-template-columns:1fr !important; gap:8px !important; }
+    #approvalControls .approval-step { padding:13px !important; min-width:0 !important; }
+    #approvalControls #confinedSpaceEhsBox,#approvalControls #dualApprovalBox {
+      margin-top:10px !important; padding:13px !important;
+    }
+    #approvalControls button { width:100% !important; min-height:48px !important; margin-top:8px !important; }
+    #approvalControls #ehsRequestMessage { display:block !important; margin:8px 0 0 !important; }
+  }
+</style>
+
 </head>
 <body>
 
@@ -3431,10 +3589,10 @@ async function doSync(){
       <b>1. Department Authorization / Site Supervisor</b><div id="supervisorStepStatus">Pending</div>
     </div>
     <div class="approval-step" data-step="hod" style="padding:14px;border-radius:12px;background:#f6f7f9;">
-      <b>3. HoD Approval</b><div id="hodStepStatus">Pending</div>
+      <b>4. HoD Approval</b><div id="hodStepStatus">Waiting for EHS test</div>
     </div>
     <div class="approval-step" data-step="ehs" style="padding:14px;border-radius:12px;background:#f6f7f9;">
-      <b>4. EHS Space Test</b><div id="ehsStepStatus">Not required</div>
+      <b>3. EHS Space Test</b><div id="ehsStepStatus">Not required</div>
     </div>
   </div>
 
@@ -3449,7 +3607,7 @@ async function doSync(){
 
   <div id="dualApprovalBox" style="display:none;margin-top:16px;padding:16px;border-radius:12px;background:#f3f7ff;border:1px solid #b9c9ee;">
     <b>Two-Approval Requirement</b>
-    <p style="margin:7px 0 0;">This permit is submitted first. It then requires <strong>Site Supervisor / Department Authorization</strong> and <strong>HoD approval</strong> before it becomes Approved.</p>
+    <p style="margin:7px 0 0;">This permit is submitted first. Confined-space permits then require <strong>Site Supervisor / Department Authorization</strong>, <strong>EHS space testing</strong>, and finally <strong>HoD approval</strong> before becoming Approved.</p>
   </div>
 </section>
 
@@ -3502,7 +3660,7 @@ async function doSync(){
     if (ehsBox) ehsBox.style.display = confined ? '' : 'none';
 
     setText('supervisorStepStatus', special ? (GHACEM_WORKFLOW.departmentAuthorized ? 'Authorized' : 'Pending') : 'Not required');
-    setText('hodStepStatus', special ? (GHACEM_WORKFLOW.hodApproved ? 'Approved' : 'Pending') : 'Not required');
+    setText('hodStepStatus', special ? (GHACEM_WORKFLOW.hodApproved ? 'Approved' : (confined && !GHACEM_WORKFLOW.ehsTestCompleted ? 'Waiting for EHS test' : 'Pending')) : 'Not required');
     setText('ehsStepStatus', confined ? (GHACEM_WORKFLOW.ehsTestCompleted ? 'Completed' : (GHACEM_WORKFLOW.ehsTestRequested ? 'Requested' : 'Awaiting request')) : 'Not required');
 
     const badge = document.getElementById('approvalStatusBadge');
@@ -3514,7 +3672,12 @@ async function doSync(){
         GHACEM_WORKFLOW.hodApproved
       : true;
 
-    if (confined) ready = ready && GHACEM_WORKFLOW.ehsTestCompleted;
+    if (confined) {
+      ready = GHACEM_WORKFLOW.managementAuthorized &&
+              GHACEM_WORKFLOW.supervisorApproved &&
+              GHACEM_WORKFLOW.ehsTestCompleted &&
+              GHACEM_WORKFLOW.hodApproved;
+    }
 
     badge.textContent = ready ? 'READY FOR SUBMISSION' : 'APPROVALS / EHS ACTION REQUIRED';
     badge.style.background = ready ? '#e7f7ed' : '#fff0f0';
@@ -3545,9 +3708,12 @@ async function doSync(){
       const confined = isConfinedSpace();
       const height = isHeight();
       if (!(confined || height)) return true;
-      const approvals = GHACEM_WORKFLOW.departmentAuthorized &&
-                        GHACEM_WORKFLOW.hodApproved;
-      return confined ? approvals && GHACEM_WORKFLOW.ehsTestCompleted : approvals;
+      if (confined) {
+        return GHACEM_WORKFLOW.departmentAuthorized &&
+               GHACEM_WORKFLOW.ehsTestCompleted &&
+               GHACEM_WORKFLOW.hodApproved;
+      }
+      return GHACEM_WORKFLOW.departmentAuthorized && GHACEM_WORKFLOW.hodApproved;
     }
   };
 
@@ -3599,10 +3765,13 @@ BACKEND WORKFLOW CONTRACT
 1) On permit submission, send email to both HoD and Manager.
 2) For 04B Confined Space:
    - Department Authorization / Site Supervisor approval MUST be recorded first.
-   - Only after management authorization may the EHS test request be sent.
-   - Permit submission MUST remain blocked until EHS records the space test as completed.
+   - Only after Site Supervisor authorization may the EHS test request be sent.
+   - EHS completes the confined-space entry test through the emailed EHS link.
+   - ONLY AFTER EHS completes the test is the HoD approval link sent.
+   - Permit becomes Approved only after HoD approval.
 3) For 04B Confined Space and 04C Working at Height:
    - Require BOTH approvals: any on-site Supervisor + HoD.
+   - For confined space, HoD approval is strictly after the EHS test.
    - HoD approval is completed through the emailed approval link.
    - Supervisor approval is recorded on site.
 4) Store: DepartmentAuthorization, SupervisorApproval, HODApproval, EHSTestRequested,
@@ -3674,7 +3843,7 @@ BACKEND WORKFLOW CONTRACT
       updateConfinedSpaceAction();
       return;
     }
-    const confined=(h.typeOfWork||[]).some(v=>/confined\\s*space/i.test(v));
+    const confined=(h.typeOfWork||[]).some(v=>/confined\s*space/i.test(v));
     if(!confined){
       st.textContent='Please select “Confined Space Entry” first.';
       return;
