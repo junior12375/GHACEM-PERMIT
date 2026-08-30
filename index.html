@@ -79,6 +79,7 @@
   .statuspill.draft{background:var(--surface-2);color:var(--text-dim);border:1px solid var(--border);}
   .statuspill.active{background:var(--caution-dim);color:var(--caution);}
   .statuspill.closed{background:var(--good-dim);color:var(--good);}
+.statuspill.approved{background:var(--good-dim);color:var(--good);}
   .statuspill.overdue{background:var(--danger-dim);color:var(--danger);}
   .statuspill.cancelled{background:var(--danger-dim);color:var(--danger);}
 
@@ -446,7 +447,215 @@
     .crewrow{display:block;}
     .crewrow input,.crewrow .btn{width:100%;margin-bottom:6px;}
   }
+
+/* ================= ENHANCED MANAGEMENT UI ================= */
+.exec-commandbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0 14px;padding:12px 14px;background:linear-gradient(135deg,var(--surface-2),var(--surface));border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.exec-commandbar .left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.exec-commandbar .eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);font-weight:800}.exec-commandbar .live{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--good);padding:5px 8px;border-radius:999px;background:var(--good-dim)}.exec-commandbar .live i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.exec-kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:14px 0}.exec-kpi{position:relative;min-height:92px;padding:13px 14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}.exec-kpi:after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--accent);opacity:.75}.exec-kpi.warn:after{background:var(--caution)}.exec-kpi.danger:after{background:var(--danger)}.exec-kpi.good:after{background:var(--good)}.exec-kpi .label{font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-dim);font-weight:800}.exec-kpi .value{font-family:var(--font-m);font-size:27px;font-weight:800;margin-top:8px;line-height:1}.exec-kpi .sub{font-size:9.5px;color:var(--text-dim);margin-top:7px}
+.control-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:12px;margin:12px 0}.control-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;min-width:0}.control-panel h5{margin:0 0 10px;font-size:11px;text-transform:uppercase;letter-spacing:.07em}.control-panel .panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.panel-head .hint{font-size:9.5px;color:var(--text-dim)}
+.workflow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.workflow-step{padding:10px 8px;border:1px solid var(--border);border-radius:9px;background:var(--surface-2);text-align:center}.workflow-step .num{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;margin:0 auto 6px;background:var(--bg);border:1px solid var(--border);font:700 10px var(--font-m);color:var(--text-dim)}.workflow-step strong{display:block;font-size:9.5px}.workflow-step span{display:block;font-size:8.5px;color:var(--text-dim);margin-top:3px}.workflow-step.active{border-color:var(--accent);background:var(--accent-dim)}.workflow-step.active .num{border-color:var(--accent);color:var(--accent)}
+.alert-list{display:flex;flex-direction:column;gap:7px;max-height:235px;overflow:auto}.control-alert{display:flex;align-items:center;gap:9px;padding:9px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2)}.control-alert .dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;background:var(--good)}.control-alert.warn .dot{background:var(--caution)}.control-alert.danger .dot{background:var(--danger)}.control-alert .body{min-width:0;flex:1}.control-alert strong{display:block;font-size:10px}.control-alert small{display:block;color:var(--text-dim);font-size:8.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.control-alert .tag{font-size:8px;font-weight:800;text-transform:uppercase;color:var(--text-dim)}
+.risk-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:999px;font-size:8px;font-weight:800;text-transform:uppercase;border:1px solid var(--border)}.risk-pill.low{color:var(--good);background:var(--good-dim)}.risk-pill.medium{color:var(--caution);background:var(--caution-dim)}.risk-pill.high,.risk-pill.critical{color:var(--danger);background:var(--danger-dim)}.risk-table{width:100%;border-collapse:collapse;font-size:9px}.risk-table th,.risk-table td{padding:7px 6px;border-bottom:1px solid var(--border);text-align:left}.risk-table th{color:var(--text-dim);font-size:8px;text-transform:uppercase;letter-spacing:.06em}.risk-table td:last-child{text-align:right}.risk-score{font:800 10px var(--font-m)}
+.audit-strip{display:flex;gap:8px;overflow:auto;padding-bottom:2px}.audit-item{min-width:150px;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2)}.audit-item .time{font:700 8px var(--font-m);color:var(--text-dim)}.audit-item strong{display:block;font-size:9.5px;margin-top:4px}.audit-item span{display:block;font-size:8.5px;color:var(--text-dim);margin-top:2px}.role-strip{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.role-chip{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:5px 8px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);color:var(--text-dim)}.role-chip.active{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+@media(max-width:1050px){.exec-kpi-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.control-grid{grid-template-columns:1fr}}@media(max-width:650px){.exec-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.workflow{grid-template-columns:1fr 1fr}.workflow-step:last-child{grid-column:1/-1}}
 </style>
+
+<style id="ghacem-reference-production-theme">
+:root{
+ --bg:#020806;--surface:#07100d;--surface-2:#0d1713;--border:#294735;
+ --border-soft:#38453f;--text:#f1f3f1;--text-dim:#b7beb9;
+ --accent:#00e83f;--accent-2:#16c83d;--danger:#ff4d4d;
+}
+html,body{background:var(--bg)!important;color:var(--text)!important;}
+body{
+ font-family:var(--font-b),Arial,sans-serif!important;
+ font-size:16px!important;
+}
+main{max-width:1500px!important;margin:0 auto!important;padding:8px 20px 70px!important;}
+/* Hide the old decorative banner area so the permit navigation starts like the reference */
+.sitebanner{display:none!important;}
+/* Reference navigation */
+.subtabs{
+ display:flex!important;gap:12px!important;flex-wrap:wrap!important;
+ align-items:center!important;padding:0 0 12px!important;margin:0!important;
+ position:static!important;background:transparent!important;border:0!important;
+}
+.subtabbtn{
+ flex:0 0 auto!important;
+ min-height:58px!important;padding:12px 30px!important;
+ border:1px solid #4d5853!important;border-radius:999px!important;
+ background:#07100d!important;color:#d9ddda!important;
+ font-family:var(--font-d)!important;font-size:20px!important;font-weight:800!important;
+ letter-spacing:-.015em!important;box-shadow:none!important;
+}
+.subtabbtn:hover{border-color:#74807a!important;color:#fff!important;}
+.subtabbtn.active{
+ border:1.5px solid var(--accent)!important;
+ color:var(--accent)!important;
+ background:rgba(0,232,63,.025)!important;
+ box-shadow:0 0 0 1px rgba(0,232,63,.04) inset!important;
+}
+.subtabbtn[data-sub="supervisor"],
+.subtabbtn[data-sub="ehsmanager"],
+.subtabbtn[data-sub="manager"]{font-size:18px!important;}
+/* Permit pane */
+.subpane{
+ position:relative!important;
+ min-height:500px;
+ background:linear-gradient(180deg,#06100d,#040a08)!important;
+ border:1px solid #2a6b40!important;
+ border-radius:14px!important;
+ padding:0 445px 24px 0!important;
+ overflow:visible!important;
+}
+.subpane.hidden{display:none!important;}
+#sub-general,#sub-hotwork,#sub-height{
+ box-shadow:0 0 0 1px rgba(0,232,63,.015) inset;
+}
+/* Permit heading */
+.subpane>.statuspill{position:absolute;right:18px;top:18px;z-index:5;}
+.subpane>.permitcode{
+ padding:24px 24px 0!important;font-size:13px!important;color:#8e9993!important;
+}
+.subpane>.permittitle{
+ padding:4px 24px 17px!important;margin:0!important;
+ font-family:var(--font-d)!important;font-size:28px!important;font-weight:900!important;
+ text-transform:uppercase!important;color:var(--accent)!important;letter-spacing:-.02em!important;
+ border-bottom:1px solid #2a6b40!important;
+}
+.subpane>.paneintro{padding:0 24px!important;font-size:16px!important;color:#d8ddda!important;line-height:1.5!important;}
+/* Forms */
+.subpane [id^="form-"]{padding:0!important;}
+.pc-section{
+ padding:22px 24px!important;margin:0!important;
+ border-top:1px solid #2a6b40!important;background:transparent!important;
+}
+.pc-section h5{
+ font-size:19px!important;color:var(--accent)!important;font-weight:900!important;
+ margin:0 0 13px!important;text-transform:uppercase!important;
+}
+label.f{
+ font-size:16px!important;color:#f0f2f0!important;
+ margin:15px 0 7px!important;letter-spacing:0!important;
+}
+input,select,textarea{
+ font-family:var(--font-b),Arial,sans-serif!important;
+ font-size:16px!important;color:#eef2ef!important;
+ background:#121a17!important;border:1px solid #58635e!important;
+ border-radius:8px!important;padding:12px 14px!important;min-height:49px!important;
+}
+textarea{min-height:95px!important;line-height:1.45!important;}
+input::placeholder,textarea::placeholder{color:#aeb5b1!important;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;outline:none!important;box-shadow:0 0 0 2px rgba(0,232,63,.10)!important;}
+.chip{font-size:15px!important;padding:10px 14px!important;}
+.formsubmit{
+ margin:0!important;padding:20px 24px!important;
+ border-top:1px solid #2a6b40!important;background:#050c09!important;
+}
+.formsubmit .btn{min-height:52px!important;font-size:17px!important;font-weight:900!important;border-radius:8px!important;}
+.formsubmit-note{font-size:13px!important;padding:0 24px 20px!important;color:#9fa9a3!important;}
+/* Right workflow/action/help column */
+.reference-sidebar{
+ position:absolute;top:0;right:0;width:425px;padding:0 0 0 16px;
+ display:flex;flex-direction:column;gap:12px;
+}
+.reference-card{
+ background:linear-gradient(180deg,#07100d,#050b09);
+ border:1px solid #2a6b40;border-radius:13px;padding:18px 20px;
+}
+.reference-title{
+ display:flex;align-items:center;gap:10px;margin:0 0 16px;
+ color:var(--accent);font-family:var(--font-d)!important;
+ font-size:19px!important;font-weight:900!important;text-transform:uppercase!important;
+}
+.reference-step{display:grid;grid-template-columns:36px 1fr;gap:12px;min-height:65px;position:relative;}
+.reference-step:not(:last-child):after{
+ content:"";position:absolute;left:17px;top:36px;bottom:-2px;
+ border-left:2px dashed #66706c;
+}
+.reference-dot{
+ width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+ background:#5b5d5e;color:#111;font-weight:900;font-size:16px;z-index:2;
+}
+.reference-step.current .reference-dot,.reference-step.done .reference-dot{background:var(--accent);}
+.reference-label{font-family:var(--font-d);font-size:16px;font-weight:900;line-height:1.2;}
+.reference-sub{font-size:14px;color:#cdd3cf;margin-top:5px;line-height:1.35;}
+.reference-action{
+ width:100%;min-height:49px;border-radius:8px;margin-top:10px;
+ font-family:var(--font-d);font-size:16px;font-weight:900;cursor:pointer;
+}
+.reference-action.primary{background:#18c83d;border:1px solid #18c83d;color:#041007;}
+.reference-action.outline{background:transparent;border:1px solid #00a83a;color:var(--accent);}
+.reference-action.neutral{background:transparent;border:1px solid #59635f;color:#f2f4f2;}
+/* Workflow/admin dashboards use the same card language */
+#sub-supervisor,#sub-ehsmanager,#sub-manager,#sub-admin{
+ padding:22px!important;
+}
+#sub-supervisor>.permittitle,#sub-ehsmanager>.permittitle,#sub-manager>.permittitle{
+ padding:0 0 8px!important;border-bottom:0!important;font-size:28px!important;
+}
+#sub-supervisor>.exec-actions,#sub-ehsmanager>.exec-actions,#sub-manager>.exec-actions{
+ display:flex;justify-content:flex-end;margin:0 0 14px;
+}
+#sub-supervisor #supervisorQueue,#sub-ehsmanager #ehsManagerQueue,#sub-manager #managerQueue{
+ background:transparent!important;
+}
+.exec-actions .btn,.histtoolbar button,.historytypes .btn,.histtypebtn{
+ border-radius:999px!important;font-size:15px!important;font-weight:800!important;
+ min-height:42px!important;padding:9px 17px!important;
+}
+.histtypebtn{
+ background:#07100d!important;border:1px solid #4b5751!important;color:#d7dbd8!important;
+}
+.histtypebtn.active{border-color:var(--accent)!important;color:var(--accent)!important;}
+.historytypes{
+ display:flex!important;gap:8px!important;flex-wrap:wrap!important;
+ padding:10px!important;background:#07100d!important;
+ border:1px solid var(--border)!important;border-radius:12px!important;
+}
+.histtoolbar{gap:10px!important;margin:12px 0!important;}
+.histtoolbar input,.histtoolbar select{min-height:45px!important;}
+.histcard,.exec-card,.vizcard,.control-panel,.statcard,.exec-banner{
+ background:linear-gradient(180deg,#08120e,#050b09)!important;
+ border:1px solid var(--border)!important;border-radius:13px!important;
+}
+.exec-card,.vizcard,.control-panel{padding:18px!important;}
+/* Admin sub-tabs and lock card */
+#adminContent>.historytypes{margin-bottom:16px!important;}
+.adminsubpane{
+ background:linear-gradient(180deg,#07100d,#050b09)!important;
+ border:1px solid var(--border)!important;border-radius:13px!important;
+ padding:20px!important;
+}
+.adminsubpane .permittitle{font-size:23px!important;color:var(--accent)!important;}
+.adminlock-card{border-color:#2a6b40!important;background:linear-gradient(180deg,#0b1511,#050b09)!important;}
+.adminlock-title{font-size:22px!important;color:var(--accent)!important;}
+.adminlock-sub{font-size:14px!important;}
+.adminlock-field input{font-size:16px!important;min-height:48px!important;}
+/* Footer */
+.sitefooter{
+ background:#07110d!important;border-top:1px solid #2a6b40!important;
+ min-height:48px!important;
+}
+.sitefooter *{font-size:14px!important;}
+/* Mobile */
+@media(max-width:1050px){
+ .subpane{padding:0 0 24px!important;}
+ .reference-sidebar{position:static;width:auto;padding:14px 20px 0;}
+}
+@media(max-width:700px){
+ main{padding:8px 10px 60px!important;}
+ .subtabs{gap:7px!important;}
+ .subtabbtn{flex:1 1 100%!important;font-size:16px!important;min-height:50px!important;padding:10px 14px!important;}
+ .subpane>.permitcode{padding:18px 16px 0!important;}
+ .subpane>.permittitle{padding:4px 16px 15px!important;font-size:23px!important;}
+ .pc-section{padding:18px 16px!important;}
+ .formsubmit{padding:16px!important;}
+ .formsubmit-note{padding:0 16px 16px!important;}
+ .reference-sidebar{padding:12px 16px 0;}
+}
+</style>
+
 </head>
 <body>
 
@@ -488,11 +697,20 @@
   </div>
 
 
-  <div class="subtabs">
+  
+<div id="workflowRoleHelp" style="margin:10px 0 14px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);font-size:11px;color:var(--text-dim);">
+  <strong style="color:var(--text);">Workflow:</strong>
+  Submit first → Site Supervisor authorizes → EHS tests confined space (if applicable) → HoD approves → permit automatically becomes <strong style="color:var(--good);">APPROVED</strong>.
+</div>
+
+<div class="subtabs">
     <button class="subtabbtn active" data-sub="general">General Work Permit</button>
     <button class="subtabbtn" data-sub="hotwork">Hot Work / Confined / Silo</button>
     <button class="subtabbtn" data-sub="height">Working at Height</button>
     <button class="subtabbtn" data-sub="signed">Signed Permits</button>
+    <button class="subtabbtn" data-sub="supervisor">Supervisor</button>
+    <button class="subtabbtn" data-sub="ehsmanager">EHS Manager</button>
+    <button class="subtabbtn" data-sub="manager">Manager</button>
     <button class="subtabbtn" data-sub="admin">Admin</button>
   </div>
 
@@ -512,6 +730,15 @@
     <div class="permitcode">GHA.OCPF 04B</div>
     <div class="permittitle">Hot Work / Confined Space / Silo Entry</div>
     <div id="form-hotwork"></div>
+    <div id="confinedSpaceActionPanel" style="display:block;margin:14px 0;padding:16px;border:2px solid var(--accent);border-radius:12px;background:var(--surface-2);">
+      <div style="font-weight:800;margin-bottom:6px;">⚠️ Confined Space — EHS Test Request</div>
+      <div id="confinedSpaceActionText" style="font-size:11px;color:var(--text-dim);margin-bottom:10px;">
+        Select <strong>Confined Space Entry</strong> under Type of Work. This button is available before the final permit submission.
+        The system will first create/save the permit record, then EHS will only be alerted after Site Supervisor / Department Authorization.
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" id="notifyEhsConfinedBtn" disabled title="Site Supervisor approval is required first">🔒 Notify EHS for Confined Space Test</button>
+      <span id="notifyEhsConfinedStatus" style="display:block;font-size:11px;margin-top:9px;"></span>
+    </div>
     <div class="formsubmit">
       <span id="submitHint-hotwork" class="submithint"></span>
       <button class="btn btn-primary" id="submitBtn-hotwork">Submit Hot Work Permit</button>
@@ -548,6 +775,28 @@
     <div id="signedPermitList"></div>
   </div>
 
+
+  <div class="subpane hidden" id="sub-supervisor">
+    <div class="permittitle">Site Supervisor</div>
+    <p class="paneintro">Authorize submitted confined-space and working-at-height permits. Your authorization is the Department Authorization / first approval.</p>
+    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshSupervisorBtn">↻ Refresh</button></div>
+    <div id="supervisorQueue"></div>
+  </div>
+
+  <div class="subpane hidden" id="sub-ehsmanager">
+    <div class="permittitle">EHS Manager</div>
+    <p class="paneintro">Review confined-space test requests and record the EHS test completion before the permit can become approved.</p>
+    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshEhsManagerBtn">↻ Refresh</button></div>
+    <div id="ehsManagerQueue"></div>
+  </div>
+
+  <div class="subpane hidden" id="sub-manager">
+    <div class="permittitle">Manager</div>
+    <p class="paneintro">Review submitted permits and approval status. Manager access is read-only; HoD approval is handled through the emailed approval link.</p>
+    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshManagerBtn">↻ Refresh</button></div>
+    <div id="managerQueue"></div>
+  </div>
+
   <div class="subpane hidden" id="sub-admin">
     <div id="adminAuthPanel" class="adminlock">
       <div class="adminlock-card" id="adminlockCard">
@@ -562,12 +811,16 @@
     </div>
 
     <div id="adminContent" class="hidden">
+      <div style="margin:0 0 12px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);font-size:10px;color:var(--text-dim);">
+        <strong style="color:var(--text);">READ-ONLY MANAGEMENT VIEW</strong> · Admin can review, search, filter, export and open permits, but cannot alter permit records.
+      </div>
       <div class="historytypes" style="margin-bottom:16px;">
         <button class="histtypebtn active" data-adminsub="overview">Overview</button>
         <button class="histtypebtn" data-adminsub="active">Active Permits</button>
         <button class="histtypebtn" data-adminsub="renewal">Renewal History</button>
         <button class="histtypebtn" data-adminsub="overdue">Permits to be Closed</button>
         <button class="histtypebtn" data-adminsub="closed">Closed Permits</button>
+        <button class="histtypebtn" data-adminsub="all">All Permits</button>
         <button class="btn btn-ghost btn-sm" id="adminLockBtn" style="margin-left:auto;">Lock</button>
       </div>
 
@@ -580,6 +833,10 @@
           <button class="btn btn-ghost btn-sm" id="exportManagementCsvBtn">Export Management CSV</button>
         </div>
         <div id="executiveBanner"></div>
+        <div class="exec-commandbar"><div class="left"><span class="eyebrow">Executive Control Centre</span><span class="live"><i></i>Live operational view</span></div><div class="role-strip" style="margin:0"><span class="role-chip active">Admin · Read Only</span><span class="role-chip">EHS</span><span class="role-chip">Manager</span><span class="role-chip">Supervisor</span></div></div>
+        <div id="enhancedKpis" class="exec-kpi-grid"></div>
+        <div class="control-grid"><div class="control-panel"><div class="panel-head"><h5>Permit Approval Workflow</h5><span class="hint">Controlled lifecycle</span></div><div class="workflow"><div class="workflow-step active"><div class="num">1</div><strong>Draft</strong><span>Permit prepared</span></div><div class="workflow-step"><div class="num">2</div><strong>Submitted</strong><span>Sent to EHS</span></div><div class="workflow-step"><div class="num">3</div><strong>EHS Review</strong><span>Controls verified</span></div><div class="workflow-step"><div class="num">4</div><strong>Approved</strong><span>Manager authorises</span></div><div class="workflow-step"><div class="num">5</div><strong>Closed</strong><span>Work completed</span></div></div></div><div class="control-panel"><div class="panel-head"><h5>Management Alerts</h5><span class="hint">Needs attention</span></div><div id="enhancedAlerts" class="alert-list"></div></div></div>
+        <div class="control-grid"><div class="control-panel"><div class="panel-head"><h5>Highest-Risk Open Permits</h5><span class="hint">Prioritised automatically</span></div><div id="enhancedRiskTable"></div></div><div class="control-panel"><div class="panel-head"><h5>Recent Audit Activity</h5><span class="hint">Traceability</span></div><div id="enhancedAudit" class="audit-strip"></div></div></div>
         <div id="executiveKpis" class="statsbar"></div>
         <div class="exec-grid">
           <div class="exec-card"><h5>Management Attention Required</h5><div id="executiveActions"></div></div>
@@ -608,17 +865,6 @@
           <button class="btn btn-ghost btn-sm" id="refreshActiveListBtn" style="margin-left:auto;">↻ Refresh</button>
         </div>
 
-        <div class="adminsubpane hidden" id="adminsub-renewal">
-          <div class="permittitle" style="margin-bottom:4px;">Renewal History</div>
-          <p class="paneintro">Completed renewals for General Work and Working at Height permits.</p>
-          <div class="historytypes" data-mode="renewal">
-            <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
-            <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
-            <button class="histtypebtn" data-histtype="height">Working at Height</button>
-            <button class="btn btn-ghost btn-sm" id="refreshRenewalListBtn" style="margin-left:auto;">↻ Refresh</button>
-          </div>
-          <div id="renewalPermitList"></div>
-        </div>
         <div class="histtoolbar">
           <input type="text" id="activeSearch" placeholder="Search by location, description, or work order…">
           <select id="activeSort">
@@ -628,6 +874,18 @@
         </div>
         <div id="activePermitList"></div>
       </div>
+
+      <div class="adminsubpane hidden" id="adminsub-renewal">
+          <div class="permittitle" style="margin-bottom:4px;">Renewal History</div>
+          <p class="paneintro">Completed renewals for General Work and Working at Height permits.</p>
+          <div class="historytypes" data-mode="renewal">
+            <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
+            <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
+            <button class="histtypebtn" data-histtype="height">Working at Height</button>
+            <button class="btn btn-ghost btn-sm" id="refreshRenewalListBtn" style="margin-left:auto;">↻ Refresh</button>
+        </div>
+          <div id="renewalPermitList"></div>
+        </div>
 
       <div class="adminsubpane hidden" id="adminsub-overdue">
         <div class="permittitle" style="margin-bottom:4px;">Permits to be Closed</div>
@@ -646,6 +904,30 @@
           </select>
         </div>
         <div id="toClosePermitList"></div>
+      </div>
+
+
+      <div class="adminsubpane hidden" id="adminsub-all">
+        <div class="permittitle" style="margin-bottom:4px;">All Permits</div>
+        <p class="paneintro">Read-only management register of every permit retrieved from the live backend.</p>
+        <div class="histtoolbar">
+          <input type="text" id="adminAllSearch" placeholder="Search permit, work order, location, contractor, status…">
+          <select id="adminAllStatus">
+            <option value="">All statuses</option>
+            <option value="active">Active</option>
+            <option value="awaiting">Awaiting Approval</option>
+            <option value="overdue">Overdue</option>
+            <option value="closed">Closed</option>
+          </select>
+          <select id="adminAllType">
+            <option value="">All permit types</option>
+            <option value="general">General Work</option>
+            <option value="hotwork">Hot Work / Confined / Silo</option>
+            <option value="height">Working at Height</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" id="refreshAllAdminBtn">↻ Refresh</button>
+        </div>
+        <div id="adminAllPermitList"></div>
       </div>
 
       <div class="adminsubpane hidden" id="adminsub-closed">
@@ -1604,6 +1886,7 @@ async function doSync(){
   function renderAll(){
     document.getElementById('form-general').innerHTML = renderGeneralForm();
     document.getElementById('form-hotwork').innerHTML = renderHotworkForm();
+    if(typeof updateConfinedSpaceAction==='function') setTimeout(updateConfinedSpaceAction,0);
     document.getElementById('form-height').innerHTML = renderHeightForm();
     ['general','hotwork','height'].forEach(k=>{
       const pill = document.getElementById('pill-'+k);
@@ -1805,6 +2088,7 @@ async function doSync(){
     const formLabel = FORM_LABEL[formKey];
     const missing = getMissingFor(formKey);
     const hint = document.getElementById('submitHint-'+formKey);
+
     if(missing.length > 0){
       toast('Missing required signatures');
       hint.innerHTML = 'Missing: ' + missing.map(m=>m.label).join(' · ');
@@ -1857,6 +2141,8 @@ async function doSync(){
       return;
     }
 
+    ghacemLastSubmissionIds[formKey] = result.submissionId || pd(formKey)._submissionId || ghacemLastSubmissionIds[formKey] || '';
+    try{ localStorage.setItem('ghacem_last_'+formKey, ghacemLastSubmissionIds[formKey]); }catch(e){}
     permitData[formKey] = JSON.parse(JSON.stringify(DEFAULTS[formKey]));
     saveState();
     renderAll();
@@ -1864,11 +2150,64 @@ async function doSync(){
       ? formLabel + ' updated — existing row updated.'
       : formLabel + ' submitted — new row created.');
   }
+
+  async function workflowPost(action, formType, submissionId, approvedBy) {
+    const data = {'Approved By': approvedBy || ''};
+    return await postToBackend({action, formType, submissionId, data});
+  }
+
+  function recordTypeFromPermit_(r) {
+    const t = String(r['Type of Work'] || '').toLowerCase();
+    return t.indexOf('confined space') >= 0 ? 'confined' : 'other';
+  }
+
+  function renderWorkflowQueues() {
+    const all = enhancedAllRecords();
+    const special = all.filter(x => (x.formType === 'hotwork' || x.formType === 'height') && !recordIsClosed(x.formType,x.r));
+    const sup = document.getElementById('supervisorQueue');
+    if (sup) {
+      const pending = special.filter(x => String(x.r['Department Authorization']||'').toLowerCase() !== 'approved');
+      sup.innerHTML = pending.length ? pending.map(x => `
+        <div class="histcard" style="margin:10px 0;padding:14px;border:1px solid var(--border);border-radius:12px;">
+          <strong>${escText(FORM_LABEL[x.formType])}</strong><br><span class="muted">${escText(x.r['Submission ID']||'')}</span>
+          <div style="margin:6px 0;font-size:11px;">${escText(x.r['Location']||x.r['Department/Location']||'')} · WO: ${escText(workOrderForRecord(x.formType,x.r)||'—')}</div>
+          <button class="btn btn-primary btn-sm" data-sup-approve="${escAttr(x.formType)}" data-sup-id="${escAttr(x.r['Submission ID']||'')}">Authorize / Approve</button>
+        </div>`).join('') : '<div class="emptyState">No permits are waiting for Site Supervisor authorization.</div>';
+      sup.querySelectorAll('[data-sup-approve]').forEach(b=>b.onclick=async()=>{
+        b.disabled=true; const r=await workflowPost('department_authorize',b.dataset.supApprove,b.dataset.supId,'Site Supervisor');
+        toast(r.ok?'Site Supervisor authorization recorded.':(r.error||'Authorization failed.')); await loadHistoryCache(); renderWorkflowQueues(); if(typeof syncConfinedPanelFromHistory==='function') syncConfinedPanelFromHistory();
+      });
+    }
+
+    const ehs = document.getElementById('ehsManagerQueue');
+    if (ehs) {
+      const pendingEhs = all.filter(x => x.formType==='hotwork' && /confined\s*space/i.test(String(x.r['Type of Work']||'')) && String(x.r['EHS Test Completed']||'').toLowerCase() !== 'completed' && String(x.r['Department Authorization']||'').toLowerCase()==='approved');
+      ehs.innerHTML = pendingEhs.length ? pendingEhs.map(x=>`
+        <div class="histcard" style="margin:10px 0;padding:14px;border:1px solid var(--border);border-radius:12px;">
+          <strong>Confined Space Test Required</strong><br><span class="muted">${escText(x.r['Submission ID']||'')}</span>
+          <div style="margin:6px 0;font-size:11px;">${escText(x.r['Location']||'')} · WO: ${escText(workOrderForRecord(x.formType,x.r)||'—')}</div>
+          <button class="btn btn-primary btn-sm" data-ehs-complete="${escAttr(x.formType)}" data-ehs-id="${escAttr(x.r['Submission ID']||'')}">Record EHS Test Completed</button>
+        </div>`).join('') : '<div class="emptyState">No confined-space EHS tests are currently awaiting completion.</div>';
+      ehs.querySelectorAll('[data-ehs-complete]').forEach(b=>b.onclick=async()=>{
+        b.disabled=true; const r=await workflowPost('ehs_test_complete',b.dataset.ehsComplete,b.dataset.ehsId,'EHS Manager');
+        toast(r.ok?'EHS test recorded.':(r.error||'EHS update failed.')); await loadHistoryCache(); renderWorkflowQueues();
+      });
+    }
+
+    const mgr = document.getElementById('managerQueue');
+    if (mgr) {
+      const pending = all.filter(x => !recordIsClosed(x.formType,x.r) && String(x.r['Approval Status']||'').toLowerCase() !== 'approved');
+      mgr.innerHTML = pending.length ? `<div class="tablescroll"><table class="exec-table"><thead><tr><th>Permit</th><th>Work Order</th><th>Permit Status</th><th>Approval</th><th>Supervisor</th><th>HoD</th><th>EHS</th></tr></thead><tbody>` + pending.map(x=>`<tr><td>${escText(FORM_LABEL[x.formType])}<br><span class="muted">${escText(x.r['Submission ID']||'')}</span></td><td>${escText(workOrderForRecord(x.formType,x.r)||'—')}</td><td>${escText(x.r['Permit Status']||'Submitted - Pending Approval')}</td><td>${escText(x.r['Approval Status']||'Pending Approval')}</td><td>${escText(x.r['Department Authorization']||'Pending')}</td><td>${escText(x.r['HoD Approval']||'Pending')}</td><td>${escText(x.r['EHS Test Completed']||'Not required')}</td></tr>`).join('')+`</tbody></table></div>` : '<div class="emptyState">No permits are currently awaiting approval.</div>';
+    }
+  }
+
+  function refreshWorkflowQueues(){ loadHistoryCache().then(renderWorkflowQueues); }
+
   document.getElementById('submitBtn-general').addEventListener('click', ()=> submitOne('general'));
   document.getElementById('submitBtn-hotwork').addEventListener('click', ()=> submitOne('hotwork'));
   document.getElementById('submitBtn-height').addEventListener('click', ()=> submitOne('height'));
 
-  const PUBLIC_SUBS = ['general','hotwork','height','signed','admin'];
+  const PUBLIC_SUBS = ['general','hotwork','height','signed','supervisor','ehsmanager','manager','admin'];
   document.querySelectorAll('.subtabs > .subtabbtn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.remove('active'));
@@ -1895,6 +2234,7 @@ async function doSync(){
   // ================= ADMIN ACCESS (client-side gate only — see note in chat) =================
   const ADMIN_PASSWORD = 'ghacem2026';
   let isAdminUnlocked = false;
+  let ghacemLastSubmissionIds = {general:'', hotwork:'', height:''};
   let currentAdminSub = 'overview';
   let pendingAdminDeepLink = null;
 
@@ -1903,13 +2243,20 @@ async function doSync(){
     else if(currentAdminSub === 'active') { renderStatsBar(); renderPermitList(activeType, 'active'); }
     else if(currentAdminSub === 'renewal') renderPermitList(renewalType, 'renewal');
     else if(currentAdminSub === 'overdue') renderPermitList(overdueType, 'overdue');
+    else if(currentAdminSub === 'all') renderAllAdminPermits();
     else { renderStatsBar(); renderPermitList(closedType, 'closed'); }
   }
+  try {
+    if (sessionStorage.getItem('ghacem_admin_unlocked') === '1') {
+      isAdminUnlocked = true;
+    }
+  } catch(e) {}
+
   function showAdminContent(){
     document.getElementById('adminAuthPanel').classList.add('hidden');
     document.getElementById('adminContent').classList.remove('hidden');
   }
-  document.getElementById('adminUnlockBtn').addEventListener('click', async ()=>{
+  document.getElementById('adminUnlockBtn').addEventListener('click', ()=>{
     const input = document.getElementById('adminPasswordInput');
     const err = document.getElementById('adminAuthError');
     if(input.value === ADMIN_PASSWORD){
@@ -1917,27 +2264,28 @@ async function doSync(){
       try{ sessionStorage.setItem('ghacem_admin_unlocked', '1'); }catch(e){}
       input.value = ''; err.textContent = '';
       showAdminContent();
-      await loadHistoryCache();
-      if(pendingAdminDeepLink){
-        const { type, id } = pendingAdminDeepLink;
-        pendingAdminDeepLink = null;
-        const rec = (historyCache[type]||[]).find((r,i)=> histKey(r,i) === id);
-        const mode = (rec && recordIsClosed(type, rec)) ? 'closed' : 'overdue';
-        if(mode === 'closed'){ closedType = type; closedExpanded.add(id); } else { overdueType = type; overdueExpanded.add(id); }
-        historyHighlightId = id; historyHighlightMode = mode;
-        currentAdminSub = mode;
-        document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.toggle('active', b.dataset.adminsub===mode));
-        document.querySelectorAll('.adminsubpane').forEach(p=> p.classList.toggle('hidden', p.id !== 'adminsub-'+mode));
-        document.querySelectorAll(`.historytypes[data-mode="${mode}"] .histtypebtn`).forEach(b=>b.classList.toggle('active', b.dataset.histtype===type));
-        if(mode === 'closed') renderStatsBar();
-        renderPermitList(type, mode);
-        setTimeout(()=>{
-          const card = document.querySelector(`[data-histkey="${CSS.escape(id)}"]`);
-          if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
-        }, 50);
-      } else {
-        renderCurrentAdminSub();
-      }
+      loadHistoryCache().then(()=>{
+        if(pendingAdminDeepLink){
+          const { type, id } = pendingAdminDeepLink;
+          pendingAdminDeepLink = null;
+          const rec = (historyCache[type]||[]).find((r,i)=> histKey(r,i) === id);
+          const mode = (rec && recordIsClosed(type, rec)) ? 'closed' : 'overdue';
+          if(mode === 'closed'){ closedType = type; closedExpanded.add(id); } else { overdueType = type; overdueExpanded.add(id); }
+          historyHighlightId = id; historyHighlightMode = mode;
+          currentAdminSub = mode;
+          document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.toggle('active', b.dataset.adminsub===mode));
+          document.querySelectorAll('.adminsubpane').forEach(p=> p.classList.toggle('hidden', p.id !== 'adminsub-'+mode));
+          document.querySelectorAll(`.historytypes[data-mode="${mode}"] .histtypebtn`).forEach(b=>b.classList.toggle('active', b.dataset.histtype===type));
+          if(mode === 'closed') renderStatsBar();
+          renderPermitList(type, mode);
+          setTimeout(()=>{
+            const card = document.querySelector(`[data-histkey="${CSS.escape(id)}"]`);
+            if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
+          }, 50);
+        } else {
+          renderCurrentAdminSub();
+        }
+      });
     } else {
       err.textContent = 'Incorrect password.';
       const card = document.getElementById('adminlockCard');
@@ -2030,6 +2378,100 @@ async function doSync(){
     catch(e){ toast('Could not copy — link: ' + text); }
     ta.remove();
   }
+
+
+  function adminAllRows() {
+    const rows = [];
+    Object.entries(historyCache).forEach(([formType, records]) => {
+      records.forEach((record, i) => {
+        rows.push({ formType, record, id: histKey(record, i) });
+      });
+    });
+    return rows;
+  }
+
+  function renderAllAdminPermits() {
+    const host = document.getElementById('adminAllPermitList');
+    if (!host) return;
+
+    const q = (document.getElementById('adminAllSearch')?.value || '').trim().toLowerCase();
+    const statusFilter = document.getElementById('adminAllStatus')?.value || '';
+    const typeFilter = document.getElementById('adminAllType')?.value || '';
+
+    let rows = adminAllRows().map(x => ({
+      ...x,
+      status: enhancedStatus(x.formType, x.record),
+      wo: workOrderForRecord(x.formType, x.record) || '',
+      location: x.record['Location'] || x.record['Department/Location'] || '',
+      updated: x.record['Last Updated'] || x.record['Submitted At'] || ''
+    }));
+
+    rows = rows.filter(x => {
+      const hay = [
+        FORM_LABEL[x.formType], x.wo, x.location, x.status,
+        x.record['Description'], x.record['Purpose'],
+        x.record['Contractor / Department'], x.record['Department'],
+        x.record['Status'], x.id
+      ].join(' ').toLowerCase();
+
+      const statusOk = !statusFilter ||
+        (statusFilter === 'active' && x.status === 'Active') ||
+        (statusFilter === 'awaiting' && x.status === 'Awaiting Approval') ||
+        (statusFilter === 'overdue' && x.status === 'Overdue') ||
+        (statusFilter === 'closed' && x.status === 'Closed');
+
+      return (!q || hay.includes(q)) && (!typeFilter || x.formType === typeFilter) && statusOk;
+    });
+
+    rows.sort((a,b) => new Date(b.updated) - new Date(a.updated));
+
+    if (!rows.length) {
+      host.innerHTML = '<div class="emptyState">No permits match the selected filters.</div>';
+      return;
+    }
+
+    host.innerHTML = `
+      <div class="tablescroll">
+        <table class="exec-table">
+          <thead><tr>
+            <th>Permit</th><th>Work Order</th><th>Location</th><th>Status</th><th>Updated</th><th>View</th>
+          </tr></thead>
+          <tbody>
+            ${rows.map(x => `
+              <tr>
+                <td><strong>${escText(FORM_LABEL[x.formType])}</strong><br><span class="muted">${escText(x.id)}</span></td>
+                <td>${escText(x.wo || '—')}</td>
+                <td>${escText(x.location || '—')}</td>
+                <td><span class="statuspill ${x.status.toLowerCase().replace(/\s+/g,'-')}" style="float:none;">${escText(x.status)}</span></td>
+                <td>${escText(String(x.updated || '—'))}</td>
+                <td><button class="btn btn-ghost btn-sm" data-admin-view="${escAttr(x.formType)}" data-admin-id="${escAttr(x.id)}">View</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>`;
+
+    host.querySelectorAll('[data-admin-view]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.adminView;
+        const id = btn.dataset.adminId;
+        const record = (historyCache[type] || []).find((r,i) => histKey(r,i) === id);
+        if (record) openReadOnlyPermit(type, record, id);
+      });
+    });
+  }
+
+  ['adminAllSearch','adminAllStatus','adminAllType'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', renderAllAdminPermits);
+    if (el && el.tagName === 'SELECT') el.addEventListener('change', renderAllAdminPermits);
+  });
+
+  const refreshAllAdminBtn = document.getElementById('refreshAllAdminBtn');
+  if (refreshAllAdminBtn) refreshAllAdminBtn.addEventListener('click', async () => {
+    await loadHistoryCache();
+    renderAllAdminPermits();
+  });
 
   document.getElementById('refreshActiveListBtn').addEventListener('click', async ()=>{
     await loadHistoryCache();
@@ -2740,6 +3182,12 @@ async function doSync(){
     toast('Management CSV downloaded.');
   }
 
+  // ================= ENHANCED MANAGEMENT CONTROL CENTRE =================
+  function enhancedPermitRisk(formType,r){let score=formType==='hotwork'?60:(formType==='height'?55:30);const text=JSON.stringify(r||{}).toLowerCase();['confined','electrical','energized','flammable','chemical','silo','hot material','fire'].forEach(t=>{if(text.includes(t))score+=6});if(formType==='hotwork'&&!r['Fire Extinguisher Photo Evidence'])score+=18;if(!r['Isolation Photo Evidence']&&(formType==='hotwork'||formType==='height'))score+=10;if(isOverdue(r))score+=18;score=Math.min(100,score);const level=score>=80?'Critical':score>=60?'High':score>=40?'Medium':'Low';return{score,level,cls:level.toLowerCase()};}
+  function enhancedStatus(formType,r){if(recordIsCancelled(r))return'Cancelled';if(recordIsClosed(formType,r))return'Closed';var a=String(r['Approval Status']||'').trim().toLowerCase();var p=String(r['Permit Status']||'').trim().toLowerCase();if(a==='approved'||p==='approved')return'Approved';if(a.indexOf('pending')===0||a.indexOf('awaiting')===0||p==='pending approval'||String(r['Renewal Status']||'')==='Pending Approval')return'Awaiting Approval';if(isOverdue(r))return'Overdue';return'Active';}
+  function enhancedAllRecords(){return['general','hotwork','height'].flatMap(formType=>(historyCache[formType]||[]).map((r,i)=>({formType,r,key:histKey(r,i)})));}
+  function renderEnhancedControlCentre(){const host=document.getElementById('enhancedKpis'),alerts=document.getElementById('enhancedAlerts'),riskHost=document.getElementById('enhancedRiskTable'),audit=document.getElementById('enhancedAudit');if(!host||!alerts||!riskHost||!audit)return;const all=enhancedAllRecords(),active=all.filter(x=>enhancedStatus(x.formType,x.r)==='Active'),overdue=all.filter(x=>enhancedStatus(x.formType,x.r)==='Overdue'),approval=all.filter(x=>enhancedStatus(x.formType,x.r)==='Awaiting Approval'),closed=all.filter(x=>enhancedStatus(x.formType,x.r)==='Closed'),high=all.filter(x=>!recordIsClosed(x.formType,x.r)).map(x=>({...x,risk:enhancedPermitRisk(x.formType,x.r)})).sort((a,b)=>b.risk.score-a.risk.score),evidenceMissing=all.filter(x=>!recordIsClosed(x.formType,x.r)&&((x.formType==='hotwork'&&!x.r['Fire Extinguisher Photo Evidence'])||((x.formType==='hotwork'||x.formType==='height')&&!x.r['Isolation Photo Evidence'])));host.innerHTML=[['TOTAL',all.length,'All submitted permits',''],['ACTIVE',active.length,'Currently open','good'],['AWAITING',approval.length,'Approval / renewal','warn'],['OVERDUE',overdue.length,'Closure required','danger'],['HIGH RISK',high.filter(x=>x.risk.score>=60).length,'Open high-risk permits','danger'],['APPROVED',all.filter(x=>enhancedStatus(x.formType,x.r)==='Approved').length,'Approved for work','good'],['CLOSED',closed.length,'Completed & retained','good']].map(k=>`<div class="exec-kpi ${k[3]}"><div class="label">${k[0]}</div><div class="value">${k[1]}</div><div class="sub">${k[2]}</div></div>`).join('');const alertRows=[];if(overdue.length)alertRows.push(`<div class="control-alert danger"><span class="dot"></span><div class="body"><strong>${overdue.length} permit${overdue.length>1?'s':''} overdue</strong><small>Open permits require closure follow-up.</small></div><span class="tag">Close</span></div>`);if(approval.length)alertRows.push(`<div class="control-alert warn"><span class="dot"></span><div class="body"><strong>${approval.length} awaiting approval</strong><small>Management/EHS decision required.</small></div><span class="tag">Review</span></div>`);if(evidenceMissing.length)alertRows.push(`<div class="control-alert warn"><span class="dot"></span><div class="body"><strong>${evidenceMissing.length} safety evidence gap${evidenceMissing.length>1?'s':''}</strong><small>Critical permits have missing evidence.</small></div><span class="tag">Evidence</span></div>`);if(!alertRows.length)alertRows.push(`<div class="control-alert"><span class="dot"></span><div class="body"><strong>No critical management alerts</strong><small>Permit operations are currently controlled.</small></div><span class="tag">OK</span></div>`);alerts.innerHTML=alertRows.join('');const rows=high.slice(0,6);riskHost.innerHTML=rows.length?`<table class="risk-table"><thead><tr><th>Permit</th><th>Work Order</th><th>Risk</th><th>Score</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${escText(FORM_LABEL[x.formType])}</td><td>${escText(workOrderForRecord(x.formType,x.r)||'—')}</td><td><span class="risk-pill ${x.risk.cls}">${x.risk.level}</span></td><td class="risk-score">${x.risk.score}</td></tr>`).join('')}</tbody></table>`:'<div style="font-size:9.5px;color:var(--text-dim);padding:8px 0">No open permits require risk prioritisation.</div>';const auditRows=[];all.sort((a,b)=>new Date(b.r['Last Updated'])-new Date(a.r['Last Updated']));all.slice(0,6).forEach(x=>{const d=new Date(x.r['Last Updated']);auditRows.push(`<div class="audit-item"><div class="time">${isNaN(d)?'—':d.toLocaleString()}</div><strong>${enhancedStatus(x.formType,x.r)}</strong><span>${escText(x.r['Work Order Number']||x.r['Work Order No.']||x.key)}</span></div>`)});audit.innerHTML=auditRows.length?auditRows.join(''):'<div class="audit-item"><div class="time">Now</div><strong>System ready</strong><span>Awaiting permit activity.</span></div>'; }
+
   function renderExecutiveOverview(){
     const s = executiveSummary();
     const banner = document.getElementById('executiveBanner');
@@ -2779,6 +3227,7 @@ async function doSync(){
     renderByDeptChart(s.departments.map(([name,d])=>[name,d.total]), 'vizByDeptExecutive');
     renderTrendChart(computeInsights().weeks, 'vizTrendExecutive');
     document.getElementById('executiveUpdatedAt').textContent = `Live dashboard · ${new Date().toLocaleString()}`;
+    renderEnhancedControlCentre();
   }
 
   document.getElementById('syncSettingsBtn').addEventListener('click', ()=>{
@@ -2825,7 +3274,15 @@ async function doSync(){
       ? 'Using built-in GHACEM sheet (leave blank, or paste a different URL to override)'
       : 'https://script.google.com/macros/s/.../exec';
     setSyncStatus(syncUrl ? 'ok' : '', syncUrl ? 'Connected — data syncs on Submit/Close' : 'Live sync not configured');
-    try{ if(sessionStorage.getItem('ghacem_admin_unlocked') === '1'){ isAdminUnlocked = true; showAdminContent(); } }catch(e){}
+    try{
+      if(sessionStorage.getItem('ghacem_admin_unlocked') === '1'){
+        isAdminUnlocked = true;
+        showAdminContent();
+        await loadHistoryCache();
+      }
+    }catch(error){
+      console.warn('Admin session restore unavailable:', error);
+    }
     renderAll();
     await openLinkedPermitFromUrl();
 }
@@ -2958,5 +3415,577 @@ async function doSync(){
   init();
 })();
 </script>
+
+<!-- GHACEM Approval & EHS Controls -->
+<section id="approvalControls" class="ghacem-approval-panel" style="margin:20px 0;padding:20px;border-radius:16px;border:1px solid rgba(0,0,0,.12);background:var(--card,#fff);">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+    <div>
+      <h3 style="margin:0 0 6px;">Approval & EHS Controls</h3>
+      <p style="margin:0;opacity:.75;">Controlled authorization for confined-space and work-at-height permits.</p>
+    </div>
+    <span id="approvalStatusBadge" style="padding:7px 12px;border-radius:999px;font-weight:700;background:#eef2f7;">NOT READY</span>
+  </div>
+
+  <div id="approvalSteps" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:16px;">
+    <div class="approval-step" data-step="supervisor" style="padding:14px;border-radius:12px;background:#f6f7f9;">
+      <b>1. Department Authorization / Site Supervisor</b><div id="supervisorStepStatus">Pending</div>
+    </div>
+    <div class="approval-step" data-step="hod" style="padding:14px;border-radius:12px;background:#f6f7f9;">
+      <b>3. HoD Approval</b><div id="hodStepStatus">Pending</div>
+    </div>
+    <div class="approval-step" data-step="ehs" style="padding:14px;border-radius:12px;background:#f6f7f9;">
+      <b>4. EHS Space Test</b><div id="ehsStepStatus">Not required</div>
+    </div>
+  </div>
+
+  <div id="confinedSpaceEhsBox" style="display:none;margin-top:16px;padding:16px;border-radius:12px;background:#fff8e6;border:1px solid #f0c36e;">
+    <b>Confined Space: EHS Test Required</b>
+    <p style="margin:7px 0 12px;">Site Supervisor / Department Authorization must be completed before EHS can receive the request to test the space.</p>
+    <button id="requestEhsTestBtn" type="button" style="padding:10px 16px;border:0;border-radius:10px;font-weight:700;cursor:pointer;">
+      Request EHS Space Test
+    </button>
+    <span id="ehsRequestMessage" style="margin-left:10px;"></span>
+  </div>
+
+  <div id="dualApprovalBox" style="display:none;margin-top:16px;padding:16px;border-radius:12px;background:#f3f7ff;border:1px solid #b9c9ee;">
+    <b>Two-Approval Requirement</b>
+    <p style="margin:7px 0 0;">This permit is submitted first. It then requires <strong>Site Supervisor / Department Authorization</strong> and <strong>HoD approval</strong> before it becomes Approved.</p>
+  </div>
+</section>
+
+
+<script>
+(function () {
+  const GHACEM_WORKFLOW = {
+        supervisorApproved: false,
+    departmentAuthorized: false,
+    hodApproved: false,
+    ehsTestRequested: false,
+    ehsTestCompleted: false
+  };
+
+  function getFormType() {
+    const candidates = [
+      window.currentPermitType, window.activePermitType, window.selectedPermitType,
+      document.querySelector('[name="permitType"]')?.value,
+      document.querySelector('#permitType')?.value
+    ].filter(Boolean).map(String).map(v => v.toLowerCase());
+
+    const text = document.body.innerText.toLowerCase();
+    if (candidates.some(v => v.includes('height')) || text.includes('working at height')) return 'height';
+    if (candidates.some(v => v.includes('confined')) || text.includes('confined space')) return 'hotwork';
+    return candidates[0] || 'general';
+  }
+
+  function isConfinedSpace() {
+    const t = getFormType();
+    return t === 'hotwork' && /confined\s*space/i.test(document.body.innerText);
+  }
+
+  function isHeight() {
+    return getFormType() === 'height';
+  }
+
+  function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  function renderWorkflow() {
+    const confined = isConfinedSpace();
+    const height = isHeight();
+    const special = confined || height;
+
+    const dual = document.getElementById('dualApprovalBox');
+    const ehsBox = document.getElementById('confinedSpaceEhsBox');
+    if (dual) dual.style.display = special ? '' : 'none';
+    if (ehsBox) ehsBox.style.display = confined ? '' : 'none';
+
+    setText('supervisorStepStatus', special ? (GHACEM_WORKFLOW.departmentAuthorized ? 'Authorized' : 'Pending') : 'Not required');
+    setText('hodStepStatus', special ? (GHACEM_WORKFLOW.hodApproved ? 'Approved' : 'Pending') : 'Not required');
+    setText('ehsStepStatus', confined ? (GHACEM_WORKFLOW.ehsTestCompleted ? 'Completed' : (GHACEM_WORKFLOW.ehsTestRequested ? 'Requested' : 'Awaiting request')) : 'Not required');
+
+    const badge = document.getElementById('approvalStatusBadge');
+    if (!badge) return;
+
+    let ready = special
+      ? GHACEM_WORKFLOW.managementAuthorized &&
+        GHACEM_WORKFLOW.supervisorApproved &&
+        GHACEM_WORKFLOW.hodApproved
+      : true;
+
+    if (confined) ready = ready && GHACEM_WORKFLOW.ehsTestCompleted;
+
+    badge.textContent = ready ? 'READY FOR SUBMISSION' : 'APPROVALS / EHS ACTION REQUIRED';
+    badge.style.background = ready ? '#e7f7ed' : '#fff0f0';
+  }
+
+  // Public hooks for the existing UI/admin layer to call.
+  window.GHACEMApproval = {
+    authorizeDepartment: function () {
+      GHACEM_WORKFLOW.departmentAuthorized = true;
+      GHACEM_WORKFLOW.supervisorApproved = true;
+      renderWorkflow();
+    },
+    approveSupervisor: function () {
+      GHACEM_WORKFLOW.supervisorApproved = true;
+      renderWorkflow();
+    },
+    approveHOD: function () {
+      GHACEM_WORKFLOW.hodApproved = true;
+      renderWorkflow();
+    },
+    completeEHSTest: function () {
+      GHACEM_WORKFLOW.ehsTestCompleted = true;
+      renderWorkflow();
+    },
+    state: GHACEM_WORKFLOW,
+    render: renderWorkflow,
+    canSubmit: function () {
+      const confined = isConfinedSpace();
+      const height = isHeight();
+      if (!(confined || height)) return true;
+      const approvals = GHACEM_WORKFLOW.departmentAuthorized &&
+                        GHACEM_WORKFLOW.hodApproved;
+      return confined ? approvals && GHACEM_WORKFLOW.ehsTestCompleted : approvals;
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('requestEhsTestBtn');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        if (!GHACEM_WORKFLOW.departmentAuthorized) {
+          document.getElementById('ehsRequestMessage').textContent =
+            'Department Authorization / Site Supervisor approval is required first.';
+          return;
+        }
+        GHACEM_WORKFLOW.ehsTestRequested = true;
+        document.getElementById('ehsRequestMessage').textContent =
+          'EHS test request submitted. EHS will be notified after Site Supervisor authorization.';
+        renderWorkflow();
+
+        // If the existing backend exposes a request function, use it.
+        if (typeof window.requestEHSTest === 'function') {
+          try { window.requestEHSTest(); } catch (e) { console.warn(e); }
+        } else {
+          try {
+            var formType = getFormType();
+            var submissionId = window.currentSubmissionId || window.activeSubmissionId || '';
+            if (submissionId && window.GHACEMWorkflowBackend) {
+              window.GHACEMWorkflowBackend.call('request_ehs_test', formType, submissionId)
+                .then(function(r){
+                  if (!r || !r.ok) throw new Error((r && r.error) || 'EHS request failed.');
+                  document.getElementById('ehsRequestMessage').textContent = 'EHS has been notified.';
+                })
+                .catch(function(err){
+                  document.getElementById('ehsRequestMessage').textContent = err.message;
+                });
+            }
+          } catch(e) {
+            document.getElementById('ehsRequestMessage').textContent = e.message;
+          }
+        }
+      });
+    }
+    renderWorkflow();
+  });
+})();
+</script>
+
+
+<!--
+BACKEND WORKFLOW CONTRACT
+1) On permit submission, send email to both HoD and Manager.
+2) For 04B Confined Space:
+   - Department Authorization / Site Supervisor approval MUST be recorded first.
+   - Only after management authorization may the EHS test request be sent.
+   - Permit submission MUST remain blocked until EHS records the space test as completed.
+3) For 04B Confined Space and 04C Working at Height:
+   - Require BOTH approvals: any on-site Supervisor + HoD.
+   - HoD approval is completed through the emailed approval link.
+   - Supervisor approval is recorded on site.
+4) Store: DepartmentAuthorization, SupervisorApproval, HODApproval, EHSTestRequested,
+   EHSTestCompleted, approval timestamps and approver identity in the permit record/history.
+5) Do not rely only on client-side checks; enforce the same rules in Code.gs/server-side.
+-->
+
+
+<script>
+(function(){
+  // Backend adapter for the final Site Supervisor workflow.
+  window.GHACEMWorkflowBackend = {
+    call: async function(action, formType, submissionId, extra) {
+      extra = extra || {};
+      var payload = Object.assign({
+        action: action,
+        formType: formType,
+        submissionId: submissionId,
+        data: Object.assign({}, extra)
+      }, extra);
+
+      if (typeof window.google !== 'undefined' && google.script && google.script.run) {
+        return new Promise(function(resolve, reject){
+          google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler(reject)
+            .doPost(JSON.stringify(payload));
+        });
+      }
+
+      if (typeof window.apiPost === 'function') return window.apiPost(payload);
+      if (typeof window.postPermitAction === 'function') return window.postPermitAction(payload);
+
+      throw new Error('Backend connection function not found.');
+    }
+  };
+})();
+
+  document.querySelectorAll('.subtabbtn').forEach(btn => btn.addEventListener('click', () => {
+    const sub = btn.dataset.sub;
+    if (['supervisor','ehsmanager','manager'].includes(sub)) setTimeout(renderWorkflowQueues, 0);
+  }));
+  document.getElementById('refreshSupervisorBtn')?.addEventListener('click', refreshWorkflowQueues);
+  document.getElementById('refreshEhsManagerBtn')?.addEventListener('click', refreshWorkflowQueues);
+  document.getElementById('refreshManagerBtn')?.addEventListener('click', refreshWorkflowQueues);
+
+  // Confined-space action button: visible while filling 04B. The permit is submitted first; the button can then request the EHS test once Site Supervisor authorization exists.
+  function updateConfinedSpaceAction() {
+    const panel=document.getElementById('confinedSpaceActionPanel'), btn=document.getElementById('notifyEhsConfinedBtn');
+    if(!panel||!btn) return;
+    const h=pd('hotwork');
+    const confined=(h.typeOfWork||[]).some(v=>/confined\s*space/i.test(v));
+    panel.style.display=confined?'block':'none';
+    const id=h._submissionId || ghacemLastSubmissionIds.hotwork || '';
+    const authorized=!!(h.departmentAuthorized || h.supervisorApproved);
+    const submitted=!!id;
+    btn.disabled=!confined;
+    const st=document.getElementById('notifyEhsConfinedStatus');
+    if(confined && !submitted) st.textContent='Click this button to submit the permit first; EHS will only be alerted after Site Supervisor authorization.';
+    else if(confined && !authorized) st.textContent='Permit submitted. Waiting for Site Supervisor / Department Authorization.';
+    else if(confined) st.textContent='Site Supervisor authorized. EHS can be requested.';
+  }
+  document.getElementById('notifyEhsConfinedBtn')?.addEventListener('click', async()=>{
+    const h=pd('hotwork');
+    const st=document.getElementById('notifyEhsConfinedStatus');
+    const authorized=!!(h.departmentAuthorized || h.supervisorApproved);
+    if(!authorized){
+      if(st) st.textContent='🔒 Site Supervisor / Department Authorization is required before EHS can be notified.';
+      updateConfinedSpaceAction();
+      return;
+    }
+    const confined=(h.typeOfWork||[]).some(v=>/confined\\s*space/i.test(v));
+    if(!confined){
+      st.textContent='Please select “Confined Space Entry” first.';
+      return;
+    }
+
+    try{
+      let id=h._submissionId || ghacemLastSubmissionIds.hotwork || '';
+
+      // Before the normal Submit button is pressed, save the permit into the
+      // approval workflow so it has a permanent Submission ID. This is not a
+      // second row if the user later presses Submit; the same ID is reused.
+      if(!id){
+        st.textContent='Saving permit for EHS test workflow…';
+        const result=await submitFormToBackend('hotwork');
+        if(!result.ok){
+          st.textContent=result.error||'Unable to save the permit.';
+          return;
+        }
+        id=result.submissionId;
+        h._submissionId=id;
+        ghacemLastSubmissionIds.hotwork=id;
+        try{ localStorage.setItem('ghacem_last_hotwork', id); }catch(e){}
+        st.textContent='Permit saved as Pending Approval. 🔒 EHS is locked until Site Supervisor / Department Authorization.';
+      }
+
+      await loadHistoryCache();
+      const rec=(window.historyCache && window.historyCache.hotwork||[])
+        .find(r=>String(r['Submission ID']||'')===String(id));
+
+      const authorized=rec && String(rec['Department Authorization']||'').toLowerCase()==='approved';
+      if(!authorized){
+        updateConfinedSpaceAction();
+        return;
+      }
+
+      st.textContent='Notifying EHS…';
+      const r=await workflowPost('request_ehs_test','hotwork',id,'Site Supervisor');
+      st.textContent=r.ok
+        ? '✓ EHS has been notified for the confined-space test.'
+        : (r.error||'EHS request failed.');
+      await loadHistoryCache();
+      renderWorkflowQueues();
+      updateConfinedSpaceAction();
+    }catch(err){
+      st.textContent=err.message || 'Unable to request EHS test.';
+    }
+  });
+
+</script>
+
+
+<!--
+FINAL WORKFLOW:
+Confined Space: Department Authorization / Site Supervisor -> EHS Test -> HoD -> proceed.
+Working at Height: Department Authorization / Site Supervisor -> HoD -> proceed.
+Submission notifications: HoD + Manager.
+EHS notification: only after Department Authorization / Site Supervisor approval.
+Backend: GHACEM_Code_gs_Final_SiteSupervisor_Workflow.gs
+-->
+
+
+<script>
+(function(){
+  let last='';
+  setInterval(function(){
+    try{
+      const h=window.pd?window.pd('hotwork'):null;
+      const sig= h ? JSON.stringify(h.typeOfWork||[])+'|'+(h._submissionId||'')+'|'+(h.departmentAuthorized||h.supervisorApproved||'') : '';
+      if(sig!==last){last=sig;if(typeof updateConfinedSpaceAction==='function') updateConfinedSpaceAction();}
+    }catch(e){}
+  },500);
+})();
+</script>
+
+<script>
+(function(){
+  async function syncConfinedPanelFromHistory(){
+    try{
+      if(typeof loadHistoryCache==='function') await loadHistoryCache();
+      const h=window.pd?window.pd('hotwork'):null;
+      if(!h) return;
+      const id=h._submissionId||'';
+      const rec=(window.historyCache && window.historyCache.hotwork||[]).find(r=>String(r['Submission ID']||'')===String(id));
+      if(rec){
+        h.departmentAuthorized=String(rec['Department Authorization']||'').toLowerCase()==='approved';
+        h.supervisorApproved=h.departmentAuthorized;
+      }
+      if(typeof updateConfinedSpaceAction==='function') updateConfinedSpaceAction();
+    }catch(e){}
+  }
+  window.syncConfinedPanelFromHistory=syncConfinedPanelFromHistory;
+})();
+
+  document.addEventListener('click', function(e){
+    if(e.target.closest('.chip[data-chip]')) setTimeout(function(){ if(typeof updateConfinedSpaceAction==='function') updateConfinedSpaceAction(); }, 0);
+  });
+</script>
+
+<script>
+(function(){
+  window.refreshPermitWorkflowState = async function(formType, submissionId){
+    try {
+      if (typeof loadHistoryCache === 'function') await loadHistoryCache();
+      const rows = window.historyCache && window.historyCache[formType] || [];
+      const rec = rows.find(r => String(r['Submission ID']||'') === String(submissionId||''));
+      if (!rec) return;
+      const wf = window.GHACEMApproval && window.GHACEMApproval.state;
+      if (!wf) return;
+      wf.departmentAuthorized = String(rec['Department Authorization']||'').toLowerCase() === 'approved';
+      wf.supervisorApproved = wf.departmentAuthorized;
+      wf.hodApproved = String(rec['HoD Approval']||'').toLowerCase() === 'approved';
+      wf.ehsTestRequested = String(rec['EHS Test Requested']||'').toLowerCase() === 'requested';
+      wf.ehsTestCompleted = String(rec['EHS Test Completed']||'').toLowerCase() === 'completed';
+      if (typeof window.GHACEMApproval.render === 'function') window.GHACEMApproval.render();
+      if (typeof window.updateConfinedSpaceAction === 'function') window.updateConfinedSpaceAction();
+    } catch(e) { console.warn('Workflow state refresh failed', e); }
+  };
+})();
+</script>
+
+
+<section id="ehsTestPage" style="display:none;max-width:900px;margin:30px auto;padding:24px;border:1px solid var(--border);border-radius:16px;background:var(--surface);">
+  <div style="font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--text-dim);">EHS MANAGER</div>
+  <h2 style="margin:6px 0 8px;">Confined Space Entry Test</h2>
+  <p id="ehsPermitSummary" style="font-size:12px;color:var(--text-dim);"></p>
+
+  <div style="padding:12px;border:1px solid var(--border);border-radius:12px;margin:14px 0;background:var(--surface-2);">
+    <strong>Read-only permit information</strong>
+    <div id="ehsReadonlyPermit" style="font-size:12px;margin-top:8px;"></div>
+  </div>
+
+  <form id="ehsTestForm">
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
+      <label>Oxygen (%)<input name="Oxygen (%)" type="number" step="0.01" min="0" max="100"></label>
+      <label>LEL (%)<input name="LEL (%)" type="number" step="0.01" min="0"></label>
+      <label>H2S (ppm)<input name="H2S (ppm)" type="number" step="0.01" min="0"></label>
+      <label>CO (ppm)<input name="CO (ppm)" type="number" step="0.01" min="0"></label>
+      <label>Gas Test Time<input name="Gas Test Time" type="datetime-local"></label>
+      <label>Test Result
+        <select name="Confined Space Test Result">
+          <option value="">Select result</option>
+          <option value="Safe / Acceptable">Safe / Acceptable</option>
+          <option value="Unsafe / Not Acceptable">Unsafe / Not Acceptable</option>
+        </select>
+      </label>
+    </div>
+    <label style="display:block;margin-top:12px;">EHS Test Remarks
+      <textarea name="EHS Test Remarks" rows="4" style="width:100%;"></textarea>
+    </label>
+    <label style="display:block;margin-top:12px;">EHS Tested By
+      <input name="EHS Tested By" required placeholder="EHS Manager / Authorized EHS Person">
+    </label>
+    <div style="margin-top:16px;">
+      <button class="btn btn-primary" type="submit" id="saveEhsTestBtn">Save Confined Space Test</button>
+      <span id="ehsTestSaveStatus" style="font-size:12px;margin-left:10px;"></span>
+    </div>
+  </form>
+</section>
+
+
+<script>
+(function(){
+  function initEhsTestPage(){
+    const p=document.getElementById('ehsTestPage');
+    if(!p) return;
+    const qs=new URLSearchParams(location.search);
+    const sid=qs.get('submissionId')||'';
+    const token=qs.get('token')||'';
+    if(qs.get('page')!=='ehs-test' || !sid) return;
+
+    p.style.display='block';
+    const main=document.querySelector('main')||document.body;
+    Array.from(main.children).forEach(el=>{ if(el!==p) el.style.display='none'; });
+
+    document.getElementById('ehsPermitSummary').textContent='Submission ID: '+sid;
+
+    // Read-only permit lookup. EHS cannot edit these fields.
+    if(typeof loadHistoryCache==='function'){
+      loadHistoryCache().then(function(){
+        const rows=(window.historyCache&&window.historyCache.hotwork)||[];
+        const rec=rows.find(r=>String(r['Submission ID']||'')===String(sid));
+        if(!rec){
+          document.getElementById('ehsReadonlyPermit').textContent='Permit not found.';
+          return;
+        }
+        document.getElementById('ehsReadonlyPermit').innerHTML =
+          '<b>Work Order:</b> '+escText(rec['Work Order Number']||rec['Work Order']||'—')+
+          ' &nbsp; <b>Location:</b> '+escText(rec['Location']||'—')+
+          ' &nbsp; <b>Permit:</b> '+escText(rec['Permit Type']||rec['Form Type']||'Confined Space');
+      });
+    }
+
+    const form=document.getElementById('ehsTestForm');
+    form.addEventListener('submit', async function(ev){
+      ev.preventDefault();
+      const st=document.getElementById('ehsTestSaveStatus');
+      const fd=new FormData(form), data={};
+      fd.forEach((v,k)=>data[k]=v);
+      data._ehsToken=token;
+      st.textContent='Saving test data…';
+      try{
+        const r=await GHACEMWorkflowBackend.call('ehs_update_test','hotwork',sid,data);
+        if(!r || !r.ok) throw new Error((r&&r.error)||'Unable to save EHS test.');
+        st.textContent='✓ EHS test data saved. The permit will update automatically when all required approvals are complete.';
+        document.getElementById('saveEhsTestBtn').disabled=true;
+      }catch(e){ st.textContent=e.message||'Unable to save EHS test.'; }
+    });
+  }
+  window.initEhsTestPage=initEhsTestPage;
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initEhsTestPage);
+  else initEhsTestPage();
+})();
+</script>
+
+
+<script id="ghacem-reference-layout">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];});}
+  const configs={
+    general:{pane:'sub-general',submit:'submitBtn-general',clear:'general',
+      title:'GENERAL WORK PERMIT',steps:[
+        ['done','1','Submitted','Permit has been submitted'],
+        ['current','2','Site Supervisor Authorization','Waiting for Site Supervisor approval'],
+        ['','3','HoD Approval','Waiting for HoD approval'],
+        ['','4','Approved','Permit is approved and active']
+      ]},
+    hotwork:{pane:'sub-hotwork',submit:'submitBtn-hotwork',clear:'hotwork',
+      title:'HOT WORK / CONFINED / SILO',steps:[
+        ['done','1','Submitted','Permit has been submitted'],
+        ['current','2','Site Supervisor Authorization','Waiting for Site Supervisor approval'],
+        ['','3','EHS Space Test (Confined Space Only)','Waiting for EHS test completion'],
+        ['','4','HoD Approval','Waiting for HoD approval'],
+        ['','5','Approved','Permit is approved and active']
+      ]},
+    height:{pane:'sub-height',submit:'submitBtn-height',clear:'height',
+      title:'WORKING AT HEIGHT',steps:[
+        ['done','1','Submitted','Permit has been submitted'],
+        ['current','2','Site Supervisor Authorization','Waiting for Site Supervisor approval'],
+        ['','3','HoD Approval','Waiting for HoD approval'],
+        ['','4','Approved','Permit is approved and active']
+      ]}
+  };
+  function addSidebar(key){
+    const c=configs[key], pane=document.getElementById(c.pane);
+    if(!pane || pane.querySelector('.reference-sidebar')) return;
+    const side=document.createElement('aside');
+    side.className='reference-sidebar';
+    side.innerHTML=
+      '<div class="reference-card"><h3 class="reference-title"><span style="font-size:24px">⚙</span>PERMIT WORKFLOW</h3>'+
+      c.steps.map(x=>'<div class="reference-step '+x[0]+'"><div class="reference-dot">'+x[1]+'</div><div><div class="reference-label">'+esc(x[2])+'</div><div class="reference-sub">'+esc(x[3])+'</div></div></div>').join('')+
+      '</div>'+
+      '<div class="reference-card"><h3 class="reference-title"><span style="font-size:24px">ϟ</span>ACTIONS</h3>'+
+      '<button class="reference-action primary" data-ref-submit="'+c.submit+'">▣ &nbsp; SAVE DRAFT</button>'+
+      '<button class="reference-action outline" data-ref-submit="'+c.submit+'">➤ &nbsp; SUBMIT PERMIT</button>'+
+      '<button class="reference-action neutral" data-ref-clear="'+c.clear+'">▢ &nbsp; CLEAR FORM</button>'+
+      '</div>'+
+      '<div class="reference-card"><h3 class="reference-title"><span style="font-size:24px">?</span>HELP</h3>'+
+      '<div class="reference-sub" style="font-size:15px">Please fill all required fields (<b style="color:#ff4d4d">*</b>) before submitting the permit.<br><br>For assistance, contact EHS Department.</div></div>';
+    pane.appendChild(side);
+  }
+  function init(){
+    addSidebar('general');addSidebar('hotwork');addSidebar('height');
+  }
+  document.addEventListener('click',function(e){
+    const s=e.target.closest('[data-ref-submit]');
+    if(s){const b=document.getElementById(s.dataset.refSubmit);if(b)b.click();}
+    const c=e.target.closest('[data-ref-clear]');
+    if(c){
+      const pane=document.getElementById('sub-'+c.dataset.refClear);
+      if(pane){
+        const clear=pane.querySelector('[data-clear-form]');
+        if(clear) clear.click();
+        else pane.querySelectorAll('input:not([type=hidden]),textarea,select').forEach(el=>{
+          if(el.type==='checkbox'||el.type==='radio')el.checked=false; else el.value='';
+        });
+      }
+    }
+  });
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
+
+<script id="ghacem-role-dashboard-theme">
+(function(){
+  const map={
+    'sub-supervisor':['SUPERVISOR WORK QUEUE','Authorize confined-space and working-at-height permits after reviewing the submitted permit.'],
+    'sub-ehsmanager':['EHS TEST CONTROL CENTRE','Record confined-space entry test results. Only EHS test fields are editable.'],
+    'sub-manager':['MANAGEMENT REVIEW','Read-only operational review of submitted permits and approval status.'],
+    'sub-signed':['SIGNED PERMITS','Approved and active permits currently available for work.'],
+    'sub-admin':['ADMIN CONTROL CENTRE','Read-only management, audit, reporting and permit oversight.']
+  };
+  function apply(){
+    Object.keys(map).forEach(id=>{
+      const p=document.getElementById(id);if(!p)return;
+      p.classList.add('reference-dashboard');
+      const t=p.querySelector(':scope > .permittitle');
+      if(t && !t.dataset.refTitle){
+        t.dataset.refTitle='1';
+        t.textContent=map[id][0];
+      }
+      const intro=p.querySelector(':scope > .paneintro');
+      if(intro && !intro.dataset.refIntro){
+        intro.dataset.refIntro='1';
+        intro.textContent=map[id][1];
+      }
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply);else apply();
+})();
+</script>
+
 </body>
 </html>
