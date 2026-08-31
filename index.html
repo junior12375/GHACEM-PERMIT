@@ -3574,6 +3574,20 @@ async function doSync(){
     openReadOnlyPermit(linkType, record, linkId, linkedPermits);
   }
   init();
+
+  // Expose to the later "Confined-space action button" <script> block below,
+  // which runs in a separate top-level scope and otherwise cannot see any of
+  // these — that mismatch was why the Notify EHS button had no click handler
+  // wired up at all (a ReferenceError on first use silently aborted the rest
+  // of that script block before the addEventListener line ever ran).
+  window.pd = pd;
+  window.lookupSupervisorName = lookupSupervisorName;
+  window.submitFormToBackend = submitFormToBackend;
+  window.workflowPost = workflowPost;
+  window.refreshWorkflowQueues = refreshWorkflowQueues;
+  window.renderWorkflowQueues = renderWorkflowQueues;
+  window.loadHistoryCache = loadHistoryCache;
+  window.ghacemLastSubmissionIds = ghacemLastSubmissionIds;
 })();
 </script>
 
