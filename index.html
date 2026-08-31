@@ -889,9 +889,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
     <div class="permittitle">Hot Work / Confined Space / Silo Entry</div>
     <div id="form-hotwork"></div>
     <div id="confinedSpaceActionPanel" style="display:block;margin:14px 0;padding:16px;border:2px solid var(--accent);border-radius:12px;background:var(--surface-2);">
-      <div style="font-weight:800;margin-bottom:6px;">⚠️ Confined Space — EHS Test Request</div>
+      <div style="font-weight:800;margin-bottom:6px;">⚠️ Confined Space / Silo Entry — EHS Test Request</div>
       <div id="confinedSpaceActionText" style="font-size:11px;color:var(--text-dim);margin-bottom:10px;">
-        Select <strong>Confined Space Entry</strong> under Type of Work. This button is available before the final permit submission.
+        Select <strong>Confined Space Entry</strong> or <strong>Silo Entry</strong> under Type of Work — both require the same pre-entry EHS atmospheric test. This button is available before the final permit submission.
         The system will first create/save the permit record, then EHS will only be alerted after Site Supervisor / Department Authorization.
       </div>
       <div id="ehsMailDeploymentNote" style="font-size:12px;color:var(--text-dim);margin:8px 0 0;">EHS notification is sent by the Apps Script deployment owner; the Site Supervisor does not receive an email.</div><button type="button" class="btn btn-primary btn-sm" id="notifyEhsConfinedBtn" disabled title="Enter a valid Site Supervisor Work ID first">Notify EHS for Confined Space Test</button>
@@ -1656,6 +1656,15 @@ async function doSync(){
   function lookupSupervisorName(workId){
     return SUPERVISOR_DIRECTORY[String(workId||'').trim()] || '';
   }
+  // Silo Entry is a confined space (GHA.OCPF 34 groups Hot Work / Confined Space /
+  // Silo Entry on one form) and must go through the same mandatory pre-entry EHS
+  // atmospheric test as "Confined Space Entry". Every place that decides whether a
+  // Hot Work permit needs the EHS test workflow must use this, not a bare
+  // "confined space" match, or Silo Entry permits silently skip EHS testing.
+  function needsConfinedSpaceEhsTest(typeOfWork){
+    const text = Array.isArray(typeOfWork) ? typeOfWork.join(', ') : String(typeOfWork||'');
+    return /confined\s*space|silo/i.test(text);
+  }
   const ID_LOOKUP_PATHS = {
     general: ['authSig','completionSig'],
     hotwork: ['safeCommenceMgr','signOffMgr'],
@@ -2342,7 +2351,7 @@ async function doSync(){
 
     const ehs = document.getElementById('ehsManagerQueue');
     if (ehs) {
-      const pendingEhs = all.filter(x => x.formType==='hotwork' && /confined\s*space/i.test(String(x.r['Type of Work']||'')) && String(x.r['EHS Test Completed']||'').toLowerCase() !== 'completed' && String(x.r['Department Authorization']||'').toLowerCase()==='approved');
+      const pendingEhs = all.filter(x => x.formType==='hotwork' && needsConfinedSpaceEhsTest(x.r['Type of Work']) && String(x.r['EHS Test Completed']||'').toLowerCase() !== 'completed' && String(x.r['Department Authorization']||'').toLowerCase()==='approved');
       // Read-only: the actual test entry only happens via the token-secured link
       // emailed to EHS for that specific permit (see notifyEHSSpaceTest_ in the
       // backend). No button here writes test data — that link is the only path.
@@ -3581,6 +3590,7 @@ async function doSync(){
   // of that script block before the addEventListener line ever ran).
   window.pd = pd;
   window.lookupSupervisorName = lookupSupervisorName;
+  window.needsConfinedSpaceEhsTest = needsConfinedSpaceEhsTest;
   window.submitFormToBackend = submitFormToBackend;
   window.workflowPost = workflowPost;
   window.refreshWorkflowQueues = refreshWorkflowQueues;
@@ -3860,7 +3870,7 @@ BACKEND WORKFLOW CONTRACT
     if(!panel||!btn) return;
 
     const h=pd('hotwork');
-    const confined=(h.typeOfWork||[]).some(v=>/confined\s*space/i.test(v));
+    const confined=needsConfinedSpaceEhsTest(h.typeOfWork);
     panel.style.display=confined?'block':'none';
 
     // IMPORTANT: only this permit's own Submission ID counts as "already saved".
@@ -3899,10 +3909,10 @@ BACKEND WORKFLOW CONTRACT
   document.getElementById('notifyEhsConfinedBtn')?.addEventListener('click', async()=>{
     const h=pd('hotwork');
     const st=document.getElementById('notifyEhsConfinedStatus');
-    const confined=(h.typeOfWork||[]).some(v=>/confined\s*space/i.test(v));
+    const confined=needsConfinedSpaceEhsTest(h.typeOfWork);
 
     if(!confined){
-      if(st) st.textContent='Please select “Confined Space Entry” first.';
+      if(st) st.textContent='Please select “Confined Space Entry” or “Silo Entry” first.';
       return;
     }
 
