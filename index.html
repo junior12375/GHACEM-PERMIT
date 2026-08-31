@@ -588,17 +588,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
 .reference-action.outline{background:transparent;border:1px solid #00a83a;color:var(--accent);}
 .reference-action.neutral{background:transparent;border:1px solid #59635f;color:#f2f4f2;}
 /* Workflow/admin dashboards use the same card language */
-#sub-supervisor,#sub-ehsmanager,#sub-manager,#sub-admin{
+#sub-admin{
  padding:22px!important;
-}
-#sub-supervisor>.permittitle,#sub-ehsmanager>.permittitle,#sub-manager>.permittitle{
- padding:0 0 8px!important;border-bottom:0!important;font-size:28px!important;
-}
-#sub-supervisor>.exec-actions,#sub-ehsmanager>.exec-actions,#sub-manager>.exec-actions{
- display:flex;justify-content:flex-end;margin:0 0 14px;
-}
-#sub-supervisor #supervisorQueue,#sub-ehsmanager #ehsManagerQueue,#sub-manager #managerQueue{
- background:transparent!important;
 }
 .exec-actions .btn,.histtoolbar button,.historytypes .btn,.histtypebtn{
  border-radius:999px!important;font-size:15px!important;font-weight:800!important;
@@ -692,10 +683,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
   #sub-hotwork,
   #sub-height,
   #sub-signed,
-  #sub-admin,
-  #sub-supervisor,
-  #sub-ehsmanager,
-  #sub-manager{
+  #sub-admin{
     height:auto !important;
     max-height:none !important;
     overflow:visible !important;
@@ -866,9 +854,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
     <button class="subtabbtn" data-sub="hotwork">Hot Work / Confined / Silo</button>
     <button class="subtabbtn" data-sub="height">Working at Height</button>
     <button class="subtabbtn" data-sub="signed">Signed Permits</button>
-    <button class="subtabbtn" data-sub="supervisor">Supervisor</button>
-    <button class="subtabbtn" data-sub="ehsmanager">EHS Manager</button>
-    <button class="subtabbtn" data-sub="manager">Manager</button>
     <button class="subtabbtn" data-sub="admin">Admin</button>
   </div>
 
@@ -889,12 +874,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
     <div class="permittitle">Hot Work / Confined Space / Silo Entry</div>
     <div id="form-hotwork"></div>
     <div id="confinedSpaceActionPanel" style="display:block;margin:14px 0;padding:16px;border:2px solid var(--accent);border-radius:12px;background:var(--surface-2);">
-      <div style="font-weight:800;margin-bottom:6px;">⚠️ Confined Space / Silo Entry — EHS Test Request</div>
+      <div id="confinedSpaceActionHeading" style="font-weight:800;margin-bottom:6px;">⚠️ Confined Space / Silo Entry — EHS Test Request</div>
       <div id="confinedSpaceActionText" style="font-size:11px;color:var(--text-dim);margin-bottom:10px;">
         Select <strong>Confined Space Entry</strong> or <strong>Silo Entry</strong> under Type of Work — both require the same pre-entry EHS atmospheric test. This button is available before the final permit submission.
         The system will first create/save the permit record, then EHS will only be alerted after Site Supervisor / Department Authorization.
       </div>
       <div id="ehsMailDeploymentNote" style="font-size:12px;color:var(--text-dim);margin:8px 0 0;">EHS notification is sent by the Apps Script deployment owner; the Site Supervisor does not receive an email.</div><button type="button" class="btn btn-primary btn-sm" id="notifyEhsConfinedBtn" disabled title="Enter a valid Site Supervisor Work ID first">Notify EHS for Confined Space Test</button>
+      <button type="button" class="btn btn-primary btn-sm" id="notifyHodHotworkBtn" disabled title="Enter a valid Site Supervisor Work ID first" style="display:none;">Notify HoD for Approval</button>
       <span id="notifyEhsConfinedStatus" style="display:block;font-size:11px;margin-top:9px;"></span>
     </div>
     <div class="formsubmit">
@@ -908,6 +894,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
     <div class="permitcode">GHA.OCPF 04C</div>
     <div class="permittitle">Working at Height Safety Form</div>
     <div id="form-height"></div>
+    <div id="heightHodActionPanel" style="display:block;margin:14px 0;padding:16px;border:2px solid var(--accent);border-radius:12px;background:var(--surface-2);">
+      <div style="font-weight:800;margin-bottom:6px;">⚠️ Site Supervisor Authorization — HoD Notification</div>
+      <div id="heightHodActionText" style="font-size:11px;color:var(--text-dim);margin-bottom:10px;">
+        Sign the <strong>Dept. Mgr./SH/Supervisor</strong> authorization above with a valid Work ID. Once recognized, this button records the authorization and sends the approval link directly to the HoD — no separate Supervisor tab needed.
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" id="notifyHodHeightBtn" disabled title="Enter a valid Site Supervisor Work ID first">Notify HoD for Approval</button>
+      <span id="notifyHodHeightStatus" style="display:block;font-size:11px;margin-top:9px;"></span>
+    </div>
     <div class="formsubmit">
       <span id="submitHint-height" class="submithint"></span>
       <button class="btn btn-primary" id="submitBtn-height">Submit Working at Height Permit</button>
@@ -931,28 +925,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
       </select>
     </div>
     <div id="signedPermitList"></div>
-  </div>
-
-
-  <div class="subpane hidden" id="sub-supervisor">
-    <div class="permittitle">Site Supervisor</div>
-    <p class="paneintro">Authorize submitted confined-space and working-at-height permits. Your authorization is the Department Authorization / first approval.</p>
-    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshSupervisorBtn">↻ Refresh</button></div>
-    <div id="supervisorQueue"></div>
-  </div>
-
-  <div class="subpane hidden" id="sub-ehsmanager">
-    <div class="permittitle">EHS Manager</div>
-    <p class="paneintro">Read-only status. Confined-space entry test data can only be entered through the secure link emailed to EHS for that specific permit — it cannot be recorded from this app.</p>
-    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshEhsManagerBtn">↻ Refresh</button></div>
-    <div id="ehsManagerQueue"></div>
-  </div>
-
-  <div class="subpane hidden" id="sub-manager">
-    <div class="permittitle">Manager</div>
-    <p class="paneintro">Review submitted permits and approval status. Manager access is read-only; HoD approval is handled through the emailed approval link.</p>
-    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshManagerBtn">↻ Refresh</button></div>
-    <div id="managerQueue"></div>
   </div>
 
   <div class="subpane hidden" id="sub-admin">
@@ -1185,6 +1157,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
       },
       safeCommenceMgr:null, safeCommenceCrew:null,
       signOffMgr:null, signOffCrew:null,
+      hodNotified:false,
       _submissionId:''
     },
     height:{
@@ -1201,6 +1174,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
       explainNo:'',
       authCrew:null, authMgr:null,
       closureCrew:null, closureMgr:null,
+      hodNotified:false,
       _submissionId:''
     }
   };
@@ -2055,6 +2029,7 @@ async function doSync(){
     document.getElementById('form-hotwork').innerHTML = renderHotworkForm();
     if(typeof updateConfinedSpaceAction==='function') setTimeout(updateConfinedSpaceAction,0);
     document.getElementById('form-height').innerHTML = renderHeightForm();
+    if(typeof updateHeightHodAction==='function') setTimeout(updateHeightHodAction,0);
     ['general','hotwork','height'].forEach(k=>{
       const pill = document.getElementById('pill-'+k);
       const closed = formIsClosed(k), signed = formIsSigned(k);
@@ -2209,6 +2184,9 @@ async function doSync(){
       if(typeof updateConfinedSpaceAction === 'function' && wid.closest('.sigrow[data-sigrow="hotwork|safeCommenceMgr"]')){
         updateConfinedSpaceAction();
       }
+      if(typeof updateHeightHodAction === 'function' && wid.closest('.sigrow[data-sigrow="height|authMgr"]')){
+        updateHeightHodAction();
+      }
       return;
     }
   });
@@ -2331,44 +2309,12 @@ async function doSync(){
     return t.indexOf('confined space') >= 0 ? 'confined' : 'other';
   }
 
-  function renderWorkflowQueues() {
-    const all = enhancedAllRecords();
-    const special = all.filter(x => (x.formType === 'hotwork' || x.formType === 'height') && !recordIsClosed(x.formType,x.r));
-    const sup = document.getElementById('supervisorQueue');
-    if (sup) {
-      const pending = special.filter(x => String(x.r['Department Authorization']||'').toLowerCase() !== 'approved');
-      sup.innerHTML = pending.length ? pending.map(x => `
-        <div class="histcard" style="margin:10px 0;padding:14px;border:1px solid var(--border);border-radius:12px;">
-          <strong>${escText(FORM_LABEL[x.formType])}</strong><br><span class="muted">${escText(x.r['Submission ID']||'')}</span>
-          <div style="margin:6px 0;font-size:11px;">${escText(x.r['Location']||x.r['Department/Location']||'')} · WO: ${escText(workOrderForRecord(x.formType,x.r)||'—')}</div>
-          <button class="btn btn-primary btn-sm" data-sup-approve="${escAttr(x.formType)}" data-sup-id="${escAttr(x.r['Submission ID']||'')}">Authorize / Approve</button>
-        </div>`).join('') : '<div class="emptyState">No permits are waiting for Site Supervisor authorization.</div>';
-      sup.querySelectorAll('[data-sup-approve]').forEach(b=>b.onclick=async()=>{
-        b.disabled=true; const r=await workflowPost('department_authorize',b.dataset.supApprove,b.dataset.supId,'Site Supervisor');
-        toast(r.ok?'Site Supervisor authorization recorded.':(r.error||'Authorization failed.')); await loadHistoryCache(); renderWorkflowQueues(); if(typeof syncConfinedPanelFromHistory==='function') syncConfinedPanelFromHistory(); if(r.ok && typeof window.renderPermitWorkflowSidebar==='function') window.renderPermitWorkflowSidebar(b.dataset.supApprove);
-      });
-    }
-
-    const ehs = document.getElementById('ehsManagerQueue');
-    if (ehs) {
-      const pendingEhs = all.filter(x => x.formType==='hotwork' && needsConfinedSpaceEhsTest(x.r['Type of Work']) && String(x.r['EHS Test Completed']||'').toLowerCase() !== 'completed' && String(x.r['Department Authorization']||'').toLowerCase()==='approved');
-      // Read-only: the actual test entry only happens via the token-secured link
-      // emailed to EHS for that specific permit (see notifyEHSSpaceTest_ in the
-      // backend). No button here writes test data — that link is the only path.
-      ehs.innerHTML = pendingEhs.length ? pendingEhs.map(x=>`
-        <div class="histcard" style="margin:10px 0;padding:14px;border:1px solid var(--border);border-radius:12px;">
-          <strong>Confined Space Test Required</strong><br><span class="muted">${escText(x.r['Submission ID']||'')}</span>
-          <div style="margin:6px 0;font-size:11px;">${escText(x.r['Location']||'')} · WO: ${escText(workOrderForRecord(x.formType,x.r)||'—')}</div>
-          <div class="muted" style="font-size:11px;">Awaiting EHS — sent to the EHS inbox via secure link.</div>
-        </div>`).join('') : '<div class="emptyState">No confined-space EHS tests are currently awaiting completion.</div>';
-    }
-
-    const mgr = document.getElementById('managerQueue');
-    if (mgr) {
-      const pending = all.filter(x => !recordIsClosed(x.formType,x.r) && String(x.r['Approval Status']||'').toLowerCase() !== 'approved');
-      mgr.innerHTML = pending.length ? `<div class="tablescroll"><table class="exec-table"><thead><tr><th>Permit</th><th>Work Order</th><th>Permit Status</th><th>Approval</th><th>Supervisor</th><th>HoD</th><th>EHS</th></tr></thead><tbody>` + pending.map(x=>`<tr><td>${escText(FORM_LABEL[x.formType])}<br><span class="muted">${escText(x.r['Submission ID']||'')}</span></td><td>${escText(workOrderForRecord(x.formType,x.r)||'—')}</td><td>${escText(x.r['Permit Status']||'Submitted - Pending Approval')}</td><td>${escText(x.r['Approval Status']||'Pending Approval')}</td><td>${escText(x.r['Department Authorization']||'Pending')}</td><td>${escText(x.r['HoD Approval']||'Pending')}</td><td>${escText(x.r['EHS Test Completed']||'Not required')}</td></tr>`).join('')+`</tbody></table></div>` : '<div class="emptyState">No permits are currently awaiting approval.</div>';
-    }
-  }
+  // The Supervisor / EHS Manager / Manager tabs have been removed. Supervisor
+  // authorization now happens directly from each permit's own signature panel
+  // (see the Notify EHS / Notify HoD action panels below), and EHS/Manager
+  // status is visible from Signed Permits. This is kept as a no-op stub since
+  // a couple of other places still call it after a workflow action.
+  function renderWorkflowQueues() {}
 
   function refreshWorkflowQueues(){ loadHistoryCache().then(renderWorkflowQueues); }
 
@@ -2376,7 +2322,7 @@ async function doSync(){
   document.getElementById('submitBtn-hotwork').addEventListener('click', ()=> submitOne('hotwork'));
   document.getElementById('submitBtn-height').addEventListener('click', ()=> submitOne('height'));
 
-  const PUBLIC_SUBS = ['general','hotwork','height','signed','supervisor','ehsmanager','manager','admin'];
+  const PUBLIC_SUBS = ['general','hotwork','height','signed','admin'];
   document.querySelectorAll('.subtabs > .subtabbtn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.remove('active'));
@@ -3842,14 +3788,6 @@ BACKEND WORKFLOW CONTRACT
   };
 })();
 
-  document.querySelectorAll('.subtabbtn').forEach(btn => btn.addEventListener('click', () => {
-    const sub = btn.dataset.sub;
-    if (['supervisor','ehsmanager','manager'].includes(sub)) setTimeout(renderWorkflowQueues, 0);
-  }));
-  document.getElementById('refreshSupervisorBtn')?.addEventListener('click', refreshWorkflowQueues);
-  document.getElementById('refreshEhsManagerBtn')?.addEventListener('click', refreshWorkflowQueues);
-  document.getElementById('refreshManagerBtn')?.addEventListener('click', refreshWorkflowQueues);
-
   // Confined-space action button: visible while filling 04B. The permit is submitted first; the button can then request the EHS test once Site Supervisor authorization exists.
   function getConfinedSupervisorWorkId_(){
     const row = document.querySelector('.sigrow[data-sigrow="hotwork|safeCommenceMgr"]');
@@ -3872,12 +3810,25 @@ BACKEND WORKFLOW CONTRACT
 
   function updateConfinedSpaceAction() {
     const panel=document.getElementById('confinedSpaceActionPanel');
-    const btn=document.getElementById('notifyEhsConfinedBtn');
-    if(!panel||!btn) return;
+    const ehsBtn=document.getElementById('notifyEhsConfinedBtn');
+    const hodBtn=document.getElementById('notifyHodHotworkBtn');
+    const heading=document.getElementById('confinedSpaceActionHeading');
+    const textEl=document.getElementById('confinedSpaceActionText');
+    const mailNote=document.getElementById('ehsMailDeploymentNote');
+    if(!panel||!ehsBtn||!hodBtn) return;
 
     const h=pd('hotwork');
     const confined=needsConfinedSpaceEhsTest(h.typeOfWork);
-    panel.style.display=confined?'block':'none';
+    panel.style.display='block';
+    ehsBtn.style.display=confined?'inline-block':'none';
+    hodBtn.style.display=confined?'none':'inline-block';
+    if(heading) heading.textContent = confined
+      ? '⚠️ Confined Space / Silo Entry — EHS Test Request'
+      : '⚠️ Site Supervisor Authorization — HoD Notification';
+    if(textEl) textEl.innerHTML = confined
+      ? 'Select <strong>Confined Space Entry</strong> or <strong>Silo Entry</strong> under Type of Work — both require the same pre-entry EHS atmospheric test. This button is available before the final permit submission. The system will first create/save the permit record, then EHS will only be alerted after Site Supervisor / Department Authorization.'
+      : 'Sign the <strong>Safe to Commence — Mgr./SH/Sup.</strong> authorization below with a valid Work ID. Once recognized, this button records the authorization and sends the approval link directly to the HoD — no EHS test is required for this type of work.';
+    if(mailNote) mailNote.style.display=confined?'block':'none';
 
     // IMPORTANT: only this permit's own Submission ID counts as "already saved".
     // ghacemLastSubmissionIds.hotwork is the ID of whichever Hot Work permit was
@@ -3888,22 +3839,33 @@ BACKEND WORKFLOW CONTRACT
     const workId=getConfinedSupervisorWorkId_();
     const supervisorName=getConfinedSupervisorName_();
     const hasWorkId=!!workId.trim();
+    const alreadyNotified=!!h.hodNotified;
 
     // Any non-empty Site Supervisor Work ID is the authorization.
     // The backend records the exact ID entered.
-    btn.disabled=!confined || !hasWorkId;
+    ehsBtn.disabled=!confined || !hasWorkId;
+    hodBtn.disabled=confined || !hasWorkId || alreadyNotified;
 
     const st=document.getElementById('notifyEhsConfinedStatus');
-    if(!confined) {
-      if(st) st.textContent='';
-    } else if(!workId) {
-      if(st) st.textContent='Enter the Site Supervisor Work ID in the authorization section. EHS notification will unlock immediately when the ID is recognized.';
-    } else if(!hasWorkId) {
-      if(st) st.textContent='Enter the Site Supervisor Work ID to authorize this permit.';
-    } else if(id) {
-      if(st) st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). EHS can be notified.';
+    if(!st) return;
+    if(st.dataset.showingCode === '1') return;
+    if(confined){
+      if(!workId) { st.textContent='Enter the Site Supervisor Work ID in the authorization section. EHS notification will unlock immediately when the ID is recognized.'; }
+      else if(!hasWorkId) { st.textContent='Enter the Site Supervisor Work ID to authorize this permit.'; }
+      else if(id) { st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). EHS can be notified.'; }
+      else { st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). Click the button to save the permit and notify EHS.'; }
+      return;
+    }
+    if(alreadyNotified){
+      st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). HoD has been notified.';
+    } else if(!workId){
+      st.textContent='Enter the Site Supervisor Work ID in the authorization section below. HoD notification will unlock once the ID is recognized.';
+    } else if(!hasWorkId){
+      st.textContent='Enter the Site Supervisor Work ID to authorize this permit.';
+    } else if(id){
+      st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). Ready to notify HoD.';
     } else {
-      if(st) st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). Click the button to save the permit and notify EHS.';
+      st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). Click the button to save the permit and notify HoD.';
     }
   }
 
@@ -3932,6 +3894,9 @@ BACKEND WORKFLOW CONTRACT
     }
 
     try{
+      // Fresh attempt — clear any previous lock so progress messages show.
+      st.dataset.showingCode = '';
+
       // Only this permit's own Submission ID counts — never the cached ID of a
       // previously-submitted (possibly different, possibly closed) permit.
       let id=h._submissionId || '';
@@ -3942,6 +3907,7 @@ BACKEND WORKFLOW CONTRACT
         st.textContent='Saving permit for EHS test workflow…';
         const result=await submitFormToBackend('hotwork');
         if(!result.ok){
+          st.dataset.showingCode = '1';
           st.textContent=result.error||'Unable to save the permit.';
           return;
         }
@@ -3961,6 +3927,10 @@ BACKEND WORKFLOW CONTRACT
         {'Supervisor Work ID': supervisorWorkId}
       );
 
+      // Lock the result so the status update below (which recalculates from
+      // current form state) cannot silently overwrite it — without this, a
+      // failed notification looked identical to a successful one.
+      st.dataset.showingCode = '1';
       if (r.ok) {
         st.textContent='✓ Site Supervisor authorized. EHS email sent to the configured EHS address.';
       } else if (r.action === 'ehs_test_email_failed') {
@@ -3975,7 +3945,224 @@ BACKEND WORKFLOW CONTRACT
       renderWorkflowQueues();
       updateConfinedSpaceAction();
     }catch(err){
+      st.dataset.showingCode = '1';
       st.textContent=err.message || 'Unable to request EHS test.';
+    }
+  });
+
+  // Plain Hot Work (not confined space / silo) needs no EHS test, so this
+  // button triggers department_authorize directly, mirroring the Height
+  // Notify HoD flow. Same signature row (safeCommenceMgr) as the EHS path
+  // above — only the resulting action differs.
+  document.getElementById('notifyHodHotworkBtn')?.addEventListener('click', async()=>{
+    const h=pd('hotwork');
+    const st=document.getElementById('notifyEhsConfinedStatus');
+    const confined=needsConfinedSpaceEhsTest(h.typeOfWork);
+
+    if(confined){
+      if(st) st.textContent='This permit needs an EHS test — use "Notify EHS for Confined Space Test" instead.';
+      return;
+    }
+
+    const supervisorWorkId=getConfinedSupervisorWorkId_();
+    const supervisorName=getConfinedSupervisorName_();
+
+    if(!supervisorWorkId){
+      if(st) st.textContent='🔒 Enter the Site Supervisor Work ID first.';
+      updateConfinedSpaceAction();
+      return;
+    }
+
+    try{
+      // Fresh attempt — clear any previous lock so progress/status stays live.
+      st.dataset.showingCode = '';
+      let id=h._submissionId || '';
+
+      if(!id){
+        st.textContent='Saving permit before notifying HoD…';
+        const result=await submitFormToBackend('hotwork');
+        if(!result.ok){
+          st.dataset.showingCode = '1';
+          st.textContent=result.error||'Unable to save the permit.';
+          return;
+        }
+        id=result.submissionId;
+        h._submissionId=id;
+        ghacemLastSubmissionIds.hotwork=id;
+        try{ localStorage.setItem('ghacem_last_hotwork', id); }catch(e){}
+      }
+
+      st.textContent='Recording Site Supervisor authorization and notifying HoD…';
+
+      const r=await workflowPost(
+        'department_authorize',
+        'hotwork',
+        id,
+        supervisorName,
+        {'Supervisor Work ID': supervisorWorkId}
+      );
+
+      if(r.ok){
+        h.hodNotified = true;
+      }
+
+      // Lock the result so it survives the updateConfinedSpaceAction() call
+      // below, which otherwise recalculates status from current form state
+      // and would silently overwrite a failure message with a generic one.
+      st.dataset.showingCode = '1';
+      if(r.ok && r.hodFieldCode){
+        const safeCode = String(r.hodFieldCode).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        st.innerHTML = '✓ Site Supervisor authorized. The HoD approval link has been emailed.' +
+          '<div style="margin-top:10px;padding:12px;border:2px solid var(--accent);border-radius:10px;background:var(--surface);">' +
+          '<div style="font-weight:800;color:var(--accent);">FIELD AUTHORIZATION CODE: ' + safeCode + '</div>' +
+          '<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Give this to the HoD in person when they arrive on site — they need it to approve. Never send it by text or email.</div>' +
+          '</div>';
+      } else {
+        st.textContent = r.ok
+          ? '✓ Site Supervisor authorized. The HoD approval link has been emailed.'
+          : '⚠ Authorization was not recorded — ' + (r.error||'please try again.');
+      }
+
+      await loadHistoryCache();
+      renderWorkflowQueues();
+      updateConfinedSpaceAction();
+    }catch(err){
+      st.dataset.showingCode = '1';
+      st.textContent=err.message || 'Unable to notify HoD.';
+    }
+  });
+
+  // Working at Height action button: the Supervisor tab was removed, so this
+  // button (visible while filling 04C) is now the only trigger for Department
+  // Authorization on Height permits. Once the Dept. Mgr./SH/Supervisor
+  // signature above is signed with a recognized Work ID, this records the
+  // authorization on the backend, which — for Height permits, since they
+  // never require an EHS test first — immediately emails the HoD decision
+  // link. No separate Supervisor queue is needed for this to work.
+  function getHeightSupervisorWorkId_(){
+    const row = document.querySelector('.sigrow[data-sigrow="height|authMgr"]');
+    const input = row ? row.querySelector('[data-sigworkid]') : null;
+    if (input) return String(input.value || '').trim();
+    // Once "Sign" has been clicked, the input is replaced by the signed-state
+    // markup and no longer exists in the DOM — read the Work ID back out of
+    // the saved signature object instead, so the button doesn't lock up.
+    const sig = pd('height').authMgr;
+    return sig && sig.workId ? String(sig.workId).trim() : '';
+  }
+
+  function getHeightSupervisorName_(){
+    const sig = pd('height').authMgr;
+    if (sig && sig.name) return sig.name;
+    const id = getHeightSupervisorWorkId_();
+    if(typeof lookupSupervisorName === 'function') return lookupSupervisorName(id);
+    return '';
+  }
+
+  function updateHeightHodAction() {
+    const btn=document.getElementById('notifyHodHeightBtn');
+    if(!btn) return;
+
+    const h=pd('height');
+    // Only this permit's own Submission ID counts as "already saved" — never a
+    // cached ID from a previously-submitted, possibly different, permit.
+    const id=h._submissionId || '';
+    const workId=getHeightSupervisorWorkId_();
+    const supervisorName=getHeightSupervisorName_();
+    const hasWorkId=!!workId.trim();
+    const alreadyNotified = !!h.hodNotified;
+
+    btn.disabled = !hasWorkId || alreadyNotified;
+
+    const st=document.getElementById('notifyHodHeightStatus');
+    if(!st) return;
+    // Don't clobber the field-code box that was just shown after a successful
+    // Notify HoD click — it needs to stay on screen so it can be read aloud/
+    // shown to the HoD in person, not get overwritten a moment later.
+    if(st.dataset.showingCode === '1') return;
+    if(alreadyNotified){
+      st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). HoD has been notified.';
+    } else if(!workId){
+      st.textContent='Enter the Site Supervisor Work ID in the authorization section above. HoD notification will unlock once the ID is recognized.';
+    } else if(!hasWorkId){
+      st.textContent='Enter the Site Supervisor Work ID to authorize this permit.';
+    } else if(id){
+      st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). Ready to notify HoD.';
+    } else {
+      st.textContent='✓ Site Supervisor authorized: '+supervisorName+' ('+workId+'). Click the button to save the permit and notify HoD.';
+    }
+  }
+
+  document.getElementById('notifyHodHeightBtn')?.addEventListener('click', async()=>{
+    const h=pd('height');
+    const st=document.getElementById('notifyHodHeightStatus');
+
+    const supervisorWorkId=getHeightSupervisorWorkId_();
+    const supervisorName=getHeightSupervisorName_();
+
+    if(!supervisorWorkId){
+      if(st) st.textContent='🔒 Enter the Site Supervisor Work ID first.';
+      updateHeightHodAction();
+      return;
+    }
+
+    try{
+      // Fresh attempt — clear any previous lock so progress/status stays live.
+      st.dataset.showingCode = '';
+      let id=h._submissionId || '';
+
+      // Save the permit once if it does not yet have a Submission ID. The same
+      // ID is reused below; this does not create a second row for this permit.
+      if(!id){
+        st.textContent='Saving permit before notifying HoD…';
+        const result=await submitFormToBackend('height');
+        if(!result.ok){
+          st.dataset.showingCode = '1';
+          st.textContent=result.error||'Unable to save the permit.';
+          return;
+        }
+        id=result.submissionId;
+        h._submissionId=id;
+        if(typeof ghacemLastSubmissionIds !== 'undefined') ghacemLastSubmissionIds.height=id;
+        try{ localStorage.setItem('ghacem_last_height', id); }catch(e){}
+      }
+
+      st.textContent='Recording Site Supervisor authorization and notifying HoD…';
+
+      const r=await workflowPost(
+        'department_authorize',
+        'height',
+        id,
+        supervisorName,
+        {'Supervisor Work ID': supervisorWorkId}
+      );
+
+      if(r.ok){
+        h.hodNotified = true;
+      }
+
+      // Lock the result so it survives the updateHeightHodAction() call below,
+      // which otherwise recalculates status from current form state and would
+      // silently overwrite a failure message with a generic success-looking one.
+      st.dataset.showingCode = '1';
+      if(r.ok && r.hodFieldCode){
+        const safeCode = String(r.hodFieldCode).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        st.innerHTML = '✓ Site Supervisor authorized. The HoD approval link has been emailed.' +
+          '<div style="margin-top:10px;padding:12px;border:2px solid var(--accent);border-radius:10px;background:var(--surface);">' +
+          '<div style="font-weight:800;color:var(--accent);">FIELD AUTHORIZATION CODE: ' + safeCode + '</div>' +
+          '<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Give this to the HoD in person when they arrive on site — they need it to approve. Never send it by text or email.</div>' +
+          '</div>';
+      } else {
+        st.textContent = r.ok
+          ? '✓ Site Supervisor authorized. The HoD approval link has been emailed.'
+          : '⚠ Authorization was not recorded — ' + (r.error||'please try again.');
+      }
+
+      await loadHistoryCache();
+      renderWorkflowQueues();
+      updateHeightHodAction();
+    }catch(err){
+      st.dataset.showingCode = '1';
+      st.textContent=err.message || 'Unable to notify HoD.';
     }
   });
 
@@ -4401,6 +4588,18 @@ Backend: GHACEM_Code_gs_Final_SiteSupervisor_Workflow.gs
           else el.value='';
         });
       }
+      if(c.dataset.refClear === 'height'){
+        const hodSt = document.getElementById('notifyHodHeightStatus');
+        if(hodSt){ hodSt.dataset.showingCode = ''; hodSt.textContent = ''; }
+        if(typeof pd === 'function'){ pd('height').hodNotified = false; if(typeof saveState==='function') saveState(); }
+        if(typeof updateHeightHodAction === 'function') updateHeightHodAction();
+      }
+      if(c.dataset.refClear === 'hotwork'){
+        const ehsSt = document.getElementById('notifyEhsConfinedStatus');
+        if(ehsSt){ ehsSt.dataset.showingCode = ''; ehsSt.textContent = ''; }
+        if(typeof pd === 'function'){ pd('hotwork').hodNotified = false; if(typeof saveState==='function') saveState(); }
+        if(typeof updateConfinedSpaceAction === 'function') updateConfinedSpaceAction();
+      }
     }
   });
 
@@ -4434,9 +4633,6 @@ Backend: GHACEM_Code_gs_Final_SiteSupervisor_Workflow.gs
 <script id="ghacem-role-dashboard-theme">
 (function(){
   const map={
-    'sub-supervisor':['SUPERVISOR WORK QUEUE','Authorize confined-space and working-at-height permits after reviewing the submitted permit.'],
-    'sub-ehsmanager':['EHS TEST CONTROL CENTRE','Record confined-space entry test results. Only EHS test fields are editable.'],
-    'sub-manager':['MANAGEMENT REVIEW','Read-only operational review of submitted permits and approval status.'],
     'sub-signed':['SIGNED PERMITS','Approved and active permits currently available for work.'],
     'sub-admin':['ADMIN CONTROL CENTRE','Read-only management, audit, reporting and permit oversight.']
   };
