@@ -943,7 +943,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
 
   <div class="subpane hidden" id="sub-ehsmanager">
     <div class="permittitle">EHS Manager</div>
-    <p class="paneintro">Review confined-space test requests and record the EHS test completion before the permit can become approved.</p>
+    <p class="paneintro">Read-only status. Confined-space entry test data can only be entered through the secure link emailed to EHS for that specific permit — it cannot be recorded from this app.</p>
     <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshEhsManagerBtn">↻ Refresh</button></div>
     <div id="ehsManagerQueue"></div>
   </div>
@@ -2343,16 +2343,15 @@ async function doSync(){
     const ehs = document.getElementById('ehsManagerQueue');
     if (ehs) {
       const pendingEhs = all.filter(x => x.formType==='hotwork' && /confined\s*space/i.test(String(x.r['Type of Work']||'')) && String(x.r['EHS Test Completed']||'').toLowerCase() !== 'completed' && String(x.r['Department Authorization']||'').toLowerCase()==='approved');
+      // Read-only: the actual test entry only happens via the token-secured link
+      // emailed to EHS for that specific permit (see notifyEHSSpaceTest_ in the
+      // backend). No button here writes test data — that link is the only path.
       ehs.innerHTML = pendingEhs.length ? pendingEhs.map(x=>`
         <div class="histcard" style="margin:10px 0;padding:14px;border:1px solid var(--border);border-radius:12px;">
           <strong>Confined Space Test Required</strong><br><span class="muted">${escText(x.r['Submission ID']||'')}</span>
           <div style="margin:6px 0;font-size:11px;">${escText(x.r['Location']||'')} · WO: ${escText(workOrderForRecord(x.formType,x.r)||'—')}</div>
-          <button class="btn btn-primary btn-sm" data-ehs-complete="${escAttr(x.formType)}" data-ehs-id="${escAttr(x.r['Submission ID']||'')}">Record EHS Test Completed</button>
+          <div class="muted" style="font-size:11px;">Awaiting EHS — sent to the EHS inbox via secure link.</div>
         </div>`).join('') : '<div class="emptyState">No confined-space EHS tests are currently awaiting completion.</div>';
-      ehs.querySelectorAll('[data-ehs-complete]').forEach(b=>b.onclick=async()=>{
-        b.disabled=true; const r=await workflowPost('ehs_test_complete',b.dataset.ehsComplete,b.dataset.ehsId,'EHS Manager');
-        toast(r.ok?'EHS test recorded.':(r.error||'EHS update failed.')); await loadHistoryCache(); renderWorkflowQueues();
-      });
     }
 
     const mgr = document.getElementById('managerQueue');
