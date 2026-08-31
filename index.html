@@ -3863,7 +3863,12 @@ BACKEND WORKFLOW CONTRACT
     const confined=(h.typeOfWork||[]).some(v=>/confined\s*space/i.test(v));
     panel.style.display=confined?'block':'none';
 
-    const id=h._submissionId || ghacemLastSubmissionIds.hotwork || '';
+    // IMPORTANT: only this permit's own Submission ID counts as "already saved".
+    // ghacemLastSubmissionIds.hotwork is the ID of whichever Hot Work permit was
+    // last submitted (possibly a different, already-closed permit) and must
+    // never be used here — using it caused "Permit not found" errors when
+    // starting a new confined-space permit.
+    const id=h._submissionId || '';
     const workId=getConfinedSupervisorWorkId_();
     const supervisorName=getConfinedSupervisorName_();
     const hasWorkId=!!workId.trim();
@@ -3911,7 +3916,9 @@ BACKEND WORKFLOW CONTRACT
     }
 
     try{
-      let id=h._submissionId || ghacemLastSubmissionIds.hotwork || '';
+      // Only this permit's own Submission ID counts — never the cached ID of a
+      // previously-submitted (possibly different, possibly closed) permit.
+      let id=h._submissionId || '';
 
       // Save the permit once if it does not yet have a Submission ID.
       // The same ID is reused later; this does not create a second workflow row.
@@ -3938,9 +3945,14 @@ BACKEND WORKFLOW CONTRACT
         {'Supervisor Work ID': supervisorWorkId}
       );
 
-      st.textContent=r.ok
-        ? '✓ Site Supervisor authorized. EHS email sent to the configured EHS address.'
-        : '⚠ Site Supervisor authorization was recorded, BUT the EHS email was NOT sent. ' + (r.error||'Check the Apps Script deployment/email permissions.');
+      if (r.ok) {
+        st.textContent='✓ Site Supervisor authorized. EHS email sent to the configured EHS address.';
+      } else if (r.action === 'ehs_test_email_failed') {
+        // The only failure mode where authorization really was written first.
+        st.textContent='⚠ Site Supervisor authorization was recorded, BUT the EHS email was NOT sent. ' + (r.error||'Check the Apps Script deployment/email permissions.');
+      } else {
+        st.textContent='⚠ EHS was not notified — nothing was saved. ' + (r.error||'Please try again.');
+      }
 
       await loadHistoryCache();
       await syncConfinedPanelFromHistory();
