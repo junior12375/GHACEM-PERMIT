@@ -3825,10 +3825,17 @@ BACKEND WORKFLOW CONTRACT
   function getConfinedSupervisorWorkId_(){
     const row = document.querySelector('.sigrow[data-sigrow="hotwork|safeCommenceMgr"]');
     const input = row ? row.querySelector('[data-sigworkid]') : null;
-    return input ? String(input.value || '').trim() : '';
+    if (input) return String(input.value || '').trim();
+    // Once "Sign" has been clicked, the input is replaced by the signed-state
+    // markup and no longer exists in the DOM — read the Work ID back out of
+    // the saved signature object instead, so the button doesn't lock up.
+    const sig = pd('hotwork').safeCommenceMgr;
+    return sig && sig.workId ? String(sig.workId).trim() : '';
   }
 
   function getConfinedSupervisorName_(){
+    const sig = pd('hotwork').safeCommenceMgr;
+    if (sig && sig.name) return sig.name;
     const id = getConfinedSupervisorWorkId_();
     if(typeof lookupSupervisorName === 'function') return lookupSupervisorName(id);
     return '';
