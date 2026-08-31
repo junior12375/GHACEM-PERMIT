@@ -813,9 +813,24 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
     #approvalControls #ehsRequestMessage { display:block !important; margin:8px 0 0 !important; }
   }
 </style>
-
+<style>
+  #staffGate{position:fixed;inset:0;z-index:9999;background:#07100d;color:#eef2ef;display:flex;align-items:center;justify-content:center;font-family:inherit;padding:24px;}
+  #staffGate .gatecard{max-width:480px;text-align:center;}
+  #staffGate h1{font-size:20px;margin:0 0 10px;}
+  #staffGate p{font-size:13px;color:#aab3ae;line-height:1.6;}
+  #staffGate.denied h1{color:#ff6b6b;}
+  #staffGate .gateemail{font-family:monospace;background:#141b19;padding:6px 10px;border-radius:8px;display:inline-block;margin-top:8px;}
+  body.staff-locked > *:not(#staffGate){display:none !important;}
+</style>
 </head>
-<body>
+<body class="staff-locked">
+
+<div id="staffGate">
+  <div class="gatecard">
+    <h1 id="staffGateTitle">Checking staff access…</h1>
+    <p id="staffGateMsg">Verifying your Google account against the staff access list.</p>
+  </div>
+</div>
 
 <header class="topbar">
   <img class="mark" src="data:image/png;base64,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vLw8VqxYwfjx46mrq8M0TaItL4tJSsA555zD2LFjqaurY8OGDSkJSL7npKqqiurqapRSWJZFOBxOOZe3thDD4fBnvjvrqABJivSYMWO45557OPHEEzn77LO544476NOnD8FgkBtvvJGBAwcyffp0DMNg+fLljBo1ihEjRvDwww9/agWblpZGMBjkvvvuo76+noKCAmKxGFdeeSVlZWUMGzaMZcuWsXjxYsLhMLfccgtr1qyhoqKCYDDIsmXLGDFiBGVlZdx3330YhsHFF1/Meeedx6BBg5g0aVKKCUgmwzAoLCzk7rvv5oYbbiAUCqG15qKLLmLu3LnU1dUxevRoGhsbqauro6amhoyMDPx+P5ZlUVdXx6RJkygrK6O+vp7s7Gxs22bKlCmceuqpTJ48GcdxeOSRRzjrrLMYM2YMa9as+Xwm+PMco5Osq+M4qZOeHccRx3HEtm0ZOnSozJgxQ2zblh07dkhaWpr85je/kYcfflgsy5La2lo54YQT5Morr5RnnnlGDMOQnTt3tnEnnTZtmowfP16GDRsml112mfTs2VO2bNkif/7zn+WNN96QESNGyKRJk6SiokL8fr8sX75cFi9eLIBUV1dL9+7d5ec//7m88MILAsjWrVtl9OjRcvLJJ8v//u//ilJKPvzwwzYs8dy5c0UpJSeeeKIAct1114mISLdu3eR3v/ud7NixQwCpr6+XMWPGyPTp02X9+vViGIY0NTXJf//3f0tpaam8+uqrkpWVJQsXLpQHH3xQMjMzZe3atdKxY0d56KGH5P777xfTNOX555+XSCTyuS6q+vOkISkRSasnKaqQOHA4qS5af540aRIjR44kLy+PqqoqGhsbWbFiBffccw95eXns3r27zcQdj8cpKChgypQpzJ8/PyX6oVCIW2+9lV27dpGXl0dOTg5aa4qKikhPT6egoIDt27ezc+dOJkyYwIQJE/D5fGzcuJHMzEy++93v8qMf/YhgMPgpC8p1XdLT05k7dy733nsv999/P2vXrqWkpAStNYZhkJaWhoiQmZmZ+myaJuFwmBUrVjBhwgROP/10cnNzicfjfPjhh/h8Pq677josy0pxbL169eKcc84hEAh87mSvP8vuXrp0Ka+99hqxWIx58+axd+9eNm7cyDPPPHNISyT5vbGxkXA4TDQaTXl7jBs3jgULFvDKK6/Qr1+/NqtarTX19fVcdNFFOI5DLBbjvffe45prrmH27NmceuqpqTexxWIxLMvCsiwikQgdOnTAsiwqKyvZs2cP8Xic4uJi4vE4zc3NNDQ0pCbqQ7VxwIAB9OnThwMHDrBjx47UvbFYjGg0mppHki8qs22b7OxscnNzKS8vJxqNEg6HsSyLTp06YZomjzzyCK+++iqXXHIJTU1N2LZ9xOf+6s/iq6677jquvvpqdu3axZQpU1i+fDlPPvkkkyZNIhQKtZlTko1sLSkA2dnZ3HLLLSxYsIBp06Zx8803f6pyyc7Nzs7mggsuoLm5mdLSUnr27Mm1117LBx98QHl5ObFYjF69ejF58mRWrlxJeno6hYWF3Hrrrdx2222cfvrpnH/++QwePDjVSUnpPVhvW5ZFPB5n4MCBTJo0idNOO43TTjuNsrIy5syZw7Rp08jNzWX//v0pDq2kpASfz8fdd9/Nr3/9a9asWUNZWRmxWIy6ujqmT59OXl4eF154IT/96U/ZtGkTaWlpn2Kiv/A6JBU1u20bruvSq1cv3n//fU444QTC4TB79uxJMaUVFRUEAgGKioqwbZuKigpKSkoAqKqqokuXLvj9fjZt2sSWLVsYOnQohYWFKTJORNizZw+2bdO5c2eam5vZs2cPffv2pbKyktWrVzNo0CCi0Sj9+vVj3759bNiwgV69euG6LsXFxfj9ftavX09DQwMjR45ERKisrCQ9PZ3c3FwqKiooLS1NqZ0kfb53715c1yUQCNClS5eU2fvOO++QlZVFfn4+HTp0oLa2FqUUxcXFbNq0iaamJsrKyti6dSs1NTUpoIqKilLquaCggMGDB1NfX09jYyPdunU7Ivb3qBeGX2Txc7RE29Eu6L4sLqz174cq89+xkv9MQFovjpIVaH3tUFRG64oe/Dn5v0N5gLSmYFqX2bqRrctvTXm0VrMHM8VJE/tQnXcwo9u6/IOvHexocSi2N3lvazr+4P76j2J7vwmp/fXd7YC0p3ZA2gFpT+2AtAPSntoBaQekPbUD0g5Ie2oHpD0dNv1/hBjbDnVu6W4AAAAASUVORK5CYII=" alt="GHACEM logo">
@@ -861,12 +876,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
   Submit first → Site Supervisor authorizes → EHS tests confined space (if applicable) → HoD approves → permit automatically becomes <strong style="color:var(--good);">APPROVED</strong>.
 </div>
 
-<div class="subtabs">
-    <button class="subtabbtn active" data-sub="general">General Work Permit</button>
-    <button class="subtabbtn" data-sub="hotwork">Hot Work / Confined / Silo</button>
-    <button class="subtabbtn" data-sub="height">Working at Height</button>
-    <button class="subtabbtn" data-sub="signed">Signed Permits</button>
-    <a class="subtabbtn" href="staff.html" style="text-decoration:none;display:inline-flex;align-items:center;">Staff Access →</a>
+<div class="subtabs" id="staffSubtabs">
+    <button class="subtabbtn" data-sub="supervisor" data-role="supervisor">Supervisor</button>
+    <button class="subtabbtn" data-sub="ehsmanager" data-role="ehsmanager">EHS Manager</button>
+    <button class="subtabbtn" data-sub="manager" data-role="manager">Manager</button>
+    <button class="subtabbtn" data-sub="admin" data-role="admin">Admin</button>
+    <a class="subtabbtn" href="index.html" style="text-decoration:none;display:inline-flex;align-items:center;margin-left:auto;">← Public Site</a>
   </div>
 
   <div class="subpane" id="sub-general">
@@ -931,6 +946,181 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
   </div>
 
 
+  <div class="subpane hidden" id="sub-supervisor">
+    <div class="permittitle">Site Supervisor</div>
+    <p class="paneintro">Authorize submitted confined-space and working-at-height permits. Your authorization is the Department Authorization / first approval.</p>
+    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshSupervisorBtn">↻ Refresh</button></div>
+    <div id="supervisorQueue"></div>
+  </div>
+
+  <div class="subpane hidden" id="sub-ehsmanager">
+    <div class="permittitle">EHS Manager</div>
+    <p class="paneintro">Read-only status. Confined-space entry test data can only be entered through the secure link emailed to EHS for that specific permit — it cannot be recorded from this app.</p>
+    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshEhsManagerBtn">↻ Refresh</button></div>
+    <div id="ehsManagerQueue"></div>
+  </div>
+
+  <div class="subpane hidden" id="sub-manager">
+    <div class="permittitle">Manager</div>
+    <p class="paneintro">Review submitted permits and approval status. Manager access is read-only; HoD approval is handled through the emailed approval link.</p>
+    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshManagerBtn">↻ Refresh</button></div>
+    <div id="managerQueue"></div>
+  </div>
+
+  <div class="subpane hidden" id="sub-admin">
+    <div id="adminAuthPanel" class="adminlock">
+      <div class="adminlock-card" id="adminlockCard">
+        <div class="adminlock-title">Admin Access</div>
+        <p class="adminlock-sub">Enter the admin password to continue.</p>
+        <div class="adminlock-field">
+          <input type="password" id="adminPasswordInput" placeholder="Admin password" autocomplete="off">
+          <button class="btn btn-primary" id="adminUnlockBtn">Unlock</button>
+        </div>
+        <p id="adminAuthError" class="adminlock-error"></p>
+      </div>
+    </div>
+
+    <div id="adminContent" class="hidden">
+      <div style="margin:0 0 12px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);font-size:10px;color:var(--text-dim);">
+        <strong style="color:var(--text);">READ-ONLY MANAGEMENT VIEW</strong> · Admin can review, search, filter, export and open permits, but cannot alter permit records.
+      </div>
+      <div class="historytypes" style="margin-bottom:16px;">
+        <button class="histtypebtn active" data-adminsub="overview">Overview</button>
+        <button class="histtypebtn" data-adminsub="active">Active Permits</button>
+        <button class="histtypebtn" data-adminsub="renewal">Renewal History</button>
+        <button class="histtypebtn" data-adminsub="overdue">Permits to be Closed</button>
+        <button class="histtypebtn" data-adminsub="closed">Closed Permits</button>
+        <button class="histtypebtn" data-adminsub="all">All Permits</button>
+        <button class="btn btn-ghost btn-sm" id="adminLockBtn" style="margin-left:auto;">Lock</button>
+      </div>
+
+      <div class="adminsubpane" id="adminsub-overview">
+        <div class="permittitle" style="margin-bottom:4px;">Operations Overview</div>
+        <p class="paneintro">A management view of permit activity, risk, accountability, and required decisions.</p>
+        <div class="exec-actions">
+          <button class="btn btn-ghost btn-sm" id="refreshOverviewBtn">↻ Refresh</button>
+          <button class="btn btn-ghost btn-sm" id="printManagementReportBtn">Print / Save PDF</button>
+          <button class="btn btn-ghost btn-sm" id="exportManagementCsvBtn">Export Management CSV</button>
+        </div>
+        <div id="executiveBanner"></div>
+        <div class="exec-commandbar"><div class="left"><span class="eyebrow">Executive Control Centre</span><span class="live"><i></i>Live operational view</span></div><div class="role-strip" style="margin:0"><span class="role-chip active">Admin · Read Only</span><span class="role-chip">EHS</span><span class="role-chip">Manager</span><span class="role-chip">Supervisor</span></div></div>
+        <div id="enhancedKpis" class="exec-kpi-grid"></div>
+        <div class="control-grid"><div class="control-panel"><div class="panel-head"><h5>Permit Approval Workflow</h5><span class="hint">Controlled lifecycle</span></div><div class="workflow"><div class="workflow-step active"><div class="num">1</div><strong>Draft</strong><span>Permit prepared</span></div><div class="workflow-step"><div class="num">2</div><strong>Submitted</strong><span>Sent to EHS</span></div><div class="workflow-step"><div class="num">3</div><strong>EHS Review</strong><span>Controls verified</span></div><div class="workflow-step"><div class="num">4</div><strong>Approved</strong><span>Manager authorises</span></div><div class="workflow-step"><div class="num">5</div><strong>Closed</strong><span>Work completed</span></div></div></div><div class="control-panel"><div class="panel-head"><h5>Management Alerts</h5><span class="hint">Needs attention</span></div><div id="enhancedAlerts" class="alert-list"></div></div></div>
+        <div class="control-grid"><div class="control-panel"><div class="panel-head"><h5>Highest-Risk Open Permits</h5><span class="hint">Prioritised automatically</span></div><div id="enhancedRiskTable"></div></div><div class="control-panel"><div class="panel-head"><h5>Recent Audit Activity</h5><span class="hint">Traceability</span></div><div id="enhancedAudit" class="audit-strip"></div></div></div>
+        <div id="executiveKpis" class="statsbar"></div>
+        <div class="exec-grid">
+          <div class="exec-card"><h5>Management Attention Required</h5><div id="executiveActions"></div></div>
+          <div class="exec-card"><h5>Executive Summary</h5><div id="executiveSummary"></div></div>
+        </div>
+        <div class="exec-grid">
+          <div class="exec-card"><h5>Department Scorecards</h5><div id="departmentScorecards"></div></div>
+          <div class="exec-card"><h5>Accountability & Ownership</h5><div id="accountabilityList"></div></div>
+        </div>
+        <div class="vizgrid" style="margin-top:14px;">
+          <div class="vizcard"><h5>Permit Mix</h5><div id="vizByTypeExecutive"></div></div>
+          <div class="vizcard"><h5>Department Activity</h5><div id="vizByDeptExecutive"></div></div>
+          <div class="vizcard vizcard-wide"><h5>Activity Trend <span class="vizcard-sub">last 8 weeks</span></h5><div id="vizTrendExecutive"></div></div>
+        </div>
+        <div class="exec-meta" id="executiveUpdatedAt"></div>
+      </div>
+
+      <div class="adminsubpane hidden" id="adminsub-active">
+        <div class="permittitle" style="margin-bottom:4px;">Active Permits</div>
+        <p class="paneintro">Authorized and signed within the last 24 hours.</p>
+        <div class="statsbar" id="statsBar"></div>
+        <div class="historytypes" data-mode="active">
+          <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
+          <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
+          <button class="histtypebtn" data-histtype="height">Working at Height</button>
+          <button class="btn btn-ghost btn-sm" id="refreshActiveListBtn" style="margin-left:auto;">↻ Refresh</button>
+        </div>
+
+        <div class="histtoolbar">
+          <input type="text" id="activeSearch" placeholder="Search by location, description, or work order…">
+          <select id="activeSort">
+            <option value="new">Newest first</option>
+            <option value="old">Oldest first</option>
+          </select>
+        </div>
+        <div id="activePermitList"></div>
+      </div>
+
+      <div class="adminsubpane hidden" id="adminsub-renewal">
+          <div class="permittitle" style="margin-bottom:4px;">Renewal History</div>
+          <p class="paneintro">Completed renewals for General Work and Working at Height permits.</p>
+          <div class="historytypes" data-mode="renewal">
+            <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
+            <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
+            <button class="histtypebtn" data-histtype="height">Working at Height</button>
+            <button class="btn btn-ghost btn-sm" id="refreshRenewalListBtn" style="margin-left:auto;">↻ Refresh</button>
+        </div>
+          <div id="renewalPermitList"></div>
+        </div>
+
+      <div class="adminsubpane hidden" id="adminsub-overdue">
+        <div class="permittitle" style="margin-bottom:4px;">Permits to be Closed</div>
+        <p class="paneintro">Open for more than 24 hours and awaiting closure.</p>
+        <div class="historytypes" data-mode="overdue">
+          <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
+          <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
+          <button class="histtypebtn" data-histtype="height">Working at Height</button>
+          <button class="btn btn-ghost btn-sm" id="refreshOverdueListBtn" style="margin-left:auto;">↻ Refresh</button>
+        </div>
+        <div class="histtoolbar">
+          <input type="text" id="overdueSearch" placeholder="Search by location, description, or work order…">
+          <select id="overdueSort">
+            <option value="new">Newest first</option>
+            <option value="old">Oldest first</option>
+          </select>
+        </div>
+        <div id="toClosePermitList"></div>
+      </div>
+
+
+      <div class="adminsubpane hidden" id="adminsub-all">
+        <div class="permittitle" style="margin-bottom:4px;">All Permits</div>
+        <p class="paneintro">Read-only management register of every permit retrieved from the live backend.</p>
+        <div class="histtoolbar">
+          <input type="text" id="adminAllSearch" placeholder="Search permit, work order, location, contractor, status…">
+          <select id="adminAllStatus">
+            <option value="">All statuses</option>
+            <option value="active">Active</option>
+            <option value="awaiting">Awaiting Approval</option>
+            <option value="overdue">Overdue</option>
+            <option value="closed">Closed</option>
+          </select>
+          <select id="adminAllType">
+            <option value="">All permit types</option>
+            <option value="general">General Work</option>
+            <option value="hotwork">Hot Work / Confined / Silo</option>
+            <option value="height">Working at Height</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" id="refreshAllAdminBtn">↻ Refresh</button>
+        </div>
+        <div id="adminAllPermitList"></div>
+      </div>
+
+      <div class="adminsubpane hidden" id="adminsub-closed">
+        <div class="permittitle" style="margin-bottom:4px;">Closed Permits</div>
+        <p class="paneintro">Signed off and completed. Retained for audit.</p>
+        <div class="statsbar" id="statsBarClosed"></div>
+        <div class="historytypes" data-mode="closed">
+          <button class="histtypebtn active" data-histtype="general">General Work Permit</button>
+          <button class="histtypebtn" data-histtype="hotwork">Hot Work</button>
+          <button class="histtypebtn" data-histtype="height">Working at Height</button>
+          <button class="btn btn-ghost btn-sm" id="refreshClosedListBtn" style="margin-left:auto;">↻ Refresh</button>
+        </div>
+        <div class="histtoolbar">
+          <input type="text" id="closedSearch" placeholder="Search by location, description, or work order…">
+          <select id="closedSort">
+            <option value="new">Newest first</option>
+            <option value="old">Oldest first</option>
+          </select>
+        </div>
+        <div id="closedPermitList"></div>
+      </div>
+    </div>
+  </div>
 </main>
 
 <section id="permitViewer" class="permitviewer hidden" role="dialog" aria-modal="true" aria-label="Read-only permit">
@@ -2166,8 +2356,8 @@ async function doSync(){
           <button class="btn btn-primary btn-sm" data-sup-approve="${escAttr(x.formType)}" data-sup-id="${escAttr(x.r['Submission ID']||'')}">Authorize / Approve</button>
         </div>`).join('') : '<div class="emptyState">No permits are waiting for Site Supervisor authorization.</div>';
       sup.querySelectorAll('[data-sup-approve]').forEach(b=>b.onclick=async()=>{
-        b.disabled=true; const r=await workflowPost('department_authorize',b.dataset.supApprove,b.dataset.supId,'Site Supervisor');
-        toast(r.ok?'Site Supervisor authorization recorded.':(r.error||'Authorization failed.')); await loadHistoryCache(); renderWorkflowQueues(); if(typeof syncConfinedPanelFromHistory==='function') syncConfinedPanelFromHistory();
+        b.disabled=true; const r=await staffWorkflowPost('staff_department_authorize',b.dataset.supApprove,b.dataset.supId,myStaffEmail);
+        toast(r.ok?'Site Supervisor authorization recorded.':(r.error||'Authorization failed.')); await loadHistoryCache(); renderWorkflowQueues();
       });
     }
 
@@ -2198,7 +2388,7 @@ async function doSync(){
   document.getElementById('submitBtn-hotwork').addEventListener('click', ()=> submitOne('hotwork'));
   document.getElementById('submitBtn-height').addEventListener('click', ()=> submitOne('height'));
 
-  const PUBLIC_SUBS = ['general','hotwork','height','signed'];
+  const PUBLIC_SUBS = ['general','hotwork','height','signed','supervisor','ehsmanager','manager','admin'];
   document.querySelectorAll('.subtabs > .subtabbtn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.remove('active'));
@@ -2237,12 +2427,75 @@ async function doSync(){
     else if(currentAdminSub === 'all') renderAllAdminPermits();
     else { renderStatsBar(); renderPermitList(closedType, 'closed'); }
   }
-  // Admin/Supervisor/EHS Manager/Manager moved to staff.html (Google-account
-  // gated). isAdminUnlocked is left permanently false here — nothing in this
-  // file can ever set it true anymore — since renderPermitList's cancel-button
-  // check reads it regardless of list mode; deleting the old sessionStorage
-  // restore too so a browser that unlocked admin before this split can't leak
-  // a Cancel Permit button onto the public Signed Permits list.
+  // Admin access is now decided solely by the real Google-account gate at
+  // the bottom of this file (via window.setAdminUnlocked), not by this old
+  // sessionStorage flag from the client-side-password era — a stale flag
+  // from before this security change would otherwise let a signed-in
+  // non-admin's browser keep showing admin-only UI.
+
+  function showAdminContent(){
+    document.getElementById('adminAuthPanel').classList.add('hidden');
+    document.getElementById('adminContent').classList.remove('hidden');
+  }
+  document.getElementById('adminUnlockBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('adminPasswordInput');
+    const err = document.getElementById('adminAuthError');
+    if(input.value === ADMIN_PASSWORD){
+      isAdminUnlocked = true;
+      try{ sessionStorage.setItem('ghacem_admin_unlocked', '1'); }catch(e){}
+      input.value = ''; err.textContent = '';
+      showAdminContent();
+      loadHistoryCache().then(()=>{
+        if(pendingAdminDeepLink){
+          const { type, id } = pendingAdminDeepLink;
+          pendingAdminDeepLink = null;
+          const rec = (historyCache[type]||[]).find((r,i)=> histKey(r,i) === id);
+          const mode = (rec && recordIsClosed(type, rec)) ? 'closed' : 'overdue';
+          if(mode === 'closed'){ closedType = type; closedExpanded.add(id); } else { overdueType = type; overdueExpanded.add(id); }
+          historyHighlightId = id; historyHighlightMode = mode;
+          currentAdminSub = mode;
+          document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.toggle('active', b.dataset.adminsub===mode));
+          document.querySelectorAll('.adminsubpane').forEach(p=> p.classList.toggle('hidden', p.id !== 'adminsub-'+mode));
+          document.querySelectorAll(`.historytypes[data-mode="${mode}"] .histtypebtn`).forEach(b=>b.classList.toggle('active', b.dataset.histtype===type));
+          if(mode === 'closed') renderStatsBar();
+          renderPermitList(type, mode);
+          setTimeout(()=>{
+            const card = document.querySelector(`[data-histkey="${CSS.escape(id)}"]`);
+            if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
+          }, 50);
+        } else {
+          renderCurrentAdminSub();
+        }
+      });
+    } else {
+      err.textContent = 'Incorrect password.';
+      const card = document.getElementById('adminlockCard');
+      card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+      input.value = '';
+      input.focus();
+    }
+  });
+  document.getElementById('adminPasswordInput').addEventListener('keydown', e=>{
+    if(e.key === 'Enter') document.getElementById('adminUnlockBtn').click();
+  });
+  document.getElementById('adminLockBtn').addEventListener('click', ()=>{
+    isAdminUnlocked = false;
+    try{ sessionStorage.removeItem('ghacem_admin_unlocked'); }catch(e){}
+    document.getElementById('adminAuthPanel').classList.remove('hidden');
+    document.getElementById('adminContent').classList.add('hidden');
+  });
+  document.querySelectorAll('[data-adminsub]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentAdminSub = btn.dataset.adminsub;
+      document.querySelectorAll('.adminsubpane').forEach(p=>{
+        p.classList.toggle('hidden', p.id !== 'adminsub-'+currentAdminSub);
+      });
+      await loadHistoryCache();
+      renderCurrentAdminSub();
+    });
+  });
 
   document.querySelectorAll('.historytypes[data-mode]').forEach(group=>{
     const mode = group.dataset.mode;
@@ -2258,6 +2511,22 @@ async function doSync(){
       });
     });
   });
+  document.getElementById('activeSearch').addEventListener('input', e=>{
+    activeSearchQuery = e.target.value.trim().toLowerCase();
+    renderPermitList(activeType, 'active');
+  });
+  document.getElementById('activeSort').addEventListener('change', e=>{
+    activeSortOrder = e.target.value;
+    renderPermitList(activeType, 'active');
+  });
+  document.getElementById('closedSearch').addEventListener('input', e=>{
+    closedSearchQuery = e.target.value.trim().toLowerCase();
+    renderPermitList(closedType, 'closed');
+  });
+  document.getElementById('closedSort').addEventListener('change', e=>{
+    closedSortOrder = e.target.value;
+    renderPermitList(closedType, 'closed');
+  });
   document.getElementById('signedSearch').addEventListener('input', e=>{
     signedSearchQuery = e.target.value.trim().toLowerCase();
     renderPermitList(signedType, 'signed');
@@ -2265,6 +2534,14 @@ async function doSync(){
   document.getElementById('signedSort').addEventListener('change', e=>{
     signedSortOrder = e.target.value;
     renderPermitList(signedType, 'signed');
+  });
+  document.getElementById('overdueSearch').addEventListener('input', e=>{
+    overdueSearchQuery = e.target.value.trim().toLowerCase();
+    renderPermitList(overdueType, 'overdue');
+  });
+  document.getElementById('overdueSort').addEventListener('change', e=>{
+    overdueSortOrder = e.target.value;
+    renderPermitList(overdueType, 'overdue');
   });
 
   function copyText(text){
@@ -2377,14 +2654,45 @@ async function doSync(){
     renderAllAdminPermits();
   });
 
+  document.getElementById('refreshActiveListBtn').addEventListener('click', async ()=>{
+    await loadHistoryCache();
+    renderStatsBar();
+    renderPermitList(activeType, 'active');
+  });
+  document.getElementById('refreshClosedListBtn').addEventListener('click', async ()=>{
+    await loadHistoryCache();
+    renderStatsBar();
+    renderPermitList(closedType, 'closed');
+  });
   document.getElementById('refreshSignedListBtn').addEventListener('click', async ()=>{
     await loadHistoryCache();
     renderPermitList(signedType, 'signed');
   });
+  document.getElementById('refreshOverdueListBtn').addEventListener('click', async ()=>{
+    await loadHistoryCache();
+    renderPermitList(overdueType, 'overdue');
+  });
+  document.getElementById('refreshOverviewBtn').addEventListener('click', async ()=>{
+    await loadHistoryCache();
+    renderExecutiveOverview();
+  });
+  document.getElementById('refreshRenewalListBtn').addEventListener('click', async ()=>{
+    await loadHistoryCache();
+    renderPermitList(renewalType, 'renewal');
+  });
+  document.getElementById('exportManagementCsvBtn').addEventListener('click', downloadManagementCsv);
+  document.getElementById('printManagementReportBtn').addEventListener('click', ()=>{
+    const previous = currentAdminSub;
+    currentAdminSub = 'overview';
+    document.querySelectorAll('.adminsubpane').forEach(p=>p.classList.toggle('hidden', p.id !== 'adminsub-overview'));
+    renderExecutiveOverview();
+    window.print();
+    currentAdminSub = previous;
+  });
 
   async function loadHistoryCache(){
-    if(!syncUrl) return;
-    const [g, h, ht] = await Promise.all([fetchHistory('general'), fetchHistory('hotwork'), fetchHistory('height')]);
+    if(!STAFF_API_URL) return;
+    const [g, h, ht] = await Promise.all([fetchStaffHistory('general'), fetchStaffHistory('hotwork'), fetchStaffHistory('height')]);
     historyCache = {
       general: g.ok ? (g.records||[]) : [],
       hotwork: h.ok ? (h.records||[]) : [],
@@ -2519,15 +2827,11 @@ async function doSync(){
     }
     if(!window.confirm('Cancel this permit? This cannot be undone from the permit list.')) return;
 
-    const result = await postToBackend({
-      action:'update', formType, submissionId,
+    const result = await postToStaffBackend({
+      action:'staff_cancel_permit', formType, submissionId,
       data:{
-        ...record,
-        'Submission ID': submissionId,
-        'Status':'Cancelled',
         'Cancellation Reason':reason.trim(),
-        'Cancelled At':new Date().toLocaleString(),
-        'Cancelled By':'Admin'
+        'Cancelled By':myStaffEmail
       }
     });
     if(!result.ok){
@@ -2617,17 +2921,9 @@ async function doSync(){
     const record = (historyCache[formType] || []).find(r => String(r['Submission ID'] || '') === String(submissionId));
     if(!record || record['Renewal Status'] !== 'Pending Approval') return;
     if(!window.confirm(`Approve renewal ${submissionId} for the next 24 hours?`)) return;
-    const approvedAt = new Date();
-    const expiresAt = new Date(approvedAt.getTime() + 24*60*60*1000);
-    const result = await postToBackend({
-      action:'update', formType, submissionId,
-      data:{
-        ...record,
-        'Renewal Status':'Approved',
-        'Renewal Approved At':approvedAt.toLocaleString(),
-        'Renewal Expires At':expiresAt.toLocaleString(),
-        'Status':'Active'
-      }
+    const result = await postToStaffBackend({
+      action:'staff_approve_renewal', formType, submissionId,
+      data:{ 'Approved By': myStaffEmail }
     });
     if(!result.ok){ toast('Renewal approval failed — ' + (result.error || 'please try again.')); return; }
     await loadHistoryCache();
@@ -3147,6 +3443,13 @@ async function doSync(){
       ? 'Using built-in GHACEM sheet (leave blank, or paste a different URL to override)'
       : 'https://script.google.com/macros/s/.../exec';
     setSyncStatus(syncUrl ? 'ok' : '', syncUrl ? 'Connected — data syncs on Submit/Close' : 'Live sync not configured');
+    // Admin access now comes solely from the real Google-account gate script
+    // (loaded later in this document) via window.setAdminUnlocked — no
+    // sessionStorage auto-restore here. That also avoids a real crash: this
+    // used to call loadHistoryCache(), which now depends on
+    // window.STAFF_API_URL/fetchStaffHistory — both defined by that later
+    // gate script, so calling it this early (before that script has run)
+    // would throw.
     renderAll();
     await openLinkedPermitFromUrl();
 }
@@ -3237,31 +3540,42 @@ async function doSync(){
     if(!record){ toast('Permit not found.'); return; }
     const isClosed = !!record && recordIsClosed(linkType, record);
     const isOverdueLink = !!record && !isClosed && isOverdue(record);
+    const needsAdmin = isClosed || isOverdueLink;
 
-    // Closed/overdue permits are staff-only now — Admin lives on staff.html,
-    // not on this public page, so there's no in-page tab to route to anymore.
-    if(isClosed || isOverdueLink){
-      toast('This permit is closed or overdue — open it from the Staff Access page.');
+    if(needsAdmin && !isAdminUnlocked){
+      pendingAdminDeepLink = { type: linkType, id: linkId };
+      document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub==='admin'));
+      PUBLIC_SUBS.forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!=='admin'));
+      toast('Admin password required to view this permit.');
       return;
     }
 
-    const mode = 'signed';
+    const mode = isClosed ? 'closed' : (isOverdueLink ? 'overdue' : 'signed');
     historyHighlightId = linkId;
     historyHighlightMode = mode;
-    signedType = linkType; signedExpanded.add(linkId);
+    if(mode === 'closed'){ closedType = linkType; closedExpanded.add(linkId); currentAdminSub = 'closed'; }
+    else if(mode === 'overdue'){ overdueType = linkType; overdueExpanded.add(linkId); currentAdminSub = 'overdue'; }
+    else { signedType = linkType; signedExpanded.add(linkId); }
 
-    document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub==='signed'));
-    PUBLIC_SUBS.forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!=='signed'));
+    const targetSub = mode === 'signed' ? 'signed' : 'admin';
+    document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.toggle('active', b.dataset.sub===targetSub));
+    PUBLIC_SUBS.forEach(t=> document.getElementById('sub-'+t).classList.toggle('hidden', t!==targetSub));
+    if(mode === 'closed' || mode === 'overdue'){
+      document.querySelectorAll('[data-adminsub]').forEach(b=>b.classList.toggle('active', b.dataset.adminsub===mode));
+      document.querySelectorAll('.adminsubpane').forEach(p=> p.classList.toggle('hidden', p.id !== 'adminsub-'+mode));
+    }
     document.querySelectorAll(`.historytypes[data-mode="${mode}"] .histtypebtn`).forEach(b=>b.classList.toggle('active', b.dataset.histtype===linkType));
 
+    if(mode === 'closed') renderStatsBar();
     // QR links open the complete read-only permit, never the editable form or
-    // a history summary.
+    // a history summary. The same rule applies after an admin has authenticated.
     const workOrder = params.get('workorder') || workOrderForRecord(linkType, record);
     const linkedPermits = workOrder ? Object.entries(historyCache)
       .flatMap(([type, rows]) => rows.map((row, i)=>({ formType:type, record:row, submissionId:histKey(row, i) })))
       .filter(p => (p.formType !== linkType || p.submissionId !== linkId) && sameWorkOrder(workOrderForRecord(p.formType, p.record), workOrder))
-      // Closed/overdue linked permits stay staff-only on this public page.
-      .filter(p => !recordIsClosed(p.formType, p.record) && !isOverdue(p.record))
+      // The public QR view follows the existing access rule: closed and overdue
+      // permits remain admin-only, while an authenticated admin can read all matches.
+      .filter(p => isAdminUnlocked || (!recordIsClosed(p.formType, p.record) && !isOverdue(p.record)))
       : [];
     openReadOnlyPermit(linkType, record, linkId, linkedPermits);
   }
@@ -3281,6 +3595,14 @@ async function doSync(){
   window.renderWorkflowQueues = renderWorkflowQueues;
   window.loadHistoryCache = loadHistoryCache;
   window.ghacemLastSubmissionIds = ghacemLastSubmissionIds;
+  // For the staff-access gate script (a separate <script> block further
+  // down): isAdminUnlocked is a variable closured inside this IIFE, not a
+  // window property, so the gate can't set it directly — it needs this
+  // setter. showAdminContent is exposed the same way so the gate can reveal
+  // the Admin tab immediately for a verified admin, skipping the legacy
+  // password prompt.
+  window.setAdminUnlocked = function(v){ isAdminUnlocked = v; };
+  window.showAdminContent = showAdminContent;
 })();
 </script>
 
@@ -3918,6 +4240,136 @@ Backend: GHACEM_Code_gs_Final_SiteSupervisor_Workflow.gs
     });
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply);else apply();
+})();
+</script>
+
+<!--
+================= STAFF ACCESS GATE =================
+This page requires a SECOND Apps Script deployment of the SAME Code.gs
+project, deployed with:
+  Execute as:      User accessing the web app
+  Who has access:  Anyone with Google account (or your Workspace domain)
+This is the ONLY configuration that lets Session.getActiveUser().getEmail()
+see who is actually signed in — the existing public deployment (used by
+index.html and the emailed EHS/HoD links) stays on "Execute as: Me" and is
+NOT changed. Paste that second deployment's /exec URL below.
+
+Code.gs must also define STAFF_DIRECTORY with the allow-listed Google
+account emails per role, and the staff_whoami / staff_history /
+staff_department_authorize / staff_cancel_permit / staff_approve_renewal
+actions that check the caller's role before doing anything.
+-->
+<script>
+(function(){
+  // ---- REQUIRED: paste your staff (Execute-as-user) deployment URL here ----
+  const STAFF_API_URL = 'PASTE_YOUR_STAFF_DEPLOYMENT_URL_HERE';
+
+  window.STAFF_API_URL = /^https?:\/\//.test(STAFF_API_URL) ? STAFF_API_URL : '';
+  window.myStaffEmail = '';
+  window.myStaffRoles = [];
+
+  window.postToStaffBackend = async function(job){
+    if(!window.STAFF_API_URL) return {ok:false, error:'Staff deployment URL is not configured.'};
+    try{
+      const res = await fetch(window.STAFF_API_URL, {
+        method:'POST',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify(job)
+      });
+      const text = await res.text();
+      try{ return JSON.parse(text); }
+      catch(e){ return res.ok ? {ok:true} : {ok:false, error:'Unexpected response from staff backend.'}; }
+    }catch(err){
+      return {ok:false, error:String(err)};
+    }
+  };
+
+  window.fetchStaffHistory = async function(formType){
+    if(!window.STAFF_API_URL) return {ok:false, error:'Staff deployment URL is not configured.'};
+    try{
+      const res = await fetch(window.STAFF_API_URL + '?formType=' + encodeURIComponent(formType) + '&mode=staff_history');
+      return await res.json();
+    }catch(err){
+      return {ok:false, error:String(err)};
+    }
+  };
+
+  window.staffWorkflowPost = async function(action, formType, submissionId, approvedBy, extraData){
+    const data = Object.assign({'Approved By': approvedBy || ''}, extraData || {});
+    return await window.postToStaffBackend({action, formType, submissionId, data});
+  };
+
+  function showGate(title, msg, denied){
+    const gate = document.getElementById('staffGate');
+    gate.classList.toggle('denied', !!denied);
+    document.getElementById('staffGateTitle').textContent = title;
+    document.getElementById('staffGateMsg').innerHTML = msg;
+  }
+
+  async function runGate(){
+    if(!window.STAFF_API_URL){
+      showGate('Staff page not configured yet',
+        'This page needs a staff-only Apps Script deployment URL pasted into staff.html (search for PASTE_YOUR_STAFF_DEPLOYMENT_URL_HERE) before it can check who you are.', true);
+      return;
+    }
+    let r;
+    try{
+      const res = await fetch(window.STAFF_API_URL + '?action=staff_whoami');
+      r = await res.json();
+    }catch(err){
+      showGate('Could not reach the staff backend', 'Error: ' + escText_(String(err)), true);
+      return;
+    }
+    if(!r || !r.ok){
+      showGate('Access denied',
+        (r && r.email
+          ? 'Signed in as <span class="gateemail">'+escText_(r.email)+'</span>, but this account is not on the staff access list for any role. Ask an admin to add it to STAFF_DIRECTORY in Code.gs.'
+          : 'You are not signed in with a Google account, or this browser could not confirm your identity. Try opening this page in a normal (non-incognito) browser window signed in to Google.'), true);
+      return;
+    }
+    window.myStaffEmail = r.email || '';
+    window.myStaffRoles = Array.isArray(r.roles) ? r.roles : [];
+    if(!window.myStaffRoles.length){
+      showGate('Access denied', 'Signed in as <span class="gateemail">'+escText_(r.email||'')+'</span>, but no role is assigned to this account. Ask an admin to add it to STAFF_DIRECTORY in Code.gs.', true);
+      return;
+    }
+
+    // Unlock: reveal the page, filter tabs to roles this account actually has.
+    document.body.classList.remove('staff-locked');
+    document.getElementById('staffGate').remove();
+
+    let firstVisibleBtn = null;
+    document.querySelectorAll('#staffSubtabs [data-role]').forEach(btn=>{
+      const allowed = window.myStaffRoles.includes(btn.dataset.role);
+      btn.style.display = allowed ? '' : 'none';
+      if(allowed && !firstVisibleBtn) firstVisibleBtn = btn;
+    });
+
+    if(window.myStaffRoles.includes('admin')){
+      // Skip the legacy password prompt — Google sign-in + STAFF_DIRECTORY
+      // already proved this account is an admin. isAdminUnlocked is closured
+      // inside the main IIFE, not a window property, so it must go through
+      // the setter exported there — setting window.isAdminUnlocked directly
+      // would silently do nothing (cancelPermit/renderPermitList etc. would
+      // never see it).
+      if(typeof window.setAdminUnlocked === 'function') window.setAdminUnlocked(true);
+      if(typeof window.showAdminContent === 'function') window.showAdminContent();
+    }
+
+    // The Supervisor/EHS Manager/Manager tab-click handlers render straight
+    // from historyCache without loading it first (only Signed/Admin do) —
+    // load it up front so the very first tab a visitor lands on isn't a
+    // false "nothing pending" until they manually hit Refresh.
+    if(typeof window.loadHistoryCache === 'function') await window.loadHistoryCache();
+
+    if(firstVisibleBtn) firstVisibleBtn.click();
+    else showGate('Access denied', 'No staff tabs are available for your account.', true);
+  }
+
+  function escText_(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', runGate);
+  else runGate();
 })();
 </script>
 
