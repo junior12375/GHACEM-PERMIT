@@ -2345,7 +2345,7 @@ async function doSync(){
         </div>`).join('') : '<div class="emptyState">No permits are waiting for Site Supervisor authorization.</div>';
       sup.querySelectorAll('[data-sup-approve]').forEach(b=>b.onclick=async()=>{
         b.disabled=true; const r=await workflowPost('department_authorize',b.dataset.supApprove,b.dataset.supId,'Site Supervisor');
-        toast(r.ok?'Site Supervisor authorization recorded.':(r.error||'Authorization failed.')); await loadHistoryCache(); renderWorkflowQueues(); if(typeof syncConfinedPanelFromHistory==='function') syncConfinedPanelFromHistory();
+        toast(r.ok?'Site Supervisor authorization recorded.':(r.error||'Authorization failed.')); await loadHistoryCache(); renderWorkflowQueues(); if(typeof syncConfinedPanelFromHistory==='function') syncConfinedPanelFromHistory(); if(r.ok && typeof window.renderPermitWorkflowSidebar==='function') window.renderPermitWorkflowSidebar(b.dataset.supApprove);
       });
     }
 
@@ -2686,6 +2686,8 @@ async function doSync(){
       hotwork: h.ok ? (h.records||[]) : [],
       height: ht.ok ? (ht.records||[]) : [],
     };
+    // Expose the same cache to the workflow/reference sidebar.
+    window.historyCache = historyCache;
     const pending = Object.values(historyCache).reduce((sum, records)=>sum + records.filter(r=>String(r['Renewal Status']||'') === 'Pending Approval').length, 0);
     const badge = document.getElementById('renewalRequestCount');
     if(badge){ badge.textContent = String(pending); badge.classList.toggle('hidden', pending === 0); }
@@ -3707,6 +3709,10 @@ async function doSync(){
 
     badge.textContent = ready ? 'READY FOR SUBMISSION' : 'APPROVALS / EHS ACTION REQUIRED';
     badge.style.background = ready ? '#e7f7ed' : '#fff0f0';
+    try {
+      const k = getFormType();
+      if (typeof window.renderPermitWorkflowSidebar === 'function') window.renderPermitWorkflowSidebar(k);
+    } catch(e) {}
   }
 
   // Public hooks for the existing UI/admin layer to call.
@@ -4140,57 +4146,250 @@ Backend: GHACEM_Code_gs_Final_SiteSupervisor_Workflow.gs
 </script>
 
 
+<script id="ghacem-workflow-bridge">
+(function(){
+  // Expose the main application's permit data/history functions to the
+  // workflow sidebar. These are references to the existing functions; no
+  // second sync mechanism is created.
+  if (typeof pd === 'function') window.pd = pd;
+  if (typeof loadHistoryCache === 'function') window.loadHistoryCache = loadHistoryCache;
+
+  window.refreshWorkflowSidebar = function(){
+    try{
+      ['general','hotwork','height'].forEach(function(k){
+        if(typeof window.renderPermitWorkflowSidebar === 'function'){
+          window.renderPermitWorkflowSidebar(k);
+        }
+      });
+    }catch(e){}
+  };
+})();
+</script>
+
 <script id="ghacem-reference-layout">
 (function(){
-  function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];});}
+  function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){
+    return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });}
+
   const configs={
-    general:{pane:'sub-general',submit:'submitBtn-general',clear:'general',
-      title:'GENERAL WORK PERMIT',steps:[
-        ['done','1','Submitted','Permit has been submitted'],
-        ['current','2','Site Supervisor Authorization','Waiting for Site Supervisor approval'],
-        ['','3','HoD Approval','Waiting for HoD approval'],
-        ['','4','Approved','Permit is approved and active']
-      ]},
-    hotwork:{pane:'sub-hotwork',submit:'submitBtn-hotwork',clear:'hotwork',
-      title:'HOT WORK / CONFINED / SILO',steps:[
-        ['done','1','Submitted','Permit has been submitted'],
-        ['current','2','Site Supervisor Authorization','Waiting for Site Supervisor approval'],
-        ['','3','EHS Space Test (Confined Space Only)','Waiting for EHS test completion'],
-        ['','4','HoD Approval','Waiting for HoD approval'],
-        ['','5','Approved','Permit is approved and active']
-      ]},
-    height:{pane:'sub-height',submit:'submitBtn-height',clear:'height',
-      title:'WORKING AT HEIGHT',steps:[
-        ['done','1','Submitted','Permit has been submitted'],
-        ['current','2','Site Supervisor Authorization','Waiting for Site Supervisor approval'],
-        ['','3','HoD Approval','Waiting for HoD approval'],
-        ['','4','Approved','Permit is approved and active']
-      ]}
+    general:{
+      pane:'sub-general',submit:'submitBtn-general',clear:'general',
+      title:'GENERAL WORK PERMIT',
+      steps:[
+        ['submitted','Submitted','Permit has been submitted'],
+        ['supervisor','Site Supervisor Authorization','Waiting for Site Supervisor approval'],
+        ['hod','HoD Approval','Waiting for HoD approval'],
+        ['approved','Approved','Permit is approved and active']
+      ]
+    },
+    hotwork:{
+      pane:'sub-hotwork',submit:'submitBtn-hotwork',clear:'hotwork',
+      title:'HOT WORK / CONFINED / SILO',
+      steps:[
+        ['submitted','Submitted','Permit has been submitted'],
+        ['supervisor','Site Supervisor Authorization','Waiting for Site Supervisor approval'],
+        ['ehs','EHS Space Test (Confined Space Only)','Waiting for EHS test completion'],
+        ['hod','HoD Approval','Waiting for HoD approval'],
+        ['approved','Approved','Permit is approved and active']
+      ]
+    },
+    height:{
+      pane:'sub-height',submit:'submitBtn-height',clear:'height',
+      title:'WORKING AT HEIGHT',
+      steps:[
+        ['submitted','Submitted','Permit has been submitted'],
+        ['supervisor','Site Supervisor Authorization','Waiting for Site Supervisor approval'],
+        ['hod','HoD Approval','Waiting for HoD approval'],
+        ['approved','Approved','Permit is approved and active']
+      ]
+    }
   };
-  function addSidebar(key){
+
+  function currentId(key){
+    try{
+      const d = window.pd ? window.pd(key) : null;
+      return String((d && d._submissionId) || '').trim();
+    }catch(e){ return ''; }
+  }
+
+  function getRecord(key){
+    const id=currentId(key);
+    if(!id) return null;
+    const rows=(window.historyCache && window.historyCache[key]) || [];
+    return rows.find(r=>String(r['Submission ID']||'').trim()===id) || null;
+  }
+
+  function isConfined(key, record){
+    if(key!=='hotwork') return false;
+    const local=(window.pd ? window.pd(key) : {}) || {};
+    const t=JSON.stringify(local.typeOfWork||record?.['Type of Work']||'').toLowerCase();
+    return /confined\s*space|silo/.test(t);
+  }
+
+  function approved(v){
+    return String(v||'').trim().toLowerCase()==='approved';
+  }
+
+  function completed(v){
+    return String(v||'').trim().toLowerCase()==='completed';
+  }
+
+  function getWorkflowState(key){
+    const r=getRecord(key);
+    const id=currentId(key);
+
+    // No saved Submission ID means the permit is still a draft.
+    if(!id && !r){
+      return {index:-1, submitted:false, states:{}};
+    }
+
+    const sup=approved(r?.['Department Authorization']);
+    const ehsReq=String(r?.['EHS Test Requested']||'').trim().toLowerCase()==='requested';
+    const ehsDone=completed(r?.['EHS Test Completed']);
+    const hod=approved(r?.['HoD Approval']);
+    const approval=approved(r?.['Approval Status']) || String(r?.['Permit Status']||'').trim().toLowerCase()==='approved';
+    const confined=isConfined(key,r);
+
+    const required = key==='hotwork'
+      ? (confined ? ['submitted','supervisor','ehs','hod','approved'] : ['submitted','supervisor','hod','approved'])
+      : key==='height'
+        ? ['submitted','supervisor','hod','approved']
+        : ['submitted','supervisor','hod','approved'];
+
+    const done={
+      submitted:!!(id||r),
+      supervisor:sup,
+      ehs:!confined || ehsDone,
+      hod:hod,
+      approved:approval
+    };
+
+    let current=-1;
+    for(let i=0;i<required.length;i++){
+      if(!done[required[i]]){ current=i; break; }
+    }
+    if(current===-1) current=required.length-1;
+
+    return {index:current,submitted:true,states:done,required,confined,ehsReq};
+  }
+
+  function renderSidebar(key){
     const c=configs[key], pane=document.getElementById(c.pane);
-    if(!pane || pane.querySelector('.reference-sidebar')) return;
-    const side=document.createElement('aside');
-    side.className='reference-sidebar';
+    if(!pane) return;
+
+    let side=pane.querySelector('.reference-sidebar');
+    if(!side){
+      side=document.createElement('aside');
+      side.className='reference-sidebar';
+      pane.appendChild(side);
+    }
+
+    const wf=getWorkflowState(key);
+    const steps = c.steps.filter(s => s[0]!=='ehs' || wf.confined);
+
+    const stepHtml=steps.map(function(s,i){
+      const keyName=s[0];
+      let cls='';
+      let label=s[1];
+      let sub=s[2];
+
+      if(wf.submitted){
+        const done = keyName==='submitted' ? wf.states.submitted :
+                     keyName==='supervisor' ? wf.states.supervisor :
+                     keyName==='ehs' ? wf.states.ehs :
+                     keyName==='hod' ? wf.states.hod :
+                     keyName==='approved' ? wf.states.approved : false;
+
+        const requiredIndex=wf.required ? wf.required.indexOf(keyName) : -1;
+
+        if(done){
+          cls='done';
+          sub = keyName==='submitted' ? 'Permit has been submitted' :
+                keyName==='supervisor' ? 'Site Supervisor authorization completed' :
+                keyName==='ehs' ? 'EHS space test completed' :
+                keyName==='hod' ? 'HoD approval completed' :
+                'Permit is approved and active';
+        }else if(requiredIndex===wf.index){
+          cls='current';
+          if(keyName==='supervisor') sub='Waiting for Site Supervisor approval';
+          if(keyName==='ehs') sub=wf.ehsReq ? 'EHS test requested — awaiting completion' : 'Waiting for EHS test request';
+          if(keyName==='hod') sub='Waiting for HoD approval';
+          if(keyName==='approved') sub='Waiting for all required approvals';
+        }
+      }else if(keyName==='submitted'){
+        cls='current';
+        sub='Permit has not been submitted';
+      }
+
+      return '<div class="reference-step '+cls+'">'+
+        '<div class="reference-dot">'+(i+1)+'</div>'+
+        '<div><div class="reference-label">'+esc(label)+'</div>'+
+        '<div class="reference-sub">'+esc(sub)+'</div></div></div>';
+    }).join('');
+
+    const id=currentId(key);
+    const record=getRecord(key);
+    const lastUpdated=record?.['Last Updated'] || '';
+    const status = !id ? 'DRAFT' :
+      wf.states.approved ? 'APPROVED' :
+      wf.states.hod ? 'AWAITING FINAL APPROVAL' :
+      wf.states.ehs && wf.confined ? 'AWAITING HoD APPROVAL' :
+      wf.states.supervisor ? (wf.confined ? 'AWAITING EHS TEST' : 'AWAITING HoD APPROVAL') :
+      'AWAITING SITE SUPERVISOR';
+
     side.innerHTML=
-      '<div class="reference-card"><h3 class="reference-title"><span style="font-size:24px">⚙</span>PERMIT WORKFLOW</h3>'+
-      c.steps.map(x=>'<div class="reference-step '+x[0]+'"><div class="reference-dot">'+x[1]+'</div><div><div class="reference-label">'+esc(x[2])+'</div><div class="reference-sub">'+esc(x[3])+'</div></div></div>').join('')+
+      '<div class="reference-card">'+
+        '<h3 class="reference-title"><span style="font-size:24px">⚙</span>PERMIT WORKFLOW</h3>'+
+        stepHtml+
+        '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);">'+
+          '<strong>Status:</strong> '+esc(status)+
+          (lastUpdated ? ' · <strong>Updated:</strong> '+esc(lastUpdated) : '')+
+        '</div>'+
+        '<button type="button" class="reference-action neutral" data-ref-refresh="'+key+'" style="margin-top:10px;">↻ &nbsp; REFRESH STATUS</button>'+
       '</div>'+
       '<div class="reference-card"><h3 class="reference-title"><span style="font-size:24px">ϟ</span>ACTIONS</h3>'+
-      '<button class="reference-action primary" data-ref-submit="'+c.submit+'">▣ &nbsp; SAVE DRAFT</button>'+
-      '<button class="reference-action outline" data-ref-submit="'+c.submit+'">➤ &nbsp; SUBMIT PERMIT</button>'+
-      '<button class="reference-action neutral" data-ref-clear="'+c.clear+'">▢ &nbsp; CLEAR FORM</button>'+
+        '<button class="reference-action primary" data-ref-submit="'+c.submit+'">▣ &nbsp; SAVE DRAFT</button>'+
+        '<button class="reference-action outline" data-ref-submit="'+c.submit+'">➤ &nbsp; SUBMIT PERMIT</button>'+
+        '<button class="reference-action neutral" data-ref-clear="'+c.clear+'">▢ &nbsp; CLEAR FORM</button>'+
       '</div>'+
       '<div class="reference-card"><h3 class="reference-title"><span style="font-size:24px">?</span>HELP</h3>'+
-      '<div class="reference-sub" style="font-size:15px">Please fill all required fields (<b style="color:#ff4d4d">*</b>) before submitting the permit.<br><br>For assistance, contact EHS Department.</div></div>';
-    pane.appendChild(side);
+        '<div class="reference-sub" style="font-size:15px">Please fill all required fields (<b style="color:#ff4d4d">*</b>) before submitting the permit.<br><br>For assistance, contact EHS Department.</div>'+
+      '</div>';
   }
+
   function init(){
-    addSidebar('general');addSidebar('hotwork');addSidebar('height');
+    renderSidebar('general');
+    renderSidebar('hotwork');
+    renderSidebar('height');
   }
-  document.addEventListener('click',function(e){
+
+  // Called after a workflow action, after history is refreshed, or after the user
+  // manually presses Refresh Status.
+  window.renderPermitWorkflowSidebar=function(key){
+    renderSidebar(key);
+  };
+
+  document.addEventListener('click',async function(e){
+    const refresh=e.target.closest('[data-ref-refresh]');
+    if(refresh){
+      const key=refresh.dataset.refRefresh;
+      const btn=refresh;
+      btn.disabled=true;
+      try{
+        if(typeof window.loadHistoryCache==='function') await window.loadHistoryCache();
+      }catch(err){}
+      renderSidebar(key);
+      btn.disabled=false;
+      return;
+    }
+
     const s=e.target.closest('[data-ref-submit]');
-    if(s){const b=document.getElementById(s.dataset.refSubmit);if(b)b.click();}
+    if(s){
+      const b=document.getElementById(s.dataset.refSubmit);
+      if(b)b.click();
+    }
+
     const c=e.target.closest('[data-ref-clear]');
     if(c){
       const pane=document.getElementById('sub-'+c.dataset.refClear);
@@ -4198,15 +4397,39 @@ Backend: GHACEM_Code_gs_Final_SiteSupervisor_Workflow.gs
         const clear=pane.querySelector('[data-clear-form]');
         if(clear) clear.click();
         else pane.querySelectorAll('input:not([type=hidden]),textarea,select').forEach(el=>{
-          if(el.type==='checkbox'||el.type==='radio')el.checked=false; else el.value='';
+          if(el.type==='checkbox'||el.type==='radio')el.checked=false;
+          else el.value='';
         });
       }
     }
   });
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+
+  // Re-render whenever the browser/tab becomes visible again. This is not an
+  // offline queue or retry mechanism; it only refreshes the displayed workflow.
+  document.addEventListener('visibilitychange',function(){
+    if(!document.hidden){
+      ['general','hotwork','height'].forEach(renderSidebar);
+    }
+  });
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
 })();
 </script>
 
+<script id="ghacem-workflow-history-hook">
+(function(){
+  if(typeof window.loadHistoryCache !== 'function') return;
+  const originalLoadHistoryCache = window.loadHistoryCache;
+  window.loadHistoryCache = async function(){
+    const result = await originalLoadHistoryCache.apply(this, arguments);
+    if(typeof window.refreshWorkflowSidebar === 'function'){
+      window.refreshWorkflowSidebar();
+    }
+    return result;
+  };
+})();
+</script>
 
 <script id="ghacem-role-dashboard-theme">
 (function(){
