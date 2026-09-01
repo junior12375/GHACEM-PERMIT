@@ -3826,7 +3826,7 @@ BACKEND WORKFLOW CONTRACT
       ? '⚠️ Confined Space / Silo Entry — EHS Test Request'
       : '⚠️ Site Supervisor Authorization — HoD Notification';
     if(textEl) textEl.innerHTML = confined
-      ? 'Select <strong>Confined Space Entry</strong> or <strong>Silo Entry</strong> under Type of Work — both require the same pre-entry EHS atmospheric test. This button is available before the final permit submission. The system will first create/save the permit record, then EHS will only be alerted after Site Supervisor / Department Authorization.'
+      ? 'Select <strong>Confined Space Entry</strong> or <strong>Silo Entry</strong> under Type of Work — both require the same pre-entry EHS atmospheric test. This button is available before the final permit submission. The system will first create/save the permit record, then EHS will only be alerted after Site Supervisor / Department Authorization. <strong>A field authorization code will appear here once EHS has been notified</strong> — give it to the HoD in person; EHS never sees it.'
       : 'Sign the <strong>Safe to Commence — Mgr./SH/Sup.</strong> authorization below with a valid Work ID. Once recognized, this button records the authorization and sends the approval link directly to the HoD — no EHS test is required for this type of work.';
     if(mailNote) mailNote.style.display=confined?'block':'none';
 
@@ -3931,7 +3931,14 @@ BACKEND WORKFLOW CONTRACT
       // current form state) cannot silently overwrite it — without this, a
       // failed notification looked identical to a successful one.
       st.dataset.showingCode = '1';
-      if (r.ok) {
+      if (r.ok && r.hodFieldCode) {
+        const safeCode = String(r.hodFieldCode).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        st.innerHTML = '✓ Site Supervisor authorized. EHS email sent to the configured EHS address.' +
+          '<div style="margin-top:10px;padding:12px;border:2px solid var(--accent);border-radius:10px;background:var(--surface);">' +
+          '<div style="font-weight:800;color:var(--accent);">FIELD AUTHORIZATION CODE: ' + safeCode + '</div>' +
+          '<div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Give this to the HoD in person when they arrive on site — they need it to approve. EHS does not see this code. Never send it by text or email. The HoD still cannot approve until EHS actually completes the gas test.</div>' +
+          '</div>';
+      } else if (r.ok) {
         st.textContent='✓ Site Supervisor authorized. EHS email sent to the configured EHS address.';
       } else if (r.action === 'ehs_test_email_failed') {
         // The only failure mode where authorization really was written first.
