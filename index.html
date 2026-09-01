@@ -495,9 +495,6 @@ main{max-width:1500px!important;margin:0 auto!important;padding:8px 20px 70px!im
  background:rgba(0,232,63,.025)!important;
  box-shadow:0 0 0 1px rgba(0,232,63,.04) inset!important;
 }
-.subtabbtn[data-sub="supervisor"],
-.subtabbtn[data-sub="ehsmanager"],
-.subtabbtn[data-sub="manager"]{font-size:18px!important;}
 /* Permit pane */
 .subpane{
  position:relative!important;
@@ -564,22 +561,41 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
  border:1px solid #2a6b40;border-radius:13px;padding:18px 20px;
 }
 .reference-title{
- display:flex;align-items:center;gap:10px;margin:0 0 16px;
+ display:flex;align-items:center;gap:10px;margin:0 0 20px;
  color:var(--accent);font-family:var(--font-d)!important;
- font-size:19px!important;font-weight:900!important;text-transform:uppercase!important;
+ font-size:22px!important;font-weight:900!important;text-transform:uppercase!important;
+ letter-spacing:.1px;
 }
-.reference-step{display:grid;grid-template-columns:36px 1fr;gap:12px;min-height:65px;position:relative;}
+.reference-title .workflow-badge{
+ margin-left:auto;display:inline-flex;align-items:center;justify-content:center;
+ padding:5px 11px;border:1px solid #315c47;border-radius:999px;
+ color:#b7c3bc;font-size:11px;font-weight:800;letter-spacing:.4px;
+}
+.reference-step{
+ display:grid;grid-template-columns:48px 1fr;gap:14px;
+ min-height:81px;position:relative;
+}
 .reference-step:not(:last-child):after{
- content:"";position:absolute;left:17px;top:36px;bottom:-2px;
+ content:"";position:absolute;left:22px;top:45px;bottom:-2px;
  border-left:2px dashed #66706c;
 }
 .reference-dot{
- width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
- background:#5b5d5e;color:#111;font-weight:900;font-size:16px;z-index:2;
+ width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+ background:#5b5d5e;color:#111;font-weight:900;font-size:18px;z-index:2;
 }
-.reference-step.current .reference-dot,.reference-step.done .reference-dot{background:var(--accent);}
-.reference-label{font-family:var(--font-d);font-size:16px;font-weight:900;line-height:1.2;}
-.reference-sub{font-size:14px;color:#cdd3cf;margin-top:5px;line-height:1.35;}
+.reference-step.current .reference-dot,.reference-step.done .reference-dot{
+ background:var(--accent);
+}
+.reference-step.current .reference-label,.reference-step.done .reference-label{
+ color:#f4f6f4;
+}
+.reference-label{
+ font-family:var(--font-d);font-size:18px;font-weight:900;line-height:1.2;
+ padding-top:2px;
+}
+.reference-sub{
+ font-size:15px;color:#cdd3cf;margin-top:6px;line-height:1.35;
+}
 .reference-action{
  width:100%;min-height:49px;border-radius:8px;margin-top:10px;
  font-family:var(--font-d);font-size:16px;font-weight:900;cursor:pointer;
@@ -866,9 +882,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
     <button class="subtabbtn" data-sub="hotwork">Hot Work / Confined / Silo</button>
     <button class="subtabbtn" data-sub="height">Working at Height</button>
     <button class="subtabbtn" data-sub="signed">Signed Permits</button>
-    <button class="subtabbtn" data-sub="supervisor">Supervisor</button>
-    <button class="subtabbtn" data-sub="ehsmanager">EHS Manager</button>
-    <button class="subtabbtn" data-sub="manager">Manager</button>
     <button class="subtabbtn" data-sub="admin">Admin</button>
   </div>
 
@@ -933,27 +946,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;out
     <div id="signedPermitList"></div>
   </div>
 
-
-  <div class="subpane hidden" id="sub-supervisor">
-    <div class="permittitle">Site Supervisor</div>
-    <p class="paneintro">Authorize submitted confined-space and working-at-height permits. Your authorization is the Department Authorization / first approval.</p>
-    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshSupervisorBtn">↻ Refresh</button></div>
-    <div id="supervisorQueue"></div>
-  </div>
-
-  <div class="subpane hidden" id="sub-ehsmanager">
-    <div class="permittitle">EHS Manager</div>
-    <p class="paneintro">Read-only status. Confined-space entry test data can only be entered through the secure link emailed to EHS for that specific permit — it cannot be recorded from this app.</p>
-    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshEhsManagerBtn">↻ Refresh</button></div>
-    <div id="ehsManagerQueue"></div>
-  </div>
-
-  <div class="subpane hidden" id="sub-manager">
-    <div class="permittitle">Manager</div>
-    <p class="paneintro">Review submitted permits and approval status. Manager access is read-only; HoD approval is handled through the emailed approval link.</p>
-    <div class="exec-actions"><button class="btn btn-ghost btn-sm" id="refreshManagerBtn">↻ Refresh</button></div>
-    <div id="managerQueue"></div>
-  </div>
 
   <div class="subpane hidden" id="sub-admin">
     <div id="adminAuthPanel" class="adminlock">
@@ -1442,66 +1434,64 @@ async function doSync(){
   }
 
   // Submit a permit safely.
-  // IMPORTANT: the presence of a browser-side Submission ID does NOT prove
-  // that the permit exists in Google Sheets. The backend is the source of truth.
-  // The backend "submit" action is idempotent: a matching ID updates the row;
-  // a missing ID creates a new row.
+  // The Apps Script backend is the source of truth.
+  // It treats "submit" idempotently: a new Submission ID creates a row,
+  // while an existing Submission ID updates that same row.
+  // This prevents a stale browser-side Submission ID from causing
+  // "Permit not found" when the EHS workflow is requested.
   async function submitFormToBackend(formKey){
     if(!syncUrl) return { ok:false, error:'Sync URL is not configured.' };
 
-    const flatteners = {
-      general: flattenGeneral,
-      hotwork: flattenHotwork,
-      height: flattenHeight
-    };
-
-    if(!flatteners[formKey]){
-      return { ok:false, error:'Unknown form type: '+formKey };
-    }
+    const flatteners = { general: flattenGeneral, hotwork: flattenHotwork, height: flattenHeight };
+    if(!flatteners[formKey]) return { ok:false, error:'Unknown form type: ' + formKey };
 
     const w = pd(formKey);
-
-    // Reuse the current permit's ID when one exists. The server will decide
-    // whether that ID already exists and will UPDATE or CREATE accordingly.
     let submissionId = String(w._submissionId || '').trim();
 
-    if(!submissionId){
-      submissionId =
-        formKey.toUpperCase() + '-' +
-        Date.now() + '-' +
-        Math.random().toString(36).slice(2,10);
+    // Generate an ID only when this permit has never had one.
+    // IMPORTANT: do not save the ID to localStorage until the server confirms
+    // that the permit was successfully written.
+    const generatedNewId = !submissionId;
+    if(generatedNewId){
+      submissionId = formKey.toUpperCase() + '-' + Date.now() + '-' + Math.random().toString(36).slice(2,10);
     }
 
     const data = flatteners[formKey]();
     data['Submission ID'] = submissionId;
 
+    // Always use "submit". The Apps Script backend decides whether to create
+    // or update based on the Submission ID. This is safer than using the mere
+    // presence of a browser-side ID to select "update".
     const result = await postToBackend({
       formType: formKey,
       action: 'submit',
-      submissionId: submissionId,
-      data: data
+      submissionId,
+      data
     });
 
-    // ONLY persist the ID locally after the server confirms the write.
     if(result && result.ok){
       const confirmedId = String(result.submissionId || submissionId).trim();
       w._submissionId = confirmedId;
 
       try{ saveState(); }catch(e){}
       try{
-        if(formKey === 'hotwork'){
-          localStorage.setItem('ghacem_last_hotwork', confirmedId);
-        }
+        localStorage.setItem('ghacem_last_' + formKey, confirmedId);
       }catch(e){}
 
       result.submissionId = confirmedId;
       return result;
     }
 
-    return result || {
-      ok:false,
-      error:'The server did not confirm that the permit was saved.'
-    };
+    // If this was a newly generated ID and the server did not confirm the save,
+    // do not leave that ID looking like a saved permit in browser state.
+    if(generatedNewId){
+      try{
+        delete w._submissionId;
+        saveState();
+      }catch(e){}
+    }
+
+    return result || { ok:false, error:'The server did not confirm that the permit was saved.' };
   }
 
   // ================= HISTORY: unflatten a saved record back into an editable form =================
@@ -3882,7 +3872,7 @@ BACKEND WORKFLOW CONTRACT
 
   document.querySelectorAll('.subtabbtn').forEach(btn => btn.addEventListener('click', () => {
     const sub = btn.dataset.sub;
-    if (['supervisor','ehsmanager','manager'].includes(sub)) setTimeout(renderWorkflowQueues, 0);
+    if (['admin'].includes(sub)) setTimeout(renderWorkflowQueues, 0);
   }));
   document.getElementById('refreshSupervisorBtn')?.addEventListener('click', refreshWorkflowQueues);
   document.getElementById('refreshEhsManagerBtn')?.addEventListener('click', refreshWorkflowQueues);
@@ -3970,9 +3960,10 @@ BACKEND WORKFLOW CONTRACT
     }
 
     try{
-      // CRITICAL FIX:
-      // Always save/verify the CURRENT permit before requesting EHS.
-      // Never assume that h._submissionId means a row exists in Sheets.
+      // ==========================================================
+      // STEP 1 — SAVE/CONFIRM THE PERMIT ON THE SERVER FIRST.
+      // Never assume that h._submissionId means the permit exists.
+      // ==========================================================
       if(st) st.textContent='Saving permit and verifying server record…';
 
       const saveResult=await submitFormToBackend('hotwork');
@@ -3985,7 +3976,7 @@ BACKEND WORKFLOW CONTRACT
         return;
       }
 
-      // Use ONLY the Submission ID returned by the server.
+      // Use ONLY the Submission ID confirmed by the backend.
       const id=String(saveResult.submissionId || '').trim();
 
       if(!id){
@@ -3996,6 +3987,9 @@ BACKEND WORKFLOW CONTRACT
       h._submissionId=id;
       try{ saveState(); }catch(e){}
 
+      // ==========================================================
+      // STEP 2 — SITE SUPERVISOR AUTHORIZATION + EHS REQUEST.
+      // ==========================================================
       if(st) st.textContent='Recording Site Supervisor authorization and notifying EHS…';
 
       const r=await workflowPost(
@@ -4012,8 +4006,7 @@ BACKEND WORKFLOW CONTRACT
         st.textContent='⚠ Site Supervisor authorization was recorded, BUT the EHS email was NOT sent. ' +
           (r.error||'Check the Apps Script deployment/email permissions.');
       }else{
-        st.textContent='❌ EHS notification failed. ' +
-          (r?.error||'Please try again.');
+        st.textContent='❌ EHS notification failed. ' + (r?.error||'Please try again.');
       }
 
       try{ await loadHistoryCache(); }catch(e){}
@@ -4023,7 +4016,7 @@ BACKEND WORKFLOW CONTRACT
 
     }catch(err){
       console.error('Confined-space EHS workflow error:',err);
-      if(st) st.textContent=err?.message || 'Unable to request EHS test.';
+      if(st) st.textContent='❌ Unable to complete EHS workflow. ' + (err?.message || 'Please check the server connection.');
     }
   });
 
@@ -4334,7 +4327,7 @@ Backend: GHACEM_Code_gs_Final_SiteSupervisor_Workflow.gs
     }
 
     const wf=getWorkflowState(key);
-    const steps = c.steps.filter(s => s[0]!=='ehs' || wf.confined);
+    const steps=c.steps.filter(s => s[0]!=='ehs' || wf.confined);
 
     const stepHtml=steps.map(function(s,i){
       const keyName=s[0];
@@ -4353,15 +4346,16 @@ Backend: GHACEM_Code_gs_Final_SiteSupervisor_Workflow.gs
 
         if(done){
           cls='done';
-          sub = keyName==='submitted' ? 'Permit has been submitted' :
-                keyName==='supervisor' ? 'Site Supervisor authorization completed' :
-                keyName==='ehs' ? 'EHS space test completed' :
-                keyName==='hod' ? 'HoD approval completed' :
-                'Permit is approved and active';
+          if(keyName==='submitted') sub='Permit has been submitted';
+          if(keyName==='supervisor') sub='Site Supervisor authorization completed';
+          if(keyName==='ehs') sub=wf.ehsReq ? 'EHS test completed' : 'EHS test not required';
+          if(keyName==='hod') sub='HoD approval completed';
+          if(keyName==='approved') sub='Permit is approved and active';
         }else if(requiredIndex===wf.index){
           cls='current';
+          if(keyName==='submitted') sub='Permit has been submitted';
           if(keyName==='supervisor') sub='Waiting for Site Supervisor approval';
-          if(keyName==='ehs') sub=wf.ehsReq ? 'EHS test requested — awaiting completion' : 'Waiting for EHS test request';
+          if(keyName==='ehs') sub='Waiting for EHS test completion';
           if(keyName==='hod') sub='Waiting for HoD approval';
           if(keyName==='approved') sub='Waiting for all required approvals';
         }
@@ -4388,12 +4382,9 @@ Backend: GHACEM_Code_gs_Final_SiteSupervisor_Workflow.gs
 
     side.innerHTML=
       '<div class="reference-card">'+
-        '<h3 class="reference-title"><span style="font-size:24px">⚙</span>PERMIT WORKFLOW</h3>'+
+        '<h3 class="reference-title"><span style="font-size:27px">⚙</span>PERMIT WORKFLOW<span class="workflow-badge">'+esc(status)+'</span></h3>'+
         stepHtml+
-        '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);">'+
-          '<strong>Status:</strong> '+esc(status)+
-          (lastUpdated ? ' · <strong>Updated:</strong> '+esc(lastUpdated) : '')+
-        '</div>'+
+        (lastUpdated ? '<div style="margin-top:2px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;color:var(--text-dim);"><strong>Updated:</strong> '+esc(lastUpdated)+'</div>' : '')+
         '<button type="button" class="reference-action neutral" data-ref-refresh="'+key+'" style="margin-top:10px;">↻ &nbsp; REFRESH STATUS</button>'+
       '</div>'+
       '<div class="reference-card"><h3 class="reference-title"><span style="font-size:24px">ϟ</span>ACTIONS</h3>'+
