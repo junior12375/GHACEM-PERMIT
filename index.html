@@ -2404,13 +2404,13 @@ async function doSync(){
   document.getElementById('submitBtn-hotwork').addEventListener('click', ()=> submitOne('hotwork'));
   document.getElementById('submitBtn-height').addEventListener('click', ()=> submitOne('height'));
 
-  const PUBLIC_SUBS = ['general','hotwork','height','signed','supervisor','ehsmanager','manager','admin'];
+  const PUBLIC_SUBS = ['general','hotwork','height','signed','admin'];
   document.querySelectorAll('.subtabs > .subtabbtn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.subtabs > .subtabbtn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       PUBLIC_SUBS.forEach(t=>{
-        document.getElementById('sub-'+t).classList.toggle('hidden', t!==btn.dataset.sub);
+        const pane=document.getElementById('sub-'+t); if(pane) pane.classList.toggle('hidden', t!==btn.dataset.sub);
       });
       if(btn.dataset.sub === 'signed') loadHistoryCache().then(()=> renderPermitList(signedType,'signed'));
       if(btn.dataset.sub === 'admin' && isAdminUnlocked) loadHistoryCache().then(renderCurrentAdminSub);
