@@ -282,8 +282,8 @@
   @media (prefers-reduced-motion: reduce){
     .chip, .subtabbtn, .btn, .ynopt, textarea, select, input, .sigrow, .subpane { transition:none !important; animation:none !important; }
   }
-  .historytypes{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
-  .histtypebtn{background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);font-family:var(--font-b);font-weight:600;font-size:11.5px;padding:8px 13px;border-radius:20px;cursor:pointer;transition:background-color .15s ease, border-color .15s ease, color .15s ease;}
+  .historytypes{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch;margin-bottom:14px;}
+  .histtypebtn{display:flex;align-items:center;justify-content:center;text-align:center;background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);font-family:var(--font-b);font-weight:600;font-size:11.5px;padding:8px 13px;border-radius:20px;cursor:pointer;transition:background-color .15s ease, border-color .15s ease, color .15s ease;}
   .histtypebtn:hover{border-color:var(--accent);color:var(--text);}
   .histtypebtn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
   .histtoolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
@@ -879,6 +879,44 @@ html[data-theme="light"]{
     .issue-datetime { display:grid !important; grid-template-columns:1fr !important; gap:10px !important; }
     .issue-datetime > div { width:100% !important; }
     .pc-section { width:100% !important; min-width:0 !important; }
+
+    /* Crew Log / Confined Space Test tables: stacked cards instead of a
+       horizontally-scrolling, tightly-packed table, so columns never
+       crowd/overlap on a phone screen. Selectors are prefixed with
+       .tablescroll to out-specificity the always-on ".tablescroll table"
+       (min-width:760px) rule above, which would otherwise still force
+       horizontal overflow here. */
+    .tablescroll { overflow-x:visible !important; overflow-y:visible !important; }
+    .scroll-hint { display:none !important; }
+    .tablescroll .testtable,
+    .tablescroll .testtable tr,
+    .tablescroll .testtable th,
+    .tablescroll .testtable td {
+      display:block !important; width:100% !important; min-width:0 !important; max-width:100% !important;
+    }
+    /* The header row is a plain <tr> of <th> cells (no <thead> wrapper) —
+       hide that first row rather than a <thead> element that doesn't exist. */
+    .tablescroll .testtable tr:first-child { display:none !important; }
+    .tablescroll .testtable tr {
+      margin-bottom:10px !important; border:1px solid var(--border) !important; border-radius:9px !important;
+      padding:4px 10px !important; background:var(--surface-2) !important;
+    }
+    .tablescroll .testtable td {
+      border:none !important; border-bottom:1px dashed var(--border) !important;
+      padding:9px 4px 9px 44% !important; position:relative !important; min-height:34px !important;
+      display:flex !important; align-items:center !important; white-space:normal !important;
+      font-size:12px !important; box-sizing:border-box !important;
+    }
+    .tablescroll .testtable td:last-child { border-bottom:none !important; }
+    .tablescroll .testtable td::before {
+      content:attr(data-label);
+      position:absolute; left:4px; top:9px; width:40%;
+      font-weight:700; font-size:9.5px; text-transform:uppercase;
+      letter-spacing:.03em; color:var(--text-dim); white-space:normal; line-height:1.25;
+    }
+    .tablescroll .testtable input,.tablescroll .testtable select {
+      width:100% !important; min-width:0 !important; box-sizing:border-box !important;
+    }
   }
 </style>
 
@@ -1324,13 +1362,17 @@ html[data-theme="light"]{
     else if(hasLocalStorage){ try{ localStorage.setItem('ghacem_public_portal_url', url); }catch(e){} }
   }
 
-  let currentTheme = '';
+  let currentTheme = 'light';
   async function loadTheme(){
     if(hasClaudeStorage){
-      try{ const r = await window.storage.get('ghacem_theme', false); currentTheme = r.value || ''; }catch(e){ currentTheme=''; }
+      try{
+        const r = await window.storage.get('ghacem_theme', false);
+        currentTheme = (r && typeof r.value === 'string') ? r.value : 'light';
+      }catch(e){ currentTheme = 'light'; } // no saved preference yet -> default to Light Mode
     } else if(hasLocalStorage){
-      currentTheme = localStorage.getItem('ghacem_theme') || '';
-    } else { currentTheme = ''; }
+      const stored = localStorage.getItem('ghacem_theme');
+      currentTheme = (stored === null) ? 'light' : stored; // null = never set -> default to Light Mode
+    } else { currentTheme = 'light'; }
   }
   function saveTheme(theme){
     currentTheme = theme;
@@ -1810,12 +1852,12 @@ async function doSync(){
   function crewLogRow(i){
     const r = pd('general').crewLog[i];
     return `<tr>
-      <td><input type="date" data-text="general|crewLog.${i}.date" value="${(r.date||'').replace(/"/g,'&quot;')}"></td>
-      <td><input type="text" data-text="general|crewLog.${i}.persons" value="${(r.persons||'').replace(/"/g,'&quot;')}"></td>
-      <td style="text-align:center;"><input type="checkbox" data-crewlog-sign="leader|${i}" ${r.sigLeader === true || r.sigLeader === 'Yes' ? 'checked' : ''} aria-label="Crew Leader signature confirmed"></td>
-      <td style="text-align:center;"><input type="checkbox" data-crewlog-sign="manager|${i}" ${r.sigMgr === true || r.sigMgr === 'Yes' ? 'checked' : ''} aria-label="Department Manager signature confirmed"></td>
-      <td><input type="time" data-text="general|crewLog.${i}.timeStart" value="${(r.timeStart||'').replace(/"/g,'&quot;')}"></td>
-      <td><input type="time" data-text="general|crewLog.${i}.timeStop" value="${(r.timeStop||'').replace(/"/g,'&quot;')}"></td>
+      <td data-label="Date"><input type="date" data-text="general|crewLog.${i}.date" value="${(r.date||'').replace(/"/g,'&quot;')}"></td>
+      <td data-label="No. of Persons"><input type="text" data-text="general|crewLog.${i}.persons" value="${(r.persons||'').replace(/"/g,'&quot;')}"></td>
+      <td data-label="Sig. of Leader" style="text-align:center;"><input type="checkbox" data-crewlog-sign="leader|${i}" ${r.sigLeader === true || r.sigLeader === 'Yes' ? 'checked' : ''} aria-label="Crew Leader signature confirmed"></td>
+      <td data-label="Sig. of Dept. Mgr." style="text-align:center;"><input type="checkbox" data-crewlog-sign="manager|${i}" ${r.sigMgr === true || r.sigMgr === 'Yes' ? 'checked' : ''} aria-label="Department Manager signature confirmed"></td>
+      <td data-label="Time to Start"><input type="time" data-text="general|crewLog.${i}.timeStart" value="${(r.timeStart||'').replace(/"/g,'&quot;')}"></td>
+      <td data-label="Time to Stop"><input type="time" data-text="general|crewLog.${i}.timeStop" value="${(r.timeStop||'').replace(/"/g,'&quot;')}"></td>
     </tr>`;
   }
 
@@ -1954,7 +1996,7 @@ async function doSync(){
           <tr><th>Date</th><th>No. of Persons Doing the Work</th><th>Signature of Leader</th><th>Signature of Dept. Mgr.</th><th>Time to Start Work</th><th>Time to Stop Work</th></tr>
           ${g.crewLog.map((r,i)=>crewLogRow(i)).join('')}
         </table></div>
-        <p style="font-size:10.5px;color:var(--text-dim);margin:4px 0 0;">Scroll sideways to see all columns on a small screen →</p>
+        <p class="scroll-hint" style="font-size:10.5px;color:var(--text-dim);margin:4px 0 0;">Scroll sideways to see all columns on a small screen →</p>
         <button class="btn btn-ghost" id="addCrewLogRow" type="button" style="margin-top:8px;">+ Add row</button>
       </div>
       <div class="pc-section">
@@ -1969,10 +2011,10 @@ async function doSync(){
   function testRow(label, pel, key){
     const t = pd('hotwork').testData[key];
     return `<tr>
-      <td>${label}</td><td>${pel}</td>
-      <td><input type="text" data-text="hotwork|testData.${key}.reading" value="${t.reading}"></td>
-      <td><input type="date" data-text="hotwork|testData.${key}.date" value="${t.date}"></td>
-      <td><input type="time" data-text="hotwork|testData.${key}.time" value="${t.time}"></td>
+      <td data-label="Substance Tested">${label}</td><td data-label="PEL">${pel}</td>
+      <td data-label="Reading"><input type="text" data-text="hotwork|testData.${key}.reading" value="${t.reading}"></td>
+      <td data-label="Date"><input type="date" data-text="hotwork|testData.${key}.date" value="${t.date}"></td>
+      <td data-label="Time"><input type="time" data-text="hotwork|testData.${key}.time" value="${t.time}"></td>
     </tr>`;
   }
 
